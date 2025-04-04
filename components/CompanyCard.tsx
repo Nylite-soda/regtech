@@ -52,7 +52,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4 flex-grow">
+          <div className="space-y-3 sm:space-y-4 flex-grow suppressHydrationWarning">
             <a
               href={company.website}
               target="_blank"

@@ -15,6 +15,7 @@ import {
   Receipt
 } from 'lucide-react';
 import Link from 'next/link';
+import { getItem } from '@/lib/utils';
 
 interface Plan {
   name: 'Basic' | 'Standard' | 'Premium';
@@ -142,7 +143,7 @@ export default function CheckoutPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <Link
-              href="/dashboard"
+              href={`/dashboard/user/${getItem('user')!.id}`}
               className="p-2 hover:bg-gray-100 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5" />

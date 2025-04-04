@@ -52,7 +52,7 @@ export default function DashboardPage() {
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                   <User className="w-5 h-5" />
                 </div>
-                <span className="font-medium">John Doe</span>
+                <span>{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).first_name : ""}</span>
               </div>
             </div>
           </div>

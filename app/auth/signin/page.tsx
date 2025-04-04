@@ -24,6 +24,9 @@ export default function SignIn() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",});
 
   useEffect(() => {
     if (searchParams.get("registered") === "true") {
@@ -38,30 +41,34 @@ export default function SignIn() {
     setFormErrors({});
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
 
-    // Validate form fields
-    const emailError = validateSignInEmail(email);
-    const passwordError = validateSignInPassword(password);
+    // // Validate form fields
+    // const emailError = validateSignInEmail(formData.email);
+    // const passwordError = validateSignInPassword(formData.password);
 
-    if (emailError || passwordError) {
-      setFormErrors({
-        ...(emailError && { email: emailError.message }),
-        ...(passwordError && { password: passwordError.message }),
-      });
-      setLoading(false);
-      return;
-    }
+    // if (emailError || passwordError) {
+    //   setFormErrors({
+    //     ...(emailError && { email: emailError.message }),
+    //     ...(passwordError && { password: passwordError.message }),
+    //   });
+    //   setLoading(false);
+    //   return;
+    // }
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: "/dashboard",
+      const response = await fetch("http://127.0.0.1:8000/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
+  
+      const result = await response.json();
+      console.log(result);
 
       if (result?.error) {
         if (result.error === "No user found with this email") {
@@ -71,9 +78,11 @@ export default function SignIn() {
         } else {
           setError(result.error);
         }
-      } else if (result?.ok) {
+      } else if (result.status === "success") {
+        localStorage.setItem("access_token", result.access_token);
+        localStorage.setItem("user", JSON.stringify(result.data.user));
         showToast(`Welcome back!`, "success");
-        router.push("/dashboard");
+        router.push("/dashboard/user/${result.user.id}");
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -109,6 +118,8 @@ export default function SignIn() {
                 name="email"
                 type="email"
                 required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Enter your email"
                 className={formErrors.email ? "border-red-500" : ""}
               />
@@ -125,6 +136,8 @@ export default function SignIn() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  value = {formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="Enter your password"
                   className={formErrors.password ? "border-red-500" : ""}
                 />

@@ -90,6 +90,8 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
 
+    console.log(formData.phone)
+
     // Validate all fields
     const validationErrors: Record<string, string> = {};
     
@@ -130,24 +132,32 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...formData,
-          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          subscription: formData.subscriptionPlan,
+          phone_number: formData.phone || null,
+          password: formData.password,
+          confirm_password: formData.confirmPassword,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
         }),
       });
-
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(result.error || "Failed to register");
       }
-
-      showToast("Registration successful! Please check your email to activate your account.", "success");
+  
+      // Save token (optional: for login persistence)
+      localStorage.setItem("access_token", result.access_token);
+      localStorage.setItem("user", JSON.stringify(result.data.user));
+      showToast("Registration successful!", "success");
       router.push("/auth/signin?registered=true");
     } catch (error) {
       showToast(error instanceof Error ? error.message : "Failed to register", "error");

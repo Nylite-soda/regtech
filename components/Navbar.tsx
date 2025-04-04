@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Menu } from "lucide-react";
+import { Menu, User } from "lucide-react";
+import { getItem } from "@/lib/utils";
 
 let navigationItems = [
   {
@@ -93,7 +94,20 @@ const Navbar = () => {
                 </Link>
             ))}
           </div>
-          <Link href="/auth/register"><Button className="hover:cursor-pointer">Register</Button></Link>
+            {getItem("user") ? (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
+              <User className="w-5 h-5" />
+              </div>
+              <span className="hidden md:block font-semibold">
+              {getItem("user")!.first_name}
+              </span>
+            </div>
+            ) : (
+            <Link href="/auth/register">
+              <Button className="hover:cursor-pointer">Register</Button>
+            </Link>
+            )}
         </div>
 
         <div className="md:hidden">
