@@ -1,3 +1,4 @@
+
 # Next.js Authentication System
 
 This project implements a comprehensive authentication system using NextAuth.js with multiple authentication providers:
@@ -119,3 +120,6 @@ pnpm dev
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+=======
+# regtech
+>>>>>>> 5529f316448bdcfa5100ed125ca85d0eff2483ab
