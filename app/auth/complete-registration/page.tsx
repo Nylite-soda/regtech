@@ -199,7 +199,7 @@ export default function CompleteRegistration() {
               <select
                 id="subscriptionPlan"
                 name="subscriptionPlan"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border-gray-500 border rounded-md"
                 value={formData.subscriptionPlan}
                 onChange={(e) => setFormData((prev) => ({ ...prev, subscriptionPlan: e.target.value }))}
               >

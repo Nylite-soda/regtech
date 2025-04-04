@@ -16,6 +16,7 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +41,11 @@ export default function ForgotPassword() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          // Include expiration time for the reset token (24 hours)
+          expirationHours: 24
+        }),
       });
 
       const data = await response.json();
@@ -50,6 +55,7 @@ export default function ForgotPassword() {
       }
 
       setSuccess("If an account exists with this email, you will receive password reset instructions.");
+      setEmailSent(true);
       showToast("Reset instructions sent to your email", "success");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to send reset email");
@@ -68,36 +74,43 @@ export default function ForgotPassword() {
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <p className="p-3 bg-red-100 text-red-600 rounded-md text-sm">{error}</p>
-            )}
-            {success && (
-              <p className="p-3 bg-green-100 text-green-600 rounded-md text-sm">{success}</p>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="Enter your email"
-              />
+          {error && (
+            <p className="p-3 bg-red-100 text-red-600 rounded-md text-sm mb-4">{error}</p>
+          )}
+          {success && (
+            <div className="p-3 bg-green-100 text-green-600 rounded-md text-sm mb-4">
+              {success}
+              <p className="mt-2">
+                The reset link will expire in 24 hours for security reasons.
+              </p>
             </div>
+          )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Sending..." : "Send Reset Instructions"}
-            </Button>
+          {!emailSent && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                />
+              </div>
 
-            <div className="text-center text-sm">
-              Remember your password?{" "}
-              <Link href="/auth/signin" className="text-blue-600 hover:text-blue-800">
-                Sign in here
-              </Link>
-            </div>
-          </form>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Sending..." : "Send Reset Instructions"}
+              </Button>
+            </form>
+          )}
+
+          <div className="text-center text-sm mt-4">
+            Remember your password?{" "}
+            <Link href="/auth/signin" className="text-blue-600 hover:text-blue-800">
+              Sign in here
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -82,9 +82,9 @@ const Navbar = () => {
               >
                   <span
                     className={
-                      "pb-1 hover:text-[#AD0000] hover:[text-shadow:_none] hover:border-b-2 hover:border-[#AD0000] " +
+                      "pb-1 hover:text-[#AD0000] hover:[text-shadow:_none] hover:border-b-2 !hover:border-[#AD0000] " +
                       (item.status === "active"
-                        ? "text-[#AD0000] border-[#AD0000] border-b-2"
+                        ? "text-[#AD0000]"
                         : "text-black")
                     }
                   >
@@ -95,14 +95,14 @@ const Navbar = () => {
             ))}
           </div>
             {getItem("user") ? (
-            <div className="flex items-center gap-2">
+            <Link href={`/dashboard/user/${getItem('user')!.id}`} className="flex items-center gap-2">
               <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
               <User className="w-5 h-5" />
               </div>
               <span className="hidden md:block font-semibold">
               {getItem("user")!.first_name}
               </span>
-            </div>
+            </Link>
             ) : (
             <Link href="/auth/register">
               <Button className="hover:cursor-pointer">Register</Button>

@@ -18,6 +18,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProfileForm from '@/components/ProfileForm';
 import SubscriptionManager from '@/components/SubscriptionManager';
+import { getItem } from '@/lib/utils'
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -48,12 +49,12 @@ export default function DashboardPage() {
                   <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                 )}
               </button>
-              <div className="flex items-center gap-2">
+              <Link href={`/dashboard/user/${getItem('user')!.id}`} className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                   <User className="w-5 h-5" />
                 </div>
-                <span>{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).first_name : ""}</span>
-              </div>
+                <span>{getItem('user') ? getItem('user')!.first_name : ""}</span>
+              </Link>
             </div>
           </div>
         </div>
@@ -61,7 +62,7 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -138,13 +139,13 @@ export default function DashboardPage() {
                   <FileText className="w-5 h-5" />
                   <span>Billing History</span>
                 </button>
-                <Link
+                {/* <Link
                   href="/checkout"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50"
                 >
                   <CreditCard className="w-5 h-5" />
                   <span>Subscription</span>
-                </Link>
+                </Link> */}
                 <Link
                   href="/search"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50"

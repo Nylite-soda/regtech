@@ -23,7 +23,7 @@ interface CompanyCardProps {
 export default function CompanyCard({ company }: CompanyCardProps) {
   return (
     <Link href={`/companies/${company.id}`} className="block h-full" suppressHydrationWarning>
-      <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 h-full flex flex-col">
+      <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-300 h-full flex flex-col">
         <div className="p-4 sm:p-6 flex flex-col flex-grow">
           <div className="flex items-start gap-3 sm:gap-4 mb-4">
             {/* Logo/Avatar Section */}

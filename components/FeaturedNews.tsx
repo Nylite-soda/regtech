@@ -61,11 +61,11 @@ const FeaturedNews = () => {
         {regTechNewsData.map((item) => (
           <Card
             key={item.id}
-            className="md:min-w-[385px] md:-top-5 md:h-[428px] border-none drop-shadow-xl border hover:scale-[1.01] transition"
+            className="md:min-w-[385px] md:-top-5 md:h-[428px] border-gray-300 drop-shadow-xl border hover:scale-[1.01] transition"
           >
             <CardContent className="p-6 flex flex-col gap-3.5">
               <img
-                className="w-full h-[200px] object-cover rounded-2xl border-2"
+                className="w-full h-[200px] object-cover rounded-2xl border-gray-300 border-2"
                 alt="News image"
                 src={item.image}
               />

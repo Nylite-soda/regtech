@@ -143,13 +143,13 @@ const HighlightedSection = () => {
         {companies.map((company) => (
           <Card
             key={company.id}
-            className="relative w-[325px] md:w-[630px] h-[400px] md:h-[380px] rounded-2xl flex-shrink-0 drop-shadow-lg border hover:scale-[1.01] transition"
+            className="relative w-[325px] md:w-[630px] h-[400px] md:h-[380px] rounded-2xl flex-shrink-0 drop-shadow-lg border border-gray-300 hover:scale-[1.01] transition"
           >
             <CardContent className=" relative flex flex-col h-full md:h-[380px] items-start gap-5 pt-[25px] md:pt-[42px] px-[30px] w-full">
               <div className="flex items-center gap-5 lg:gap-[70px] w-full">
                 <div className="flex items-center gap-3.5">
                   <img
-                    className="w-[95px] md:w-[120px] h-[95x] md:h-[120px] object-cover rounded-2xl border-2"
+                    className="w-[95px] md:w-[120px] h-[95x] md:h-[120px] object-cover rounded-2xl border-gray-300 border-2"
                     alt={`${company.name} logo`}
                     src={company.logo}
                   />

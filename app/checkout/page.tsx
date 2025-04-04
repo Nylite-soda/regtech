@@ -139,17 +139,9 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 pt-30">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-gray-300 border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/dashboard/user/${getItem('user')!.id}`}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
             <h1 className="text-2xl font-bold">Checkout</h1>
-          </div>
         </div>
       </div>
 

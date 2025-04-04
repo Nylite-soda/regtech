@@ -13,7 +13,7 @@ export function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="fixed top-4 left-4 p-2 hover:cursor-pointer rounded-full bg-white/80 hover:bg-[#AD0000] hover:text-white shadow-md transition-all duration-200 z-50"
+      className="hidden md:block fixed top-35 left-4 p-2 hover:cursor-pointer rounded-full bg-white hover:bg-[#AD0000] hover:text-white shadow-md transition-all duration-200 z-50"
       aria-label="Go back"
     >
       <ArrowLeft className="w-6 h-6" />

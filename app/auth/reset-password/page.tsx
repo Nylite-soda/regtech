@@ -117,6 +117,9 @@ export default function ResetPassword() {
               {formErrors.password && (
                 <p className="text-red-500 text-sm">{formErrors.password}</p>
               )}
+              <p className="text-sm text-gray-500">
+                Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.
+              </p>
             </div>
 
             <div className="space-y-2">
