@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "tsc scripts/run-migrations.ts && node scripts/run-migrations.js && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "migrate": "tsc scripts/run-migrations.ts && node scripts/run-migrations.js"
