@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { setItem, isBrowser } from "@/lib/utils";
-import { showToast } from "@/components/ui/toast";
+import { save } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast-context";
 
 export default function CompanyLogin() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -27,12 +28,10 @@ export default function CompanyLogin() {
 
   useEffect(() => {
     // Check if there's a success message in the URL (e.g., after registration)
-    if (isBrowser()) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const registered = urlParams.get("registered");
-      if (registered === "true") {
-        setSuccess("Registration successful! Please log in with your credentials.");
-      }
+    const urlParams = new URLSearchParams(window.location.search);
+    const registered = urlParams.get("registered");
+    if (registered === "true") {
+      setSuccess("Registration successful! Please log in with your credentials.");
     }
   }, []);
 
@@ -90,10 +89,8 @@ export default function CompanyLogin() {
       if (result.status === "error") {
         setError(result.message || "Invalid email or password");
       } else if (result.status === "success") {
-        if (isBrowser()) {
-          setItem("access_token", result.access_token);
-          setItem("company", result.data.company);
-        }
+        save("access_token", result.access_token);
+        save("company", result.data.company);
         showToast(`Welcome back!`, "success");
         router.push("/dashboard/company");
       }

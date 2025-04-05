@@ -127,7 +127,7 @@ export default function Register() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setLoading(false);
-      showToast("Please fix the errors in the form", "error");
+      showToast("An unexpected errror occurred. Please Try again!", "error");
       return;
     }
 
