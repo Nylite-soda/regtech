@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import CompanyCard from '@/components/CompanyCard';
+import { Button } from '@/components/ui/button';
 
 interface SearchFilters {
   location: string[];
@@ -89,12 +90,13 @@ function SearchContent() {
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">Filters</h2>
-                <button
+                <Button
                   onClick={() => setShowFilters(!showFilters)}
                   className="lg:hidden p-2 hover:bg-gray-50 rounded-lg"
+                  suppressHydrationWarning
                 >
                   <SlidersHorizontal className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
               <div className={`space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
@@ -118,6 +120,7 @@ function SearchContent() {
                             }
                           }}
                           className="rounded border-gray-300 text-[#AD0000] focus:ring-[#AD0000]"
+                          suppressHydrationWarning
                         />
                         <span className="text-sm text-gray-600">{location}</span>
                       </label>
@@ -145,6 +148,7 @@ function SearchContent() {
                             }
                           }}
                           className="rounded border-gray-300 text-[#AD0000] focus:ring-[#AD0000]"
+                          suppressHydrationWarning
                         />
                         <span className="text-sm text-gray-600">{size} employees</span>
                       </label>
@@ -172,6 +176,7 @@ function SearchContent() {
                             }
                           }}
                           className="rounded border-gray-300 text-[#AD0000] focus:ring-[#AD0000]"
+                          suppressHydrationWarning
                         />
                         <span className="text-sm text-gray-600">{service}</span>
                       </label>
@@ -195,6 +200,7 @@ function SearchContent() {
                           })
                         }
                         className="w-full rounded-lg border-gray-300 focus:ring-[#AD0000] focus:border-[#AD0000]"
+                        suppressHydrationWarning
                       />
                     </div>
                     <div>
@@ -209,6 +215,7 @@ function SearchContent() {
                           })
                         }
                         className="w-full rounded-lg border-gray-300 focus:ring-[#AD0000] focus:border-[#AD0000]"
+                        suppressHydrationWarning
                       />
                     </div>
                   </div>
@@ -223,6 +230,7 @@ function SearchContent() {
                       setFilters({ ...filters, sortBy: e.target.value as SearchFilters['sortBy'] })
                     }
                     className="w-full rounded-lg border-gray-300 focus:ring-[#AD0000] focus:border-[#AD0000]"
+                    suppressHydrationWarning
                   >
                     <option value="relevance">Relevance</option>
                     <option value="name">Company Name</option>
@@ -247,15 +255,17 @@ function SearchContent() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search companies by name or keyword..."
                     className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-[#AD0000] focus:border-[#AD0000]"
+                    suppressHydrationWarning
                   />
                 </div>
-                <button
+                <Button
                   onClick={handleSaveSearch}
                   className="px-4 py-2 bg-[#AD0000] text-white rounded-lg hover:bg-[#AD0000]/90 flex items-center gap-2"
+                  suppressHydrationWarning
                 >
                   <Bookmark className="w-5 h-5" />
                   Save Search
-                </button>
+                </Button>
               </div>
 
               {/* Active Filters */}
@@ -267,7 +277,7 @@ function SearchContent() {
                   >
                     <MapPin className="w-4 h-4" />
                     {location}
-                    <button
+                    <Button
                       onClick={() =>
                         setFilters({
                           ...filters,
@@ -275,9 +285,10 @@ function SearchContent() {
                         })
                       }
                       className="ml-1 hover:text-red-500"
+                      suppressHydrationWarning
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </span>
                 ))}
                 {/* Add similar spans for other active filters */}
@@ -285,7 +296,7 @@ function SearchContent() {
             </div>
 
             {/* Results */}
-            <div className="space-y-6">
+            <div className="space-y-6" suppressHydrationWarning>
               {companies.map((company) => (
                 <CompanyCard key={company.id} company={company} />
               ))}

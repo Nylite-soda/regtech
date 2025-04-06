@@ -23,6 +23,7 @@ export default function CompanyFilters({ filters, setFilters }: CompanyFiltersPr
           value={filters.location}
           onChange={(e) => setFilters({ ...filters, location: e.target.value })}
           className="appearance-none pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000] bg-white"
+          suppressHydrationWarning
         >
           <option value="">All Locations</option>
           {locations.map((location) => (
@@ -38,6 +39,7 @@ export default function CompanyFilters({ filters, setFilters }: CompanyFiltersPr
         value={filters.size}
         onChange={(e) => setFilters({ ...filters, size: e.target.value })}
         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000] bg-white"
+        suppressHydrationWarning
       >
         <option value="">All Sizes</option>
         {sizes.map((size) => (
@@ -51,6 +53,7 @@ export default function CompanyFilters({ filters, setFilters }: CompanyFiltersPr
         value={filters.service}
         onChange={(e) => setFilters({ ...filters, service: e.target.value })}
         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000] bg-white"
+        suppressHydrationWarning
       >
         <option value="">All Services</option>
         {services.map((service) => (

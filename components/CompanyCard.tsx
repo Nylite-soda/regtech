@@ -1,6 +1,7 @@
 import { Building2, Globe, Users, Target, Briefcase, Banknote } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Button } from './ui/button';
 
 interface Company {
   id: number;
@@ -53,18 +54,19 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           </div>
 
           <div className="space-y-3">
-            <button
+            <Button
+              variant="ghost"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.open(company.website, '_blank', 'noopener,noreferrer');
               }}
-              className="flex items-center text-gray-600 hover:text-[#AD0000] transition-colors text-sm sm:text-base"
+              className="flex items-center text-gray-600 hover:text-[#AD0000] transition-colors text-sm sm:text-base p-0 h-auto justify-start"
               suppressHydrationWarning
             >
               <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
               <span className="truncate">{company.website}</span>
-            </button>
+            </Button>
 
             <div className="flex items-center text-gray-600 text-sm sm:text-base">
               <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />

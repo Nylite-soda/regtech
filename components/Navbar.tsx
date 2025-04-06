@@ -65,9 +65,10 @@ const Navbar = () => {
     >
       <div className="flex w-full items-center justify-between rounded-full border border-black/20 py-3 px-5 md:px-10 backdrop-blur-lg">
         <Link href="/">
-          <button
+          <Button
             className="flex items-center gap-3 hover:cursor-pointer"
             onClick={() => changeStatus(navigationItems, "Home")}
+            suppressHydrationWarning
           >
             <Image
               src="/images/horizon-logo.png"
@@ -78,15 +79,16 @@ const Navbar = () => {
             <h2 className="font-semibold text-xl [text-shadow:_0_1px_0_rgb(235_235_235)]">
               Regtech Horizon
             </h2>
-          </button>
+          </Button>
         </Link>
 
         <div className="hidden gap-10 md:flex">
           {navigationItems.map((item) => (
             <Link key={item.href} href={item.href}>
-              <button
+              <Button
                 onClick={() => changeStatus(navigationItems, item.title)}
                 className="[text-shadow:_0_1px_0_rgb(235_235_235)] font-medium h-6"
+                suppressHydrationWarning
               >
                 <span
                   className={
@@ -98,7 +100,7 @@ const Navbar = () => {
                 >
                   {item.title}
                 </span>
-              </button>
+              </Button>
             </Link>
           ))}
         </div>
@@ -114,7 +116,7 @@ const Navbar = () => {
           </Link>
         ) : (
           <Link href="/auth/register">
-            <Button className="hover:cursor-pointer">Register</Button>
+            <Button className="hover:cursor-pointer" suppressHydrationWarning>Register</Button>
           </Link>
         )}
       </div>
@@ -124,6 +126,7 @@ const Navbar = () => {
           size="icon"
           className="hover:cursor-pointer bg-[#AD0000] hover:scale-[1.1]"
           onClick={() => setIsOpen(!isOpen)}
+          suppressHydrationWarning
         >
           <Menu className="size-4 transition" color="white" />
         </Button>
@@ -133,14 +136,15 @@ const Navbar = () => {
         <div className="relative -top-[35px] pt-[53.5px] w-full text-[#AD0000] flex flex-col items-center justify-center gap-3 px-5 py-3 md:hidden">
           {navigationItems.map((item) => (
             <Link key={item.href} href={item.href}>
-              <button
+              <Button
                 onClick={() => {
                   setIsOpen(!isOpen);
                 }}
                 className="py-1 [text-shadow:_0_1px_0_rgb(235_235_235)] text-lg w-full hover:bg-[#AD0000] hover:text-white text-center"
+                suppressHydrationWarning
               > 
                 {item.title}
-              </button>
+              </Button>
             </Link>
           ))}
         </div>

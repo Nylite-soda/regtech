@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import Link from "next/link"
 import React from "react";
+import { Button } from "./ui/button";
 
 export default function AccessDenied() {
   return (
@@ -32,12 +33,13 @@ export default function AccessDenied() {
         </div>
 
         <Link href="/">
-          <button
+          <Button
             onClick={() => (window.location.href = "/")}
             className="mt-4 px-6 py-2 text-white bg-black hover:bg-[#AD0000] hover:cursor-pointer rounded-md transition-all duration-300 ease-in-out"
+            suppressHydrationWarning
           >
             Go Back Home
-          </button>
+          </Button>
         </Link>
       </div>
     </div>
