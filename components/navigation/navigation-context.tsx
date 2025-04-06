@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 interface NavigationContextType {
@@ -32,6 +32,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
   }, [pathname, searchParams, startLoading, stopLoading]);
 
   return (
+  <Suspense>
     <NavigationContext.Provider 
       value={{ 
         isLoading, 
@@ -42,6 +43,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
     >
       {children}
     </NavigationContext.Provider>
+    </Suspense>
   );
 }
 

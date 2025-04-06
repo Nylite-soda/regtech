@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,7 @@ export default function ActivateAccount() {
   }, [searchParams, router, showToast]);
 
   return (
+    <Suspense>
     <div className="container mx-auto flex items-center justify-center min-h-screen py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -80,5 +81,6 @@ export default function ActivateAccount() {
         </CardContent>
       </Card>
     </div>
+    </Suspense>
   );
 } 
