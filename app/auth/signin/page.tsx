@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -103,6 +103,7 @@ export default function SignIn() {
   };
 
   return (
+  <Suspense>
     <div className="container mx-auto flex items-center justify-center min-h-screen py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -215,5 +216,6 @@ export default function SignIn() {
         </CardContent>
       </Card>
     </div>
+    </Suspense>
   );
 } 
