@@ -56,7 +56,10 @@ const Footer = () => {
           </div>
 
           <Link href="/companies">
-            <Button className="bg-white rounded-xl text-[#080808] hover:text-white hover:border hover:border-white">
+            <Button 
+              className="bg-white rounded-xl text-[#080808] hover:text-white hover:border hover:border-white"
+              suppressHydrationWarning
+            >
               <span className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-base">
                 List Your Company
               </span>
@@ -65,7 +68,7 @@ const Footer = () => {
         </div>
 
         {/* Footer Links */}
-        <div className="flex items-start gap-10 md:gap-0 w-full md:justify-between flex-wrap md:flex-nowrap">
+        <div className="flex flex-col w-full md:w-[60%] items-start gap-10">
           {/* Locations */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
             <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl md:text-2xl tracking-[0] leading-6 md:leading-8">
@@ -99,7 +102,7 @@ const Footer = () => {
           </div>
 
           {/* Resource Links */}
-          <div className="flex flex-col w-full md:w-[20%] items-start pb-10 gap-5">
+          <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
             <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl tracking-[0] leading-6">
               Resources
             </h3>
@@ -121,7 +124,7 @@ const Footer = () => {
       {/* Footer Bottom */}
       <div className="flex flex-col items-start gap-2 pt-5 w-full">
         <Separator className="w-full h-1 bg-white/20" />
-        <div className="flex items-center justify-between gap-5 w-full flex-wrap md:flex-nowrap py-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full gap-5">
           <div className="flex min-w-[70px] w-[20%] h-full items-center gap-2">
             <img
               className="w-[16.43px] h-[15px]"
