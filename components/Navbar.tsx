@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Menu, User } from "lucide-react";
 import { getItem } from "@/lib/utils";
@@ -36,6 +36,15 @@ let navigationItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [navItems, setNavItems] = useState(navigationItems);
+  const [user, setUser] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Use useEffect to handle client-side only operations
+  useEffect(() => {
+    setIsClient(true);
+    const userData = getItem("user");
+    setUser(userData);
+  }, []);
 
   function changeStatus(navItems: typeof navigationItems, item: string) {
     navigationItems = navItems.map((navItem) => ({
@@ -44,6 +53,7 @@ const Navbar = () => {
     }));
     setNavItems(navigationItems);
   }
+  
   return (
     <nav
       className={
@@ -53,7 +63,7 @@ const Navbar = () => {
           : "")
       }
     >
-      <div className="flex w-full items-center justify-between rounded-full border border-black/20 py-3 px-5 md:px-10 backdrop-blur-lg  ">
+      <div className="flex w-full items-center justify-between rounded-full border border-black/20 py-3 px-5 md:px-10 backdrop-blur-lg">
         <Link href="/">
           <button
             className="flex items-center gap-3 hover:cursor-pointer"
@@ -71,54 +81,52 @@ const Navbar = () => {
           </button>
         </Link>
 
-        <div className="hidden md:flex md:items-center md:gap-10">
-          <div className="hidden gap-10 md:flex">
-            {navigationItems.map((item) => (
-              <Link key={item.href} href={item.href}>
+        <div className="hidden gap-10 md:flex">
+          {navigationItems.map((item) => (
+            <Link key={item.href} href={item.href}>
               <button
-                
                 onClick={() => changeStatus(navigationItems, item.title)}
                 className="[text-shadow:_0_1px_0_rgb(235_235_235)] font-medium h-6"
               >
-                  <span
-                    className={
-                      "pb-1 hover:text-[#AD0000] hover:[text-shadow:_none] hover:border-b-2 !hover:border-[#AD0000] " +
-                      (item.status === "active"
-                        ? "text-[#AD0000]"
-                        : "text-black")
-                    }
-                  >
-                    {item.title}
-                  </span>
+                <span
+                  className={
+                    "pb-1 hover:text-[#AD0000] hover:[text-shadow:_none] hover:border-b-2 !hover:border-[#AD0000] " +
+                    (item.status === "active"
+                      ? "text-[#AD0000]"
+                      : "text-black")
+                  }
+                >
+                  {item.title}
+                </span>
               </button>
-                </Link>
-            ))}
-          </div>
-            {getItem("user") ? (
-            <Link href={`/dashboard/user/${getItem('user')!.id}`} className="flex items-center gap-2">
-              <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
+            </Link>
+          ))}
+        </div>
+        
+        {isClient && user ? (
+          <Link href={`/dashboard/user/${user.id}`} className="flex items-center gap-2">
+            <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
               <User className="w-5 h-5" />
-              </div>
-              <span className="hidden md:block font-semibold">
-              {getItem("user")!.first_name}
-              </span>
-            </Link>
-            ) : (
-            <Link href="/auth/register">
-              <Button className="hover:cursor-pointer">Register</Button>
-            </Link>
-            )}
-        </div>
+            </div>
+            <span className="hidden md:block font-semibold">
+              {user.first_name}
+            </span>
+          </Link>
+        ) : (
+          <Link href="/auth/register">
+            <Button className="hover:cursor-pointer">Register</Button>
+          </Link>
+        )}
+      </div>
 
-        <div className="md:hidden">
-          <Button
-            size="icon"
-            className="hover:cursor-pointer bg-[#AD0000] hover:scale-[1.1]"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <Menu className="size-4 transition" color="white" />
-          </Button>
-        </div>
+      <div className="md:hidden">
+        <Button
+          size="icon"
+          className="hover:cursor-pointer bg-[#AD0000] hover:scale-[1.1]"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Menu className="size-4 transition" color="white" />
+        </Button>
       </div>
 
       {isOpen && (

@@ -52,18 +52,19 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4 flex-grow suppressHydrationWarning">
-            <a
-              href={company.website}
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className="space-y-3">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(company.website, '_blank', 'noopener,noreferrer');
+              }}
               className="flex items-center text-gray-600 hover:text-[#AD0000] transition-colors text-sm sm:text-base"
-              onClick={(e) => e.stopPropagation()}
               suppressHydrationWarning
             >
               <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
               <span className="truncate">{company.website}</span>
-            </a>
+            </button>
 
             <div className="flex items-center text-gray-600 text-sm sm:text-base">
               <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
