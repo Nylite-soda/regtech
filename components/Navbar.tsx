@@ -130,7 +130,7 @@ const Navbar = () => {
                   setIsOpen(!isOpen);
                 }}
                 className="py-1 [text-shadow:_0_1px_0_rgb(235_235_235)] text-lg w-full hover:bg-[#AD0000] hover:text-white text-center"
-              >
+              > 
                 {item.title}
               </button>
             </Link>

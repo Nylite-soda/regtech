@@ -5,10 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export function save(name:string, item:any){
-  localStorage.setItem(name, JSON.stringify(item))
+  if (isBrowser) {
+    localStorage.setItem(name, JSON.stringify(item))
+  }
 }
 
 export function getItem(name:string){
-  return JSON.parse(localStorage.getItem(name)!)
+  if (isBrowser) {
+    const item = localStorage.getItem(name);
+    return item ? JSON.parse(item) : null;
+  }
+  return null;
 }

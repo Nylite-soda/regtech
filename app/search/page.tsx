@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { 
   Search, 
   MapPin, 
@@ -25,7 +25,8 @@ interface SearchFilters {
   sortBy: 'relevance' | 'name' | 'founded' | 'employees';
 }
 
-export default function AdvancedSearchPage() {
+// Main search component
+function SearchContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
@@ -284,7 +285,7 @@ export default function AdvancedSearchPage() {
             </div>
 
             {/* Results */}
-            <div className="space-y-6" suppressHydrationWarning>
+            <div className="space-y-6">
               {companies.map((company) => (
                 <CompanyCard key={company.id} company={company} />
               ))}
@@ -293,5 +294,26 @@ export default function AdvancedSearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading component
+function SearchLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50 pt-30 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#AD0000] mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading search...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main export with Suspense boundary
+export default function AdvancedSearchPage() {
+  return (
+    <Suspense fallback={<SearchLoading />}>
+      <SearchContent />
+    </Suspense>
   );
 } 
