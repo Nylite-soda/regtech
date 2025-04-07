@@ -128,7 +128,7 @@ export default function CompanyRegister() {
             Register Your Company
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Create a company account to access our platform
+            Create a company account on our platform
           </p>
         </div>
 

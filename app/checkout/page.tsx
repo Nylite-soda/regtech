@@ -139,8 +139,8 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 pt-30">
       {/* Header */}
-      <div className="bg-white border-gray-300 border-b">
-        <div className="container mx-auto px-4 py-6">
+      <div className="bg-white border-gray-300 border-b sticky top-[120px] z-1">
+        <div className="container mx-auto px-4 py-6 md:ml-15">
             <h1 className="text-2xl font-bold">Checkout</h1>
         </div>
       </div>

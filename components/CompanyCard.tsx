@@ -7,7 +7,7 @@ interface Company {
   id: number;
   name: string;
   website: string;
-  services: string[]; 
+  services: string[];
   lastFundingDate: string;
   acquisitions: number;
   employees: number;
@@ -53,7 +53,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 grid md:grid-cols-2">
             <button
               onClick={(e) => {
                 e.preventDefault();

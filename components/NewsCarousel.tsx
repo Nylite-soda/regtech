@@ -85,10 +85,10 @@ const NewsCarousel = () => {
             }`}
           >
             <div className="flex flex-col justify-center w-[90%] h-full">
-              <h2 className="md:text-2xl text-lg  font-bold md:leading-normal leading-5">
+              <h2 className="md:text-2xl text-lg font-bold md:leading-normal leading-5">
                 {item.title}
               </h2>
-              <p className="text-white mt-1 mb-2 md:mb-3 md:leading-normal leading-none">
+              <p className="text-white mt-2 mb-3 md:text-sm md:mb-3 md:leading-normal leading-none">
                 {item.summary}
               </p>
               <span className="text-gray-300 text-xs md:text-sm">

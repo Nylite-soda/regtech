@@ -16,7 +16,7 @@ const Hero = () => {
             Discover Africa’s Leading{" "}
             <span className="text-[#AD0000]">RegTech</span> Companies
           </h1>
-          <p className="px-6 text-lg text-rdms font-medium my-4">
+          <p className="px-6 text-lg text-rdms font-medium my-4 tracking-tight">
             Discover & Connect with Top RegTech Firms – Explore Insights, Trends
             & Growth Opportunities!
           </p>

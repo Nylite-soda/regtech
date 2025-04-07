@@ -169,7 +169,7 @@ export default function CompaniesPage() {
         </div>
 
         {/* Companies Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" suppressHydrationWarning>
+        <div className="grid gap-6" suppressHydrationWarning>
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}
