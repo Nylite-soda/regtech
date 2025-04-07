@@ -88,11 +88,11 @@ function SearchContent() {
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between lg:mb-6">
                 <h2 className="text-lg font-semibold">Filters</h2>
                 <Button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden p-2 hover:bg-gray-50 rounded-lg"
+                  className="lg:hidden p-2 hover:bg-[#AD0000] rounded-lg"
                   suppressHydrationWarning
                 >
                   <SlidersHorizontal className="w-5 h-5" />
@@ -273,22 +273,22 @@ function SearchContent() {
                 {filters.location.map((location) => (
                   <span
                     key={location}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-gray-100 text-sm"
                   >
                     <MapPin className="w-4 h-4" />
                     {location}
-                    <Button
+                    <button
                       onClick={() =>
                         setFilters({
                           ...filters,
                           location: filters.location.filter((l) => l !== location),
                         })
                       }
-                      className="ml-1 hover:text-red-500"
+                      className="ml-1 hover:bg-[#AD0000] hover:text-white p-1 rounded-full"
                       suppressHydrationWarning
                     >
                       <X className="w-4 h-4" />
-                    </Button>
+                    </button>
                   </span>
                 ))}
                 {/* Add similar spans for other active filters */}

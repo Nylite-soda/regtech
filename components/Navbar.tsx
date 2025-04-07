@@ -65,7 +65,7 @@ const Navbar = () => {
     >
       <div className="flex w-full items-center justify-between rounded-full border border-black/20 py-3 px-5 md:px-10 backdrop-blur-lg">
         <Link href="/">
-          <Button
+          <button
             className="flex items-center gap-3 hover:cursor-pointer"
             onClick={() => changeStatus(navigationItems, "Home")}
             suppressHydrationWarning
@@ -79,13 +79,14 @@ const Navbar = () => {
             <h2 className="font-semibold text-xl [text-shadow:_0_1px_0_rgb(235_235_235)]">
               Regtech Horizon
             </h2>
-          </Button>
+          </button>
         </Link>
 
+        <div className="hidden md:flex md:items-center md:gap-10">
         <div className="hidden gap-10 md:flex">
           {navigationItems.map((item) => (
             <Link key={item.href} href={item.href}>
-              <Button
+              <button
                 onClick={() => changeStatus(navigationItems, item.title)}
                 className="[text-shadow:_0_1px_0_rgb(235_235_235)] font-medium h-6"
                 suppressHydrationWarning
@@ -100,7 +101,7 @@ const Navbar = () => {
                 >
                   {item.title}
                 </span>
-              </Button>
+              </button>
             </Link>
           ))}
         </div>
@@ -130,6 +131,7 @@ const Navbar = () => {
         >
           <Menu className="size-4 transition" color="white" />
         </Button>
+      </div>
       </div>
 
       {isOpen && (

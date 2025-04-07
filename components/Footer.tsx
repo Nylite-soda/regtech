@@ -68,7 +68,7 @@ const Footer = () => {
         </div>
 
         {/* Footer Links */}
-        <div className="flex flex-col w-full md:w-[60%] items-start gap-10">
+        <div className="flex items-start gap-10 md:gap-0 w-full md:justify-between flex-wrap md:flex-nowrap">
           {/* Locations */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
             <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl md:text-2xl tracking-[0] leading-6 md:leading-8">
@@ -78,7 +78,7 @@ const Footer = () => {
               <a
                 key={index}
                 href="#"
-                className="[font-family:'Satoshi-Regular',Helvetica] font-normal text-white text-lg lg:text-xl tracking-[0] leading-5 md:leading-7"
+                className="footer-link"
               >
                 {link}
               </a>
@@ -87,14 +87,14 @@ const Footer = () => {
 
           {/* Company Links */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
-            <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl md:text-2xl tracking-[0] leading-6 md:leading-8">
+            <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl tracking-[0] leading-6 md:leading-8">
               Company
             </h3>
             {categories.map((link, index) => (
               <a
                 key={index}
                 href="#"
-                className="[font-family:'Satoshi-Regular',Helvetica] font-normal text-white text-lg lg:text-xl tracking-[0] leading-5 md:leading-7"
+                className="footer-link"
               >
                 {link}
               </a>
@@ -111,7 +111,7 @@ const Footer = () => {
                 <Link
                   key={link.text}
                   href={link.href}
-                  className="[font-family:'Satoshi-Regular',Helvetica] font-normal text-white text-base tracking-[0] leading-6 hover:text-[#AD0000]"
+                  className="footer-link"
                 >
                   {link.text}
                 </Link>

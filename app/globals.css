@@ -135,6 +135,9 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+  .footer-link{
+    @apply [font-family:'Satoshi-Regular',Helvetica] font-normal text-white text-base tracking-[0] leading-6 hover:text-[#AD0000]
+  }
 }
 
 @keyframes spin-slow {

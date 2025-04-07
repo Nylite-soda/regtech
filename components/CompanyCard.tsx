@@ -7,7 +7,7 @@ interface Company {
   id: number;
   name: string;
   website: string;
-  services: string[];
+  services: string[]; 
   lastFundingDate: string;
   acquisitions: number;
   employees: number;
@@ -54,8 +54,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           </div>
 
           <div className="space-y-3">
-            <Button
-              variant="ghost"
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -66,7 +65,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             >
               <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
               <span className="truncate">{company.website}</span>
-            </Button>
+            </button>
 
             <div className="flex items-center text-gray-600 text-sm sm:text-base">
               <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />

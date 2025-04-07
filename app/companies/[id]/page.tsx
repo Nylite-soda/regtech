@@ -144,7 +144,7 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-gray-50 pt-32">
       {/* Hero Section */}
       <div className="bg-[#AD0000] text-white py-16">
         <div className="container mx-auto px-4">
@@ -303,7 +303,7 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Ratings & Reviews</h2>
                   <Button
-                    className="text-[#AD0000] hover:bg-gray-50"
+                    className="hover:text-[#AD0000] hover:border-[#AD0000] border hover:bg-gray-50"
                     suppressHydrationWarning
                   >
                     Write a Review
@@ -430,7 +430,7 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
                         <span className="text-gray-600">{doc.name}</span>
                       </div>
                       <Button
-                        className="text-[#AD0000] hover:bg-gray-50"
+                        className="hover:bg-[#AD0000]"
                         suppressHydrationWarning
                       >
                         <Download className="w-4 h-4" />
