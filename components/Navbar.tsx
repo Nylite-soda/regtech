@@ -31,6 +31,12 @@ let navigationItems = [
     items: [],
     status: "",
   },
+  {
+    title: "Advanced Search",
+    href: "/search",
+    items: [],
+    status: "",
+  },
 ];
 
 const Navbar = () => {
@@ -57,9 +63,9 @@ const Navbar = () => {
   return (
     <nav
       className={
-        "fixed z-50 left-1/2 mt-7 flex flex-wrap md:!rounded-full md:flex-nowrap w-11/12 max-w-7xl -translate-x-1/2 items-center" +
+        "fixed z-50 left-1/2 mt-7 bg-white/70 md:backdrop-blur-xl backdrop-blur-lg flex flex-col flex-wrap rounded-full md:flex-nowrap w-11/12 max-w-7xl -translate-x-1/2 items-center" +
         (isOpen
-          ? " h-[235px] md:!h-auto rounded-t-[37px] md:backdrop-blur-xl md:border-none border border-black/20 backdrop-blur-lg  rounded-b-2xl "
+          ? "md:!h-auto rounded-t-[37px] md:border-none border border-black/20 pb-4 rounded-b-2xl "
           : "")
       }
     >
@@ -83,7 +89,7 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex md:items-center md:gap-10">
-        <div className="hidden gap-10 md:flex">
+        <div className="hidden gap-10 lg:flex">
           {navigationItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <button
@@ -107,25 +113,25 @@ const Navbar = () => {
         </div>
         
         {isClient && user ? (
-          <Link href={`/dashboard/user/${user.id}`} className="flex items-center gap-2">
+          <Link href={`/dashboard/user/${user.id}`} className="hidden md:flex items-center gap-2">
             <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
               <User className="w-5 h-5" />
             </div>
-            <span className="hidden md:block font-semibold">
+            <span className="font-semibold">
               {user.first_name}
             </span>
           </Link>
         ) : (
-          <Link href="/auth/register">
+          <Link href="/auth/register" className="hidden lg:flex">
             <Button className="hover:cursor-pointer" suppressHydrationWarning>Register</Button>
           </Link>
         )}
       </div>
 
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <Button
           size="icon"
-          className="hover:cursor-pointer bg-[#AD0000] hover:scale-[1.1]"
+          className="hover:cursor-pointer hover:bg-[#AD0000] hover:scale-[1.1]"
           onClick={() => setIsOpen(!isOpen)}
           suppressHydrationWarning
         >
@@ -135,20 +141,31 @@ const Navbar = () => {
       </div>
 
       {isOpen && (
-        <div className="relative -top-[35px] pt-[53.5px] w-full text-[#AD0000] flex flex-col items-center justify-center gap-3 px-5 py-3 md:hidden">
+        <div className="relative w-full text-[#AD0000] flex flex-col items-center justify-end gap-1 px-5 py-3 lg:hidden">
           {navigationItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button
+            <Link key={item.href} href={item.href}
+                className="py-2 [text-shadow:_0_1px_0_rgb(235_235_235)] text-lg w-full hover:bg-[#AD0000] hover:text-white text-center"
+                >
+              <button
                 onClick={() => {
                   setIsOpen(!isOpen);
-                }}
-                className="py-1 [text-shadow:_0_1px_0_rgb(235_235_235)] text-lg w-full hover:bg-[#AD0000] hover:text-white text-center"
-                suppressHydrationWarning
+                }}suppressHydrationWarning
               > 
                 {item.title}
-              </Button>
+              </button>
             </Link>
           ))}
+          {user ? (
+            <Link href={`/dashboard/user/${user.id}`} className="w-full flex justify-center items-center">
+            <Button className="hover:cursor-pointer bg-[#AD0000] w-[50%] h-[50px] mt-3 text-white" suppressHydrationWarning>Dashboard</Button>
+          </Link>
+          ):
+          (
+            <Link href="/auth/register" className="w-full flex justify-center items-center">
+            <Button className="hover:cursor-pointer w-[50%] h-[50px] mt-3" suppressHydrationWarning>Register</Button>
+          </Link>
+          )
+          }
         </div>
       )}
     </nav>

@@ -71,7 +71,7 @@ const Footer = () => {
         <div className="flex items-start gap-10 md:gap-0 w-full md:justify-between flex-wrap md:flex-nowrap">
           {/* Locations */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
-            <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl md:text-2xl tracking-[0] leading-6 md:leading-8">
+            <h3 className="footer-link-header">
               Locations
             </h3>
             {locations.map((link, index) => (
@@ -87,7 +87,7 @@ const Footer = () => {
 
           {/* Company Links */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
-            <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl tracking-[0] leading-6 md:leading-8">
+            <h3 className="footer-link-header">
               Company
             </h3>
             {categories.map((link, index) => (
@@ -103,7 +103,7 @@ const Footer = () => {
 
           {/* Resource Links */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
-            <h3 className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-white text-xl tracking-[0] leading-6">
+            <h3 className="footer-link-header">
               Resources
             </h3>
             <div className="flex flex-col items-start gap-3">
