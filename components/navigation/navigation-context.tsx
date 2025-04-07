@@ -12,7 +12,7 @@ interface NavigationContextType {
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
-export function NavigationProvider({ children }: { children: React.ReactNode }) {
+function NavigationProviderContent({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,7 +32,6 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
   }, [pathname, searchParams, startLoading, stopLoading]);
 
   return (
-  <Suspense>
     <NavigationContext.Provider 
       value={{ 
         isLoading, 
@@ -43,6 +42,15 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
     >
       {children}
     </NavigationContext.Provider>
+  );
+}
+
+export function NavigationProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <NavigationProviderContent>
+        {children}
+      </NavigationProviderContent>
     </Suspense>
   );
 }
