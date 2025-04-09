@@ -10,7 +10,8 @@ import {
   Star, 
   Bookmark,
   SlidersHorizontal,
-  X
+  X,
+  UsersIcon
 } from 'lucide-react';
 import CompanyCard from '@/components/CompanyCard';
 import { Button } from '@/components/ui/button';
@@ -529,6 +530,48 @@ function SearchContent() {
                         setFilters({
                           ...filters,
                           location: filters.location.filter((l) => l !== location),
+                        })
+                      }
+                      className="ml-1 hover:bg-[#AD0000] hover:text-white p-1 rounded-full"
+                      suppressHydrationWarning
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
+                ))}
+                {filters.companySize.map((size) => (
+                  <span
+                    key={size}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-gray-100 text-sm"
+                  >
+                    <UsersIcon className="w-4 h-4" />
+                    {size}
+                    <button
+                      onClick={() =>
+                        setFilters({
+                          ...filters,
+                          companySize: filters.companySize.filter((l) => l !== size),
+                        })
+                      }
+                      className="ml-1 hover:bg-[#AD0000] hover:text-white p-1 rounded-full"
+                      suppressHydrationWarning
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
+                ))}
+                {filters.serviceType.map((type) => (
+                  <span
+                    key={type}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-gray-100 text-sm"
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    {type}
+                    <button
+                      onClick={() =>
+                        setFilters({
+                          ...filters,
+                          serviceType: filters.serviceType.filter((l) => l !== type),
                         })
                       }
                       className="ml-1 hover:bg-[#AD0000] hover:text-white p-1 rounded-full"

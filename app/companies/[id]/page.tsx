@@ -23,6 +23,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CompanyProfile {
   id: number;
@@ -171,7 +172,7 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
             <div className="flex items-center gap-4 ml-auto">
               <Link
                 href="/search"
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg flex items-center gap-2"
+                className="hidden px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg md:flex items-center gap-2"
               >
                 <Search className="w-5 h-5" />
                 Search Companies
@@ -197,8 +198,8 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="flex space-x-8">
+        <div className="mb-4 md:mb-8">
+          <div className="border-b border-gray-200 hidden md:flex space-x-8">
             <button
               onClick={() => setActiveTab('overview')}
               className={`pb-4 px-1 border-b-2 font-medium text-sm ${
@@ -254,7 +255,23 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
             >
               Documents
             </button>
-          </nav>
+          </div>
+          <div className='md:hidden'>
+            <Select name="content" value={activeTab} onValueChange={(value) => setActiveTab(value)}>
+              <SelectTrigger className='w-full text-lg font-semibold py-5 text-[#AD0000]'>
+                <SelectValue placeholder="Overview" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="overview">Overview</SelectItem>
+                  <SelectItem value="services">Services</SelectItem>
+                  <SelectItem value="team">Team</SelectItem>
+                  <SelectItem value="investments">Investments</SelectItem>
+                  <SelectItem value="documents">Documents</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Tab Content */}
