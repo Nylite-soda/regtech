@@ -1,7 +1,9 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const locations = [
   "Nigeria Companies",
@@ -40,6 +42,29 @@ const resourceLinks = [
 ];
 
 const Footer = () => {
+  const router = useRouter();
+  const [companyData, setCompanyData] = useState("");
+
+  useEffect(() => {
+    const storedCompany = localStorage.getItem("access_token");
+    console.log(storedCompany);
+    if (storedCompany) {
+      try {
+        setCompanyData(storedCompany);
+      } catch (error) {
+        console.error("Error parsing company data:", error);
+      }
+    }
+  }, []);
+
+  const handleCompanyCreation = () => {
+    if (companyData) {
+      router.push("/auth/company/register");
+    } else {
+      router.push("/auth/register");
+    }
+  };
+
   return (
     <footer className="w-full bg-[#111111] flex flex-col items-start gap-5 mx-auto pt-10 px-6 md:px-10">
       <Separator className="w-full h-1 bg-white/20 mb-5" />
@@ -55,16 +80,15 @@ const Footer = () => {
             </p>
           </div>
 
-          <Link href="/companies">
-            <Button 
-              className="bg-white rounded-xl text-[#080808] hover:text-white hover:border hover:border-white"
-              suppressHydrationWarning
-            >
-              <span className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-base">
-                List Your Company
-              </span>
-            </Button>
-          </Link>
+          <Button 
+            onClick={handleCompanyCreation}
+            className="bg-white rounded-xl text-[#080808] hover:text-white hover:border hover:border-white"
+            suppressHydrationWarning
+          >
+            <span className="[font-family:'Satoshi-Bold',Helvetica] font-bold text-base">
+              {companyData ? "Create Company" : "Sign Up to Create Company"}
+            </span>
+          </Button>
         </div>
 
         {/* Footer Links */}
