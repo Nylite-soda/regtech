@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Building2, Globe, Mail, Phone, Link as LinkIcon } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 
 interface CompanyData {
   company_name: string;
@@ -35,7 +36,7 @@ export default function CompanyDashboard() {
   useEffect(() => {
     const storedData = localStorage.getItem("company");
     if (!storedData) {
-      router.push("/auth/company/login");
+      router.push("/auth/company-login");
       return;
     }
 
@@ -44,14 +45,14 @@ export default function CompanyDashboard() {
       setCompanyData(parsedData);
     } catch (error) {
       console.error("Error parsing company data:", error);
-      router.push("/auth/company/login");
+      router.push("/auth/company-login");
     }
   }, [router]);
 
   if (!companyData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <LoadingScreen />
       </div>
     );
   }

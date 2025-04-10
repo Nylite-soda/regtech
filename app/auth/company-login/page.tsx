@@ -95,7 +95,7 @@ export default function CompanyLogin() {
       if (result.status !== "success") {
         setError(result.message || "Invalid email or password");
       } else if (result.status === "success") {
-        localStorage.setItem("company", JSON.stringify(result.data));
+        save("company", JSON.stringify(result.data));
         save("access_token", result.access_token);
         showToast(`Welcome back!`, "success");
         router.push("/dashboard/company");

@@ -420,7 +420,7 @@ export default function Register() {
 
             <div className="text-center text-sm">
               Already have an account?{" "}
-              <Link href="/auth/signin" className="text-blue-600 hover:text-blue-800">
+              <Link href="/auth/signin" className="text-[#AD0000] hover:text-red-600">
                 Sign in here
               </Link>
             </div>

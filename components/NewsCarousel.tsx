@@ -70,7 +70,7 @@ const NewsCarousel = () => {
   };
 
   return (
-    <div className="w-full h-40 bg-black text-white flex flex-col self-center relative overflow-hidden">
+    <div className="w-full h-44 bg-black text-white flex flex-col self-center relative overflow-hidden">
       {/* News Content */}
       <div className="flex-grow relative overflow-hidden">
         {newsItems.map((item, index) => (
@@ -100,28 +100,30 @@ const NewsCarousel = () => {
       </div>
 
       {/* Control Buttons */}
-      <div className="absolute top-0 right-0 p-2 flex flex-col space-y-2">
-        <Button
-          onClick={handlePrevious}
-          size="icon"
-          className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
-        >
-          <ChevronUp />
-        </Button>
-        <Button
-          onClick={handleNext}
-          size="icon"
-          className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
-        >
-          <ChevronDown />
-        </Button>
-        <Button
-          onClick={togglePlayPause}
-          size="icon"
-          className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
-        >
-          {isPlaying ? <Pause /> : <Play />}
-        </Button>
+      <div className="absolute top-0 h-full right-0 p-2 flex justify-center items-center">
+        <div className="flex flex-col space-y-2">
+          <Button
+            onClick={handlePrevious}
+            size="icon"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+          >
+            <ChevronUp />
+          </Button>
+          <Button
+            onClick={handleNext}
+            size="icon"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+          >
+            <ChevronDown />
+          </Button>
+          <Button
+            onClick={togglePlayPause}
+            size="icon"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+          >
+            {isPlaying ? <Pause /> : <Play />}
+          </Button>
+        </div>
       </div>
 
       {/* Pagination */}
