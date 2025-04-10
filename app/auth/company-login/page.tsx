@@ -76,21 +76,27 @@ export default function CompanyLogin() {
     try {
       // This is a placeholder for the actual API call
       // Replace with your actual API integration
-      const response = await fetch("/api/company/login", {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        showToast("User not signed up", "error");
+        return;
+      }
+      const response = await fetch("http://127.0.0.1:8000/api/v1/company/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
       });
       
       const result = await response.json();
       
-      if (result.status === "error") {
+      if (result.status !== "success") {
         setError(result.message || "Invalid email or password");
       } else if (result.status === "success") {
+        localStorage.setItem("company", JSON.stringify(result.data));
         save("access_token", result.access_token);
-        save("company", result.data.company);
         showToast(`Welcome back!`, "success");
         router.push("/dashboard/company");
       }

@@ -32,7 +32,7 @@ export default function CompanyRegister() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
-    companyName: "",
+    companyName: "",  
     email: "",
     phone: "",
     password: "",
@@ -214,43 +214,75 @@ export default function CompanyRegister() {
     setLoading(true);
     setError(null);
     
-    if (!validateForm()) {
-      setLoading(false);
+    // if (!validateForm()) {
+    //   setLoading(false);
 
-      const errorFields = Object.keys(formErrors)
-      .map(key => key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'))
-      .join(', ');
+    //   const errorFields = Object.keys(formErrors)
+    //   .map(key => key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'))
+    //   .join(', ');
       
-      showToast(`Please fill in all required fields: ${errorFields}`, "error");
-      return;
-    }
+    //   showToast(`Please fill in all required fields: ${errorFields}`, "error");
+    //   return;
+    // }
     
-    const dataToSubmit = {
-      ...formData,
-      founder: formData.founder.filter(name => name.trim()),
-    };
+    // const dataToSubmit = {
+    //   ...formData,
+    //   founder: formData.founder.filter(name => name.trim()),
+    // };
 
     try {
-      // This is a placeholder for the actual API call
-      // Replace with your actual API integration
-      const response = await fetch("/api/company/register", {
+      // Get the access token from localStorage
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        showToast("User not signed up", "error");
+        return;
+      }
+
+      // Make the API request with the bearer token
+      const response = await fetch("http://127.0.0.1:8000/api/v1/company/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`
         },
-        body: JSON.stringify(dataToSubmit),
+        body: JSON.stringify(
+          {
+            company_type: formData.type,
+            company_name: formData.companyName,
+            company_email: formData.email,
+            company_phone: formData.phone,
+            company_website: formData.website,
+            company_size: formData.size,
+            year_founded: formData.yearFounded,
+            headquarters: formData.headquarters,
+            description: formData.description,
+            social_media: formData.social_media,
+            founder: formData.founder,
+            niche: formData.niche,
+            last_funding: formData.lastFunding,
+            logo: formData.logo,
+            company_password: formData.password,
+            founders: formData.founder
+          }
+        ),
       });
       
       const result = await response.json();
       
-      if (result.status === "error") {
-        setError(result.message || "Registration failed. Please try again.");
-      } else if (result.status === "success") {
+      if (!response.ok) {
+        throw new Error(result.error || result.message || "Registration failed");
+      }
+
+      if (result.status === "success") {
         showToast("Registration successful! Please log in.", "success");
         router.push("/auth/company-login?registered=true");
+      } else {
+        throw new Error(result.message || "Registration failed");
       }
     } catch (err) {
-      setError("An error occurred. Please try again later.");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred. Please try again later.";
+      setError(errorMessage);
+      showToast(errorMessage, "error");
       console.error(err);
     } finally {
       setLoading(false);
@@ -956,6 +988,7 @@ export default function CompanyRegister() {
             type="submit"
             className="mt-8 w-full"
             disabled={loading}
+            onClick={handleSubmit}
           >
             {loading ? "Registering..." : "Register Company"}
           </Button>

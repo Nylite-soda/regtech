@@ -155,7 +155,7 @@ export default function Register() {
       }
   
       // Save token (optional: for login persistence)
-      localStorage.setItem("access_token", result.access_token);
+      localStorage.setItem("access_token", result.data.access_token);
       localStorage.setItem("user", JSON.stringify(result.data.user));
       showToast("Registration successful!", "success");
       router.push("/auth/signin?registered=true");

@@ -41,22 +41,7 @@ export default function SignIn() {
     setFormErrors({});
     setLoading(true);
 
-
-    // // Validate form fields
-    // const emailError = validateSignInEmail(formData.email);
-    // const passwordError = validateSignInPassword(formData.password);
-
-    // if (emailError || passwordError) {
-    //   setFormErrors({
-    //     ...(emailError && { email: emailError.message }),
-    //     ...(passwordError && { password: passwordError.message }),
-    //   });
-    //   setLoading(false);
-    //   return;
-    // }
-
     try {
-      console.log(formData)
       const response = await fetch("http://127.0.0.1:8000/api/v1/auth/login", {
         method: "POST",
         headers: {
@@ -69,7 +54,6 @@ export default function SignIn() {
       });
   
       const result = await response.json();
-      console.log(result);
 
       if (result?.error) {
         if (result.error === "No user found with this email") {
@@ -80,10 +64,10 @@ export default function SignIn() {
           setError(result.error);
         }
       } else if (result.status === "success") {
-        localStorage.setItem("access_token", result.access_token);
+        localStorage.setItem("access_token", result.data.access_token);
         localStorage.setItem("user", JSON.stringify(result.data.user));
-        showToast(`Welcome back!`, "success");
-        router.push("/dashboard/user/${result.user.id}");
+        showToast(result.message || "Welcome back!", "success");
+        router.push(`/dashboard/user/${result.data.user.id}`);
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
