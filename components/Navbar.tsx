@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
-import { Briefcase, Menu, Moon, User } from "lucide-react";
-import { getItem } from "@/lib/utils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Briefcase, Menu, Moon, User, LogOut, Sun } from "lucide-react";
+import { getItem, logout } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { useTheme } from "@/lib/theme-provider";
 
 let navigationItems = [
   {
@@ -45,6 +47,8 @@ const Navbar = () => {
   const [navItems, setNavItems] = useState(navigationItems);
   const [user, setUser] = useState<any>(null);
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   // Use useEffect to handle client-side only operations
   useEffect(() => {
@@ -52,6 +56,18 @@ const Navbar = () => {
     const userData = getItem("user");
     setUser(userData);
   }, []);
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    router.push("/");
+  };
+
+  // Toggle dark mode
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   function changeStatus(navItems: typeof navigationItems, item: string) {
     navigationItems = navItems.map((navItem) => ({
@@ -64,13 +80,13 @@ const Navbar = () => {
   return (
     <nav
       className={
-        "fixed z-50 left-1/2 mt-7 bg-white/70 md:backdrop-blur-xl backdrop-blur-lg flex flex-col flex-wrap rounded-full md:flex-nowrap w-11/12 max-w-7xl -translate-x-1/2 items-center" +
+        "fixed z-50 left-1/2 mt-7 bg-white/70 dark:bg-gray-900/70 md:backdrop-blur-xl backdrop-blur-lg flex flex-col flex-wrap rounded-full md:flex-nowrap w-11/12 max-w-7xl -translate-x-1/2 items-center" +
         (isOpen
-          ? "md:!h-auto !bg-white rounded-t-[37px] md:border-none border border-black/20 pb-4 rounded-b-2xl "
+          ? "md:!h-auto !bg-white dark:!bg-gray-900 rounded-t-[37px] md:border-none border border-black/20 dark:border-white/20 pb-4 rounded-b-2xl "
           : "")
       }
     >
-      <div className="flex w-full items-center justify-between rounded-full border border-black/20 py-3 px-5 md:px-10 backdrop-blur-lg">
+      <div className="flex w-full items-center justify-between rounded-full border border-black/20 dark:border-white/20 py-3 px-5 md:px-10 backdrop-blur-lg">
         <Link href="/">
           <button
             className="flex items-center gap-3 hover:cursor-pointer"
@@ -83,7 +99,7 @@ const Navbar = () => {
               width={45}
               height={45}
             />
-            <h2 className="font-semibold text-xl [text-shadow:_0_1px_0_rgb(235_235_235)]">
+            <h2 className="font-semibold text-xl [text-shadow:_0_1px_0_rgb(235_235_235)] dark:text-white">
               Regtech Horizon
             </h2>
           </button>
@@ -103,7 +119,7 @@ const Navbar = () => {
                     "pb-1 hover:text-[#AD0000] hover:[text-shadow:_none] hover:border-b-2 !hover:border-[#AD0000] " +
                     (item.status === "active"
                       ? "text-[#AD0000]"
-                      : "text-black")
+                      : "text-black dark:text-white")
                   }
                 >
                   {item.title}
@@ -117,10 +133,10 @@ const Navbar = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="hidden lg:flex ">
                 <div className="items-center gap-2 hover:cursor-pointer">
-                  <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 border border-black dark:border-white rounded-full flex items-center justify-center">
                     <User className="w-5 h-5" />
                   </div>
-                  <span className="font-semibold">
+                  <span className="font-semibold dark:text-white">
                     {user.first_name}
                   </span>
                 </div>
@@ -134,14 +150,19 @@ const Navbar = () => {
                   </Link>
                   <DropdownMenuShortcut><Briefcase /></DropdownMenuShortcut>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Switch to Dark Mode
-                  <DropdownMenuShortcut><Moon /></DropdownMenuShortcut>
+                <DropdownMenuItem onClick={toggleTheme}>
+                  {theme === "light" ? "Dark Mode" : "Light Mode"}
+                  <DropdownMenuShortcut>{theme === "light" ? <Moon /> : <Sun />}</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href={`/dashboard/user/${user.id}`}><Button className="hover:cursor-pointer bg-[#AD0000] w-full text-white" suppressHydrationWarning>Dashboard</Button></Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                Logout
+                <DropdownMenuShortcut><LogOut /></DropdownMenuShortcut>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -190,6 +211,24 @@ const Navbar = () => {
           </Link>
           )
           }
+          
+          {user && (
+            <Button 
+              onClick={handleLogout} 
+              className="hover:cursor-pointer w-[50%] h-[50px] mt-3 bg-red-600 text-white" 
+              suppressHydrationWarning
+            >
+              Logout
+            </Button>
+          )}
+          
+          <Button 
+            onClick={toggleTheme} 
+            className="hover:cursor-pointer w-[50%] h-[50px] mt-3 bg-gray-800 text-white" 
+            suppressHydrationWarning
+          >
+            {theme === "light" ? "Dark Mode" : "Light Mode"}
+          </Button>
         </div>
       )}
     </nav>
