@@ -24,3 +24,12 @@ export function getItem(name:string){
 
 // API Base URL configuration
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || " https://583b-105-119-1-95.ngrok-free.app";
+
+// Logout function to remove user data from localStorage
+export function logout() {
+  if (isBrowser) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("company");
+  }
+}
