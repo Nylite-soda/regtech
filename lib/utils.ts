@@ -21,3 +21,6 @@ export function getItem(name:string){
   }
   return null;
 }
+
+// API Base URL configuration
+export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || " https://583b-105-119-1-95.ngrok-free.app";

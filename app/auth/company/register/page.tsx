@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "@mui/x-date-pickers/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BASE_URL } from "@/lib/utils";
 
 export default function CompanyRegister() {
   const router = useRouter();
@@ -50,6 +51,15 @@ export default function CompanyRegister() {
     logo: "",
     social_media: [] as {platform: string, url: string}[],
   });
+
+    useEffect(() => {
+      const storedData = localStorage.getItem("access_token")
+      if (!storedData) {
+        showToast("User not signed up", "error");
+        router.push("/auth/register");
+        return;
+      }
+    }, []);
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
@@ -239,7 +249,7 @@ export default function CompanyRegister() {
       }
 
       // Make the API request with the bearer token
-      const response = await fetch("http://127.0.0.1:8000/api/v1/company/register", {
+      const response = await fetch(`${BASE_URL}/api/v1/company/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

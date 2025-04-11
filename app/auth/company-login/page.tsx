@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { save } from "@/lib/utils";
+import { save, BASE_URL } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 
 export default function CompanyLogin() {
@@ -26,8 +26,15 @@ export default function CompanyLogin() {
     password: "",
   });
 
+
   useEffect(() => {
-    // Check if there's a success message in the URL (e.g., after registration)
+    // Check if there's a success message in th e URL (e.g., after registration)
+    const storedData = localStorage.getItem("user")
+    if (!storedData) {
+      showToast("User not signed up", "error");
+      router.push("/auth/register");
+      return;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     const registered = urlParams.get("registered");
     if (registered === "true") {
@@ -81,7 +88,7 @@ export default function CompanyLogin() {
         showToast("User not signed up", "error");
         return;
       }
-      const response = await fetch("http://127.0.0.1:8000/api/v1/company/login", {
+      const response = await fetch(`${BASE_URL}/api/v1/company/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +103,7 @@ export default function CompanyLogin() {
         setError(result.message || "Invalid email or password");
       } else if (result.status === "success") {
         localStorage.setItem("company", JSON.stringify(result.data));
-        save("access_token", result.access_token);
+        localStorage.setItem("access_token", result.access_token);  
         showToast(`Welcome back!`, "success");
         router.push("/dashboard/company");
       }

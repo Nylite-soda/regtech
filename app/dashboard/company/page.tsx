@@ -35,7 +35,7 @@ export default function CompanyDashboard() {
   useEffect(() => {
     const storedData = localStorage.getItem("company");
     if (!storedData) {
-      router.push("/auth/company/login");
+      router.push("/auth/company-login");
       return;
     }
 
@@ -44,7 +44,7 @@ export default function CompanyDashboard() {
       setCompanyData(parsedData);
     } catch (error) {
       console.error("Error parsing company data:", error);
-      router.push("/auth/company/login");
+      router.push("/auth/company-login");
     }
   }, [router]);
 

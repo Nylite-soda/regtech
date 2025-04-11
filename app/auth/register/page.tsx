@@ -23,6 +23,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { BASE_URL } from "@/lib/utils";
 
 export default function Register() {
   const router = useRouter();
@@ -132,7 +133,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/auth/register", {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
