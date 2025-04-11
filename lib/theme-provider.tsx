@@ -22,21 +22,35 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export function ThemeProvider({
   children,
   defaultTheme = "light",
   storageKey = "regtech-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  // Initialize theme state with defaultTheme
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+
+  // Load theme from localStorage after component mounts (client-side only)
+  useEffect(() => {
+    if (isBrowser) {
+      const savedTheme = localStorage.getItem(storageKey) as Theme;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      }
+    }
+  }, [storageKey]);
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem(storageKey, theme);
+    if (isBrowser) {
+      const root = window.document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+      localStorage.setItem(storageKey, theme);
+    }
   }, [theme, storageKey]);
 
   const value = {
