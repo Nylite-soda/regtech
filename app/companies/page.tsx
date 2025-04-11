@@ -4,7 +4,22 @@ import { useState } from 'react';
 import { Search, Filter, Building2, Globe, Users, Target, Briefcase, Banknote } from 'lucide-react';
 import CompanyCard from '@/components/CompanyCard';
 import CompanyFilters from '@/components/CompanyFilters';
+import { useEffect } from 'react';
+import { BASE_URL } from "@/lib/utils";
 
+interface Company {
+  id: number;
+  name: string;
+  website: string;
+  services: string;
+  lastFundingDate: string;
+  acquisitions: number;
+  employees: string;
+  niche: string;
+  type: string;
+  location: string;
+  logo: string;
+}
 export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -12,127 +27,140 @@ export default function CompaniesPage() {
     size: '',
     service: '',
   });
-
+  const [companies, setCompanies] = useState<Company[]>([]);
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      setCompanies(data);
+    };
+    fetchCompanies();
+  }, []);
   // Mock data - replace with actual data fetching
-  const companies = [
-    {
-      id: 1,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'Compliance', 'KYC'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
-    },
-    {
-      id: 2,
-      name: 'ComplianceTech Africa',
-      website: 'https://compliancetech.africa',
-      services: ['Compliance', 'Regulatory'],
-      lastFundingDate: '2023-11-20',
-      acquisitions: 1,
-      employees: 75,
-      niche: 'Compliance',
-      type: 'Private',
-      location: 'Nigeria',
-      // No logo provided, will show fallback icon
-    },
-    {
-      id: 3,
-      name: 'AML Shield',
-      website: 'https://amlshield.com',
-      services: ['AML', 'KYC'],
-      lastFundingDate: '2023-10-05',
-      acquisitions: 0,
-      employees: 200,
-      niche: 'AML',
-      type: 'Private',
-      location: 'Kenya',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
-    },
-    {
-      id: 4,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'Compliance', 'KYC'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
-    },
-    {
-      id: 5,
-      name: 'ComplianceTech Africa',
-      website: 'https://compliancetech.africa',
-      services: ['Compliance', 'Regulatory'],
-      lastFundingDate: '2023-11-20',
-      acquisitions: 1,
-      employees: 75,
-      niche: 'Compliance',
-      type: 'Private',
-      location: 'Nigeria',
-      // No logo provided, will show fallback icon
-    },
-    {
-      id: 6,
-      name: 'AML Shield',
-      website: 'https://amlshield.com',
-      services: ['AML', 'KYC'],
-      lastFundingDate: '2023-10-05',
-      acquisitions: 0,
-      employees: 200,
-      niche: 'AML',
-      type: 'Private',
-      location: 'Kenya',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
-    },
-    {
-      id: 7,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'Compliance', 'KYC'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
-    },
-    {
-      id: 8,
-      name: 'ComplianceTech Africa',
-      website: 'https://compliancetech.africa',
-      services: ['Compliance', 'Regulatory'],
-      lastFundingDate: '2023-11-20',
-      acquisitions: 1,
-      employees: 75,
-      niche: 'Compliance',
-      type: 'Private',
-      location: 'Nigeria',
-      // No logo provided, will show fallback icon
-    },
-    {
-      id: 9,
-      name: 'AML Shield',
-      website: 'https://amlshield.com',
-      services: ['AML', 'KYC'],
-      lastFundingDate: '2023-10-05',
-      acquisitions: 0,
-      employees: 200,
-      niche: 'AML',
-      type: 'Private',
-      location: 'Kenya',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
-    },
-  ];
+  // const companies = [
+  //   {
+  //     id: 1,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'Compliance', 'KYC'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'ComplianceTech Africa',
+  //     website: 'https://compliancetech.africa',
+  //     services: ['Compliance', 'Regulatory'],
+  //     lastFundingDate: '2023-11-20',
+  //     acquisitions: 1,
+  //     employees: 75,
+  //     niche: 'Compliance',
+  //     type: 'Private',
+  //     location: 'Nigeria',
+  //     // No logo provided, will show fallback icon
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'AML Shield',
+  //     website: 'https://amlshield.com',
+  //     services: ['AML', 'KYC'],
+  //     lastFundingDate: '2023-10-05',
+  //     acquisitions: 0,
+  //     employees: 200,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'Kenya',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'Compliance', 'KYC'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'ComplianceTech Africa',
+  //     website: 'https://compliancetech.africa',
+  //     services: ['Compliance', 'Regulatory'],
+  //     lastFundingDate: '2023-11-20',
+  //     acquisitions: 1,
+  //     employees: 75,
+  //     niche: 'Compliance',
+  //     type: 'Private',
+  //     location: 'Nigeria',
+  //     // No logo provided, will show fallback icon
+  //   },
+  //   {
+  //     id: 6,
+  //     name: 'AML Shield',
+  //     website: 'https://amlshield.com',
+  //     services: ['AML', 'KYC'],
+  //     lastFundingDate: '2023-10-05',
+  //     acquisitions: 0,
+  //     employees: 200,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'Kenya',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
+  //   },
+  //   {
+  //     id: 7,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'Compliance', 'KYC'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS', // Updated placeholder URL
+  //   },
+  //   {
+  //     id: 8,
+  //     name: 'ComplianceTech Africa',
+  //     website: 'https://compliancetech.africa',
+  //     services: ['Compliance', 'Regulatory'],
+  //     lastFundingDate: '2023-11-20',
+  //     acquisitions: 1,
+  //     employees: 75,
+  //     niche: 'Compliance',
+  //     type: 'Private',
+  //     location: 'Nigeria',
+  //     // No logo provided, will show fallback icon
+  //   },
+  //   {
+  //     id: 9,
+  //     name: 'AML Shield',
+  //     website: 'https://amlshield.com',
+  //     services: ['AML', 'KYC'],
+  //     lastFundingDate: '2023-10-05',
+  //     acquisitions: 0,
+  //     employees: 200,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'Kenya',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=AS', // Updated placeholder URL
+  //   },
+  // ];
 
   return (
     <div className="min-h-screen bg-white pt-32">

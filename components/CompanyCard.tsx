@@ -7,10 +7,10 @@ interface Company {
   id: number;
   name: string;
   website: string;
-  services: string[];
+  services: string;
   lastFundingDate: string;
   acquisitions: number;
-  employees: number;
+  employees: String;
   niche: string;
   type: string;
   location: string;
@@ -80,14 +80,11 @@ export default function CompanyCard({ company }: CompanyCardProps) {
             <div className="flex items-start text-gray-600 text-sm sm:text-base">
               <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-1" />
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {company.services.map((service, index) => (
                   <span
-                    key={index}
                     className="px-2 py-0.5 sm:py-1 text-xs sm:text-sm rounded-full bg-gray-100"
                   >
-                    {service}
+                    {company.services}
                   </span>
-                ))}
               </div>
             </div>
 
