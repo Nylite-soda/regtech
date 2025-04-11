@@ -24,6 +24,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getItem } from '@/lib/utils';
+
+const company = getItem("company");
 
 interface CompanyProfile {
   id: number;
@@ -152,10 +155,10 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-lg bg-white/10 flex items-center justify-center">
-                {mockCompany.logo ? (
+                {company.logo ? (
                   <Image
-                    src={mockCompany.logo}
-                    alt={`${mockCompany.name} logo`}
+                    src={company.logo}
+                    alt={`${company.name} logo`}
                     width={80}
                     height={80}
                     className="rounded-lg object-contain"
@@ -165,8 +168,8 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{mockCompany.name}</h1>
-                <p className="text-white/80">{mockCompany.location}</p>
+                <h1 className="text-2xl font-bold">{company.name}</h1>
+                <p className="text-white/80">{company.location}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 ml-auto">
@@ -295,21 +298,21 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
                     <Users className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-500">Employees</p>
-                      <p className="font-medium">{mockCompany.employees}</p>
+                      <p className="font-medium">{company.employees}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Target className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-500">Niche</p>
-                      <p className="font-medium">{mockCompany.niche}</p>
+                      <p className="font-medium">{company.niche}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Banknote className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-500">Last Funding</p>
-                      <p className="font-medium">{mockCompany.lastFundingDate}</p>
+                      <p className="font-medium">{company.lastFundingDate}</p>
                     </div>
                   </div>
                 </div>
@@ -377,7 +380,7 @@ export default function CompanyProfilePage({ params }: { params: { id: string } 
                       rel="noopener noreferrer"
                       className="text-[#AD0000] hover:underline"
                     >
-                      {mockCompany.website}
+                      {company.website}
                     </a>
                   </div>
                 </div>
