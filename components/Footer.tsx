@@ -47,7 +47,6 @@ const Footer = () => {
 
   useEffect(() => {
     const storedCompany = localStorage.getItem("access_token");
-    console.log(storedCompany);
     if (storedCompany) {
       try {
         setCompanyData(storedCompany);
@@ -61,7 +60,7 @@ const Footer = () => {
     if (companyData) {
       router.push("/auth/company/register");
     } else {
-      router.push("/auth/register");
+      router.push("/auth/signin");
     }
   };
 
@@ -112,7 +111,7 @@ const Footer = () => {
           {/* Company Links */}
           <div className="flex flex-col w-full md:w-[30%] items-start gap-4">
             <h3 className="footer-link-header">
-              Company
+              Niches
             </h3>
             {categories.map((link, index) => (
               <a

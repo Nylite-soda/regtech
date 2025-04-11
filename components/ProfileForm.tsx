@@ -4,21 +4,20 @@ import { useState } from 'react';
 import { User, Camera, Check, X } from 'lucide-react';
 import Image from 'next/image';
 
-interface ProfileData {
-  firstName: string;
-  lastName: string;
+type ProfileData = {
+  id: string,
+  subscription: string,
+  phone_number: number | null,
+  password: string,
+  confirm_password: string,
+  first_name: string,
+  last_name: string,
   email: string;
-  phone: string;
   profilePicture?: string;
 }
 
-export default function ProfileForm() {
-  const [profile, setProfile] = useState<ProfileData>({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1234567890',
-  });
+export default function ProfileForm(data: ProfileData) {
+  const [profile, setProfile] = useState<ProfileData>(data);
 
   const [changes, setChanges] = useState<Partial<ProfileData>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -79,8 +78,8 @@ export default function ProfileForm() {
             </label>
             <input
               type="text"
-              value={changes.firstName ?? profile.firstName}
-              onChange={(e) => handleChange('firstName', e.target.value)}
+              value={changes.first_name ?? profile.first_name}
+              onChange={(e) => handleChange('first_name', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000]"
             />
           </div>
@@ -90,8 +89,8 @@ export default function ProfileForm() {
             </label>
             <input
               type="text"
-              value={changes.lastName ?? profile.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
+              value={changes.last_name ?? profile.last_name}
+              onChange={(e) => handleChange('last_name', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000]"
             />
           </div>
@@ -118,8 +117,8 @@ export default function ProfileForm() {
           </label>
           <input
             type="tel"
-            value={changes.phone ?? profile.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            value={changes.phone_number?.toString() ?? profile.phone_number?.toString()}
+            onChange={(e) => handleChange('phone_number', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AD0000]"
           />
         </div>

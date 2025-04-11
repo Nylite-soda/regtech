@@ -3,8 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
-import { Menu, User } from "lucide-react";
+import { Briefcase, Menu, Moon, User } from "lucide-react";
 import { getItem } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 let navigationItems = [
   {
@@ -65,7 +66,7 @@ const Navbar = () => {
       className={
         "fixed z-50 left-1/2 mt-7 bg-white/70 md:backdrop-blur-xl backdrop-blur-lg flex flex-col flex-wrap rounded-full md:flex-nowrap w-11/12 max-w-7xl -translate-x-1/2 items-center" +
         (isOpen
-          ? "md:!h-auto rounded-t-[37px] md:border-none border border-black/20 pb-4 rounded-b-2xl "
+          ? "md:!h-auto !bg-white rounded-t-[37px] md:border-none border border-black/20 pb-4 rounded-b-2xl "
           : "")
       }
     >
@@ -113,14 +114,37 @@ const Navbar = () => {
         </div>
         
         {isClient && user ? (
-          <Link href={`/dashboard/user/${user.id}`} className="hidden md:flex items-center gap-2">
-            <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
-              <User className="w-5 h-5" />
-            </div>
-            <span className="font-semibold">
-              {user.first_name}
-            </span>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="hidden lg:flex ">
+                <div className="items-center gap-2 hover:cursor-pointer">
+                  <div className="w-8 h-8 border border-black rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <span className="font-semibold">
+                    {user.first_name}
+                  </span>
+                </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-56 hidden lg:flex ">
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Link href="/auth/company/register/" className="w-full">
+                    List a Company
+                  </Link>
+                  <DropdownMenuShortcut><Briefcase /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Switch to Dark Mode
+                  <DropdownMenuShortcut><Moon /></DropdownMenuShortcut>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href={`/dashboard/user/${user.id}`}><Button className="hover:cursor-pointer bg-[#AD0000] w-full text-white" suppressHydrationWarning>Dashboard</Button></Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         ) : (
           <Link href="/auth/register" className="hidden lg:flex">
             <Button className="hover:cursor-pointer" suppressHydrationWarning>Register</Button>

@@ -154,13 +154,13 @@ export default function SignIn() {
               </div>
               <Link
                 href="/auth/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-[#AD0000] hover:text-red-600"
               >
                 Forgot password?
               </Link>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full hover:bg-[#AD0000]" disabled={loading}>
               {loading ? "Signing in..." : "Sign in"}
             </Button>
 
@@ -193,7 +193,7 @@ export default function SignIn() {
 
             <p className="text-sm text-center">
               Don&apos;t have an account?{" "}
-              <Link href="/auth/register" className="text-blue-600 hover:text-blue-800">
+              <Link href="/auth/register" className="text-[#AD0000] hover:text-red-600">
                 Register here
               </Link>
             </p>

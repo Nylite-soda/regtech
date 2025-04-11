@@ -64,16 +64,8 @@ const companies = [
 const HighlightedSection = () => {
   return (
     <section className="flex flex-col w-full mx-auto mt-10 p-3 md:p-6 justify-center gap-5 max-w-7xl">
-      <div className="relative mx-5 md:mx-0">
-      <div className="relative w-full h-[40px] md:w-[350px] md:h-[60px] rounded-l-xl overflow-hidden">
-            <img
-              className="absolute top-0 left-0 w-[350px] h-full object-cover"
-              alt="Rectangle"
-              src="/images/rectangle-19.svg" />
-          <h2 className="absolute top-1/4 md:top-4 left-6 [font-family:'Satoshi-Medium',Helvetica] font-medium text-white text-xl md:text-2xl">
-            Highlighted Companies
-          </h2>
-        </div>
+      <div className="p-3 w-fit font-family:'Satoshi-Medium',Helvetica] rounded-tr-xl pr-8 bg-[#AD0000] font-medium text-white text-xl md:text-2xl">
+          Highlighted Companies
       </div>
       <div className="relative flex max-w-full  md:items-center items-end justify-between mx-5 md:mx-0">
         <div className="flex flex-col gap-3">
@@ -112,7 +104,7 @@ const HighlightedSection = () => {
           </div>
         </div>
 
-        <div className="flex gap-2 md:gap-5 absolute bottom-0 right-0">
+        <div className="flex gap-2 md:gap-5 absolute bottom-0 -right-2">
           <Button
             variant="outline"
             className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] bg-[#373737] rounded-[35px] rotate-180 p-0 border-none hover:bg-[#AD0000] hover:cursor-pointer"
