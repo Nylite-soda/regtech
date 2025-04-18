@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { save, BASE_URL } from "@/lib/utils";
+import { save, BASE_URL, getAndClearRedirectUrl } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 
 export default function CompanyLogin() {
@@ -81,8 +81,6 @@ export default function CompanyLogin() {
     }
     
     try {
-      // This is a placeholder for the actual API call
-      // Replace with your actual API integration
       const accessToken = localStorage.getItem('access_token');
       if (!accessToken) {
         showToast("User not signed up", "error");
@@ -105,7 +103,8 @@ export default function CompanyLogin() {
         localStorage.setItem("company", JSON.stringify(result.data));
         localStorage.setItem("access_token", result.access_token);  
         showToast(`Welcome back!`, "success");
-        router.push("/dashboard/company");
+        const redirectUrl = getAndClearRedirectUrl();
+        router.push(redirectUrl);
       }
     } catch (err) {
       setError("An error occurred. Please try again later.");
@@ -227,7 +226,7 @@ export default function CompanyLogin() {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full dark:bg-[#AD0000] dark:text-white dark:hover:bg-[#890000] dark:hover:text-white hover:cursor-pointer"
             disabled={loading}
           >
             {loading ? "Signing in..." : "Sign in"}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { 
   Search, 
   MapPin, 
@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import CompanyCard from '@/components/CompanyCard';
 import { Button } from '@/components/ui/button';
+import { BackButton } from "@/components/BackButton";
+import { BASE_URL } from '@/lib/utils';
 
 interface SearchFilters {
   location: string[];
@@ -25,6 +27,21 @@ interface SearchFilters {
     max: number;
   };
   sortBy: 'relevance' | 'name' | 'founded' | 'employees';
+}
+
+
+interface Company {
+  id: number;
+  name: string;
+  website: string;
+  services: string;
+  lastFundingDate: string;
+  acquisitions: number;
+  employees: string;
+  niche: string;
+  type: string;
+  location: string;
+  logo: string;
 }
 
 // Main search component
@@ -49,269 +66,296 @@ function SearchContent() {
   const serviceTypes = ['AML', 'KYC', 'Compliance', 'Risk Management', 'Regulatory Reporting'];
 
   // Mock companies data - replace with actual data fetching
-  const companies = [
-    {
-      id: 1,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 2,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 3,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 4,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 5,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 6,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 7,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 8,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 9,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 10,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 11,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 12,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 13,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 14,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 15,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 16,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 17,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 18,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 19,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    {
-      id: 20,
-      name: 'RegTech Solutions',
-      website: 'https://regtech.com',
-      services: ['AML', 'KYC', 'Compliance'],
-      lastFundingDate: '2023-12-15',
-      acquisitions: 3,
-      employees: 150,
-      niche: 'AML',
-      type: 'Private',
-      location: 'South Africa',
-      logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
-    },
-    // Add more mock companies here
-  ];
+  // const companies = [
+  //   {
+  //     id: 1,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 6,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 7,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 8,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 9,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 10,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 11,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 12,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 13,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 14,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 15,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 16,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 17,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 18,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 19,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   {
+  //     id: 20,
+  //     name: 'RegTech Solutions',
+  //     website: 'https://regtech.com',
+  //     services: ['AML', 'KYC', 'Compliance'],
+  //     lastFundingDate: '2023-12-15',
+  //     acquisitions: 3,
+  //     employees: 150,
+  //     niche: 'AML',
+  //     type: 'Private',
+  //     location: 'South Africa',
+  //     logo: 'https://placehold.co/128x128/AD0000/FFFFFF/png?text=RS',
+  //   },
+  //   // Add more mock companies here
+  // ];
+
+  const [companies, setCompanies] = useState<Company[]>([]);
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        // You can set an error state here if you want to show an error message to the user
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   const handleSaveSearch = () => {
     const searchString = `${searchQuery}${filters.location.length ? ` | Location: ${filters.location.join(', ')}` : ''}`;
@@ -324,7 +368,7 @@ function SearchContent() {
     <div className="min-h-screen bg-gray-50 pt-30">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6 md:ml-15">
+        <div className="container mx-auto px-4 py-6 md:pl-15">
           <h1 className="text-2xl font-bold text-gray-900">Advanced Search</h1>
           <p className="text-gray-600 mt-1">Find companies that match your criteria</p>
         </div>
@@ -332,6 +376,7 @@ function SearchContent() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        <BackButton href="/" />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
@@ -586,10 +631,31 @@ function SearchContent() {
             </div>
 
             {/* Results */}
-            <div className="space-y-6" suppressHydrationWarning>
-              {companies.map((company) => (
-                <CompanyCard key={company.id} company={company} />
-              ))}
+            <div className="bg-white rounded-lg shadow-sm" suppressHydrationWarning>
+              {/* Table Headers - Desktop Only */}
+              <div className="hidden md:grid md:grid-cols-[1fr_100px_1fr_1fr_1fr_60px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
+                <div className="text-left font-medium text-sm text-gray-700">Company</div>
+                <div className="text-center font-medium text-sm text-gray-700">Niche</div>
+                <div className="text-center font-medium text-sm text-gray-700">Services</div>
+                <div className="text-center font-medium text-sm text-gray-700">Size</div>
+                <div className="font-medium text-sm text-gray-700">Website</div>
+                <div></div>
+              </div>
+              {/* Company Cards */}
+              <div className="md:divide-y md:divide-gray-200">
+                <div className="grid grid-cols-1 gap-4 p-4 md:block md:p-0">
+                  {companies.map((company) => (
+                    <CompanyCard 
+                      key={company.id} 
+                      company={{
+                        ...company,
+                        services: company.services,
+                        employees: company.employees.toString()
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

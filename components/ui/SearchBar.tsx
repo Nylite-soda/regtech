@@ -1,27 +1,115 @@
-import { Search } from "lucide-react";
-import React from "react";
+"use client";
 
-const SearchBar = () => {
+import { Search, X } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface SearchBarProps {
+  onSearch?: (query: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+const SearchBar = ({ onSearch, placeholder = "Search companies...", className = "" }: SearchBarProps) => {
+  const [query, setQuery] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch?.(query);
+  };
+
+  const clearSearch = () => {
+    setQuery("");
+    onSearch?.("");
+    inputRef.current?.focus();
+  };
+
   return (
-    <div className="my-5 w-[100%] md:w-[80%]">
-      <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-        <input
-          type="search"
-          className="relative m-0 -mr-0.5 block w-[1px] min-w-0 flex-auto rounded-tl-4xl rounded-bl-4xl border border-solid border-neutral-500 bg-transparent bg-clip-padding px-5 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
-          placeholder="Search"
-          aria-label="Search"
-          aria-describedby="button-addon1"
-        />
-
-        <button
-          className="relative z-[2] flex items-center rounded-r bg-primary px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-primary-700 hover:shadow-lg focus:bg-primary-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primary-800 active:shadow-lg"
-          type="button"
-          id="button-addon1"
+    <motion.div 
+      className={`relative w-full max-w-5xl ${className}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <form onSubmit={handleSearch} className="w-full">
+        <div 
+          className={`
+            relative flex items-center w-full 
+            bg-background/95 dark:bg-card/95 backdrop-blur-xl
+            rounded-2xl 
+            transition-all duration-300 
+            ${isFocused ? 'ring-1 ring-white/80 shadow-lg dark:shadow-black/30' : 'shadow-sm hover:shadow-md dark:hover:shadow-black/20'} 
+            border border-border/20 dark:border-border/10
+            group
+          `}
         >
-          <Search />
-        </button>
-      </div>
-    </div>
+          <div className="absolute left-4 text-muted-foreground/60 group-hover:text-foreground/80 transition-colors duration-300">
+            <Search className="w-5 h-5" />
+          </div>
+          
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="
+              w-full pl-12 pr-12 py-4 
+              bg-transparent 
+              text-foreground/90 placeholder:text-muted-foreground/50
+              focus:outline-none focus:ring-0 
+              transition-all duration-300 
+              text-base
+              group-hover:placeholder:text-muted-foreground/70
+            "
+            placeholder={placeholder}
+          />
+
+          <AnimatePresence>
+            {query && (
+              <motion.button
+                type="button"
+                onClick={clearSearch}
+                className="
+                  absolute right-4 
+                  p-1.5 
+                  text-muted-foreground/50 hover:text-foreground/80
+                  hover:bg-accent/50 dark:hover:bg-accent/20
+                  rounded-full 
+                  transition-all duration-300
+                "
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X className="w-4 h-4" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+      </form>
+
+      {/* Search suggestions dropdown - can be implemented later */}
+      {/* {isFocused && query && (
+        <div className="absolute w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="p-2">
+            <div className="text-sm text-gray-500 dark:text-gray-400">Recent searches</div>
+            <div className="mt-2 space-y-1">
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm">
+                AML Compliance
+              </button>
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-sm">
+                KYC Solutions
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
+    </motion.div>
   );
 };
 

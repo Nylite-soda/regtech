@@ -23,84 +23,105 @@ interface CompanyCardProps {
 }
 
 export default function CompanyCard({ company }: CompanyCardProps) {
-  return (
-    <Link href={`/companies/${company.id}`} className="block h-full" suppressHydrationWarning>
-      <button 
-              onClick={(e) => {
-                save("company", company)
-              }}>
-        <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-300 h-full flex flex-col">
-          <div className="p-4 sm:p-6 flex flex-col flex-grow">
-            <div className="flex items-start gap-3 sm:gap-4 mb-4">
-              {/* Logo/Avatar Section */}
-              <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gray-100 flex items-center justify-center">
-                {company.logo ? (
-                  <Image
-                    src={company.logo}
-                    alt={`${company.name} logo`}
-                    width={64}
-                    height={64}
-                    className="rounded-lg object-contain"
-                  />
-                ) : (
-                  <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                )}
-              </div>
-              {/* Company Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate hover:text-[#AD0000] transition-colors">
-                  {company.name}
-                </h3>
-                <span className="px-2 py-1 text-xs sm:text-sm rounded-full bg-[#AD0000] text-white inline-block mt-1">
-                  {company.type}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-3 grid md:grid-cols-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.open(company.website, '_blank', 'noopener,noreferrer');
-                }}
-                className="flex items-center text-gray-600 hover:text-[#AD0000] transition-colors text-sm sm:text-base p-0 h-auto justify-start"
-                suppressHydrationWarning
-              >
-                <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span className="truncate">{company.website}</span>
-              </button>
-              <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span className="truncate">{company.niche}</span>
-              </div>
-              <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span>{company.employees} employees</span>
-              </div>
-              <div className="flex items-start text-gray-600 text-sm sm:text-base">
-                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-1" />
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    <span
-                      className="px-2 py-0.5 sm:py-1 text-xs sm:text-sm rounded-full bg-gray-100"
-                    >
-                      {company.services}
-                    </span>
-                </div>
-              </div>
-              <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                <Banknote className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                <span>Last funding: {company.lastFundingDate}</span>
-              </div>
-              {company.acquisitions > 0 && (
-                <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                  <Building2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
-                  <span>{company.acquisitions} acquisitions</span>
-                </div>
-              )}
-            </div>
+  const handleWebsiteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(company.website, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCardClick = () => {
+    save("company", company);
+  };
+
+  // Mobile/Tablet Card View
+  const CardView = () => (
+    <div className="md:hidden bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
+      <div className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 flex-shrink-0 rounded-full overflow-hidden bg-gray-50 flex items-center justify-center">
+            {company.logo ? (
+              <Image 
+                src={company.logo} 
+                alt={company.name} 
+                width={48} 
+                height={48} 
+                className="object-contain p-1.5" 
+              />
+            ) : (
+              <Building2 className="h-6 w-6 text-gray-400" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-gray-900 truncate">
+              {company.name}
+            </h3>
           </div>
         </div>
-      </button>
+        
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex items-center text-sm text-gray-600">
+            <Globe className="h-4 w-4 mr-2.5 text-gray-400 flex-shrink-0" />
+            <span className="truncate">{company.website}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <Users className="h-4 w-4 mr-2.5 text-gray-400 flex-shrink-0" />
+            <span>{company.employees} employees</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <Target className="h-4 w-4 mr-2.5 text-gray-400 flex-shrink-0" />
+            <span>{company.niche}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <Briefcase className="h-4 w-4 mr-2.5 text-gray-400 flex-shrink-0" />
+            <span className="truncate">{company.services}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Desktop Table View
+  const TableView = () => (
+    <div className="hidden md:grid md:grid-cols-[1fr_100px_1fr_1fr_1fr_60px] items-center px-5 py-3 bg-white">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="h-10 w-10 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center">
+          {company.logo ? (
+            <Image 
+              src={company.logo} 
+              alt={company.name} 
+              width={40} 
+              height={40} 
+              className="object-contain rounded-lg p-1" 
+            />
+          ) : (
+            <Building2 className="h-5 w-5 text-gray-400" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <h3 className="font-medium text-sm text-gray-900 flex flex-wrap">
+            {company.name}
+          </h3>
+        </div>
+      </div>
+      <div className="text-center truncate text-sm text-gray-600">{company.niche}</div>
+      <div className="text-center truncate text-sm text-gray-600">{company.services}</div>
+      <div className="text-center text-sm text-gray-600">{company.employees} employees</div>
+      <div className="truncate text-sm text-gray-600">{company.website}</div>
+      <div className="text-right">
+        <span className="text-sm font-medium text-[#AD0000]">View →</span>
+      </div>
+    </div>
+  );
+
+  return (
+    <Link 
+      href={`/companies/${company.id}`} 
+      className="block border-b border-gray-200 last:border-0 hover:bg-gray-50 transition-colors" 
+      onClick={handleCardClick}
+      suppressHydrationWarning
+    >
+      <CardView />
+      <TableView />
     </Link>
   );
 } 

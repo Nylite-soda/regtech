@@ -56,7 +56,7 @@ export default function CompanyRegister() {
       const storedData = localStorage.getItem("access_token")
       if (!storedData) {
         showToast("User not signed up", "error");
-        router.push("/auth/register");
+        router.push("/auth/signin");
         return;
       }
     }, []);
@@ -996,7 +996,7 @@ export default function CompanyRegister() {
 
           <Button
             type="submit"
-            className="mt-8 w-full"
+            className="mt-8 w-full dark:bg-[#AD0000] dark:text-white dark:hover:bg-[#890000] dark:hover:text-white hover:cursor-pointer"
             disabled={loading}
             onClick={handleSubmit}
           >

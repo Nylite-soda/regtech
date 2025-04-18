@@ -31,27 +31,25 @@ export function ThemeProvider({
   storageKey = "regtech-theme",
   ...props
 }: ThemeProviderProps) {
-  // Initialize theme state with defaultTheme
+  const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
-  // Load theme from localStorage after component mounts (client-side only)
   useEffect(() => {
-    if (isBrowser) {
-      const savedTheme = localStorage.getItem(storageKey) as Theme;
-      if (savedTheme) {
-        setTheme(savedTheme);
-      }
+    setMounted(true);
+    const savedTheme = localStorage.getItem(storageKey) as Theme;
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (isBrowser) {
+    if (mounted) {
       const root = window.document.documentElement;
       root.classList.remove("light", "dark");
       root.classList.add(theme);
       localStorage.setItem(storageKey, theme);
     }
-  }, [theme, storageKey]);
+  }, [theme, storageKey, mounted]);
 
   const value = {
     theme,
@@ -59,6 +57,10 @@ export function ThemeProvider({
       setTheme(theme);
     },
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

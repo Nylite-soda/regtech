@@ -13,7 +13,7 @@ import { validateSignInEmail, validateSignInPassword } from "@/lib/validation";
 import { useToast } from "@/components/ui/toast-context";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, getAndClearRedirectUrl } from "@/lib/utils";
 
 export default function SignIn() {
   const router = useRouter();
@@ -68,7 +68,8 @@ export default function SignIn() {
         localStorage.setItem("access_token", result.data.access_token);
         localStorage.setItem("user", JSON.stringify(result.data.user));
         showToast(result.message || "Welcome back!", "success");
-        router.push(`/dashboard/user/${result.data.user.id}`);
+        const redirectUrl = getAndClearRedirectUrl();
+        router.push(redirectUrl);
       } else {
         setError("An unexpected error occurred. Please try again.");
       }

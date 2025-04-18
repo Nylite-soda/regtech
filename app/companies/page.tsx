@@ -6,6 +6,7 @@ import CompanyCard from '@/components/CompanyCard';
 import CompanyFilters from '@/components/CompanyFilters';
 import { useEffect } from 'react';
 import { BASE_URL } from "@/lib/utils";
+import Link from 'next/link';
 
 interface Company {
   id: number;
@@ -30,14 +31,26 @@ export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   useEffect(() => {
     const fetchCompanies = async () => {
-      const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+      try {
+        const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      });
-      const data = await response.json();
-      setCompanies(data);
+        
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        // You can set an error state here if you want to show an error message to the user
+      }
     };
     fetchCompanies();
   }, []);
@@ -165,19 +178,29 @@ export default function CompaniesPage() {
   return (
     <div className="min-h-screen bg-white pt-32">
       {/* Hero Section */}
-      <div className="bg-[#AD0000] text-white py-16">
+      <div className="bg-[#AD0000] text-white py-8 md:py-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Explore Companies</h1>
-          <p className="text-xl opacity-90">
-            Discover and connect with leading RegTech companies across Africa
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4">Explore Companies</h1>
+              <p className="text-lg md:text-xl opacity-90">
+                Discover and connect with leading RegTech companies across Africa
+              </p>
+            </div>
+            <Link 
+              href="/auth/company/register" 
+              className="w-full md:w-auto bg-white text-[#AD0000] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center"
+            >
+              List a Company
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Search and Filters */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -197,10 +220,24 @@ export default function CompaniesPage() {
         </div>
 
         {/* Companies Grid */}
-        <div className="grid gap-6" suppressHydrationWarning>
-          {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
-          ))}
+        <div className="grid gap-4 md:gap-6" suppressHydrationWarning>
+        <div className="hidden md:grid md:grid-cols-[1fr_100px_1fr_1fr_1fr_60px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
+                <div className="text-left font-medium text-sm text-gray-700">Company</div>
+                <div className="text-center font-medium text-sm text-gray-700">Niche</div>
+                <div className="text-center font-medium text-sm text-gray-700">Services</div>
+                <div className="text-center font-medium text-sm text-gray-700">Size</div>
+                <div className="font-medium text-sm text-gray-700">Website</div>
+                <div></div>
+              </div>
+          {companies.length === 0 ? (
+            <div className="text-center py-12 col-span-full">
+              <p className="text-xl text-gray-600">No Companies Listed yet</p>
+            </div>
+          ) : (
+            companies.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))
+          )}
         </div>
       </div>
     </div>
