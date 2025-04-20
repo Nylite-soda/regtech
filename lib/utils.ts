@@ -42,12 +42,27 @@ export function storeRedirectUrl() {
   }
 }
 
-// Get and clear the stored redirect URL
-export function getAndClearRedirectUrl() {
-  if (isBrowser) {
-    const url = localStorage.getItem('redirectUrl');
-    localStorage.removeItem('redirectUrl');
-    return url || '/'; // Return home if no redirect URL is stored
-  }
-  return '/';
+/**
+ * Gets the stored redirect URL from localStorage and clears it
+ * @returns The redirect URL or "/dashboard" as default
+ */
+export function getAndClearRedirectUrl(): string {
+  if (typeof window === 'undefined') return '/dashboard';
+  
+  const redirectUrl = localStorage.getItem("redirectUrl") || "/dashboard";
+  localStorage.removeItem("redirectUrl");
+  return redirectUrl;
+}
+
+/**
+ * Checks if a user is currently signed in
+ * @returns boolean indicating if a user is signed in
+ */
+export function isUserSignedIn(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  const accessToken = localStorage.getItem("access_token");
+  const user = localStorage.getItem("user");
+  
+  return !!(accessToken && user);
 }

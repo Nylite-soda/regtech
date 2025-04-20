@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { PageWrapper } from "@/components/layout/page-wrapper";
 import { NavigationProvider } from "@/components/navigation/navigation-context";
-import { BackButton } from "@/components/ui/back-button";
 import { ToastProvider } from "@/components/ui/toast-context";
 import { ThemeProvider } from "@/lib/theme-provider";
 
@@ -33,7 +32,6 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="light" storageKey="regtech-theme">
           <ToastProvider>
             <NavigationProvider>
-              <BackButton />
               <PageWrapper>{children}</PageWrapper>
             </NavigationProvider>
           </ToastProvider>

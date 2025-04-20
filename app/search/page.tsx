@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import CompanyCard from '@/components/CompanyCard';
 import { Button } from '@/components/ui/button';
-import { BackButton } from "@/components/BackButton";
+import { BackButton } from "@/components/ui/back-button";
 import { BASE_URL } from '@/lib/utils';
 
 interface SearchFilters {
@@ -376,7 +376,7 @@ function SearchContent() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <BackButton href="/" />
+        <BackButton />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">

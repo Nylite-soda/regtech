@@ -5,33 +5,42 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast-context";
 import { PasswordStrength } from "@/components/ui/password-strength";
-import { validateEmail, validatePassword, validateName, validatePhone } from "@/lib/validation";
-import { Eye, EyeOff } from "lucide-react";
+import { validateFormField } from "@/lib/validation";
+import { Eye, EyeOff, User, Mail, Phone, Lock, Calendar, Building, Globe, Users, MapPin, Briefcase } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, storeRedirectUrl, isUserSignedIn } from "@/lib/utils";
+import { LoadingScreen } from "@/components/ui/loading-screen";
+
+// Define the structure of our form errors
+interface FormErrors {
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  password: string | null;
+  confirmPassword: string | null;
+  phone: string | null;
+  termsAccepted: string | null;
+  privacyAccepted: string | null;
+}
 
 export default function Register() {
   const router = useRouter();
   const { showToast } = useToast();
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
+  // Initialize form data
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,98 +48,119 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     phone: "",
-    subscriptionPlan: "basic",
+    // subscriptionPlan: "basic",
     referralCode: "",
     termsAccepted: false,
     privacyAccepted: false,
   });
-  const [error, setError] = useState<string | null>(null);
+  
+  // Initialize form errors with null values
+  const [errors, setErrors] = useState<FormErrors>({
+    firstName: null,
+    lastName: null,
+    email: null,
+    password: null,
+    confirmPassword: null,
+    phone: null,
+    termsAccepted: null,
+    privacyAccepted: null,
+  });
 
-  // Real-time validation
+  // Redirect if user is already signed in
   useEffect(() => {
-    const validationErrors: Record<string, string> = {};
+    const checkAuth = async () => {
+      if (isUserSignedIn()) {
+        setIsRedirecting(true);
+        router.push("/");
+      }
+    };
     
-    const emailError = validateEmail(formData.email);
-    if (emailError) validationErrors[emailError.field] = emailError.message;
+    checkAuth();
+  }, [router]);
 
-    const firstNameError = validateName(formData.firstName);
-    if (firstNameError) validationErrors[firstNameError.field] = firstNameError.message;
+  // Store the current URL in localStorage when component mounts
+  useEffect(() => {
+    // Use the utility function to store the redirect URL
+    storeRedirectUrl();
+  }, []);
 
-    const lastNameError = validateName(formData.lastName);
-    if (lastNameError) validationErrors[lastNameError.field] = lastNameError.message;
-
-    if (formData.phone) {
-      const phoneError = validatePhone(formData.phone);
-      if (phoneError) validationErrors[phoneError.field] = phoneError.message;
-    }
-
-    // Add password confirmation validation
-    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      validationErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(validationErrors);
-  }, [formData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
+  // Validate a single field and return the error message or null
+  const validateField = (name: string, value: string): string | null => {
+    return validateFormField(name, value, name === 'confirmPassword' ? formData.password : undefined);
   };
 
+  // Handle input changes and validate in real-time
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    
+    // Update form data
+    setFormData(prev => ({ ...prev, [name]: newValue }));
+    
+    // Validate the field and update errors
+    if (name !== "referralCode" && name !== "termsAccepted" && name !== "privacyAccepted") {
+      const fieldError = validateField(name, value);
+      setErrors(prev => ({ ...prev, [name]: fieldError }));
+    }
+  };
+
+  // Handle phone input changes
   const handlePhoneChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      phone: value.startsWith('+') ? value : `+${value}`
-    }));
+    setFormData(prev => ({ ...prev, phone: value }));
+    
+    // Validate phone number
+    const digitsOnly = value.replace(/\D/g, '');
+    const phoneError = digitsOnly.length < 10 ? "Please enter a valid phone number" : null;
+    setErrors(prev => ({ ...prev, phone: phoneError }));
+  };
+
+  // Validate all fields before form submission
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = { ...errors };
+    let isValid = true;
+    
+    // Validate all text fields
+    Object.keys(formData).forEach(key => {
+      if (key !== "referralCode" && key !== "termsAccepted" && key !== "privacyAccepted") {
+        const fieldError = validateField(key, formData[key as keyof typeof formData] as string);
+        if (fieldError) {
+          newErrors[key as keyof FormErrors] = fieldError;
+          isValid = false;
+        } else {
+          newErrors[key as keyof FormErrors] = null;
+        }
+      }
+    });
+    
+    // Validate checkboxes
+    if (!formData.termsAccepted) {
+      newErrors.termsAccepted = "You must accept the Terms and Conditions";
+      isValid = false;
+    } else {
+      newErrors.termsAccepted = null;
+    }
+    
+    if (!formData.privacyAccepted) {
+      newErrors.privacyAccepted = "You must accept the Privacy Policy";
+      isValid = false;
+    } else {
+      newErrors.privacyAccepted = null;
+    }
+    
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-
-    console.log(formData.phone)
-
-    // Validate all fields
-    const validationErrors: Record<string, string> = {};
+    setError(null);
     
-    const emailError = validateEmail(formData.email);
-    if (emailError) validationErrors[emailError.field] = emailError.message;
-
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) validationErrors[passwordError.field] = passwordError.message;
-
-    const firstNameError = validateName(formData.firstName);
-    if (firstNameError) validationErrors[firstNameError.field] = firstNameError.message;
-
-    const lastNameError = validateName(formData.lastName);
-    if (lastNameError) validationErrors[lastNameError.field] = lastNameError.message;
-
-    if (formData.phone) {
-      const phoneError = validatePhone(formData.phone);
-      if (phoneError) validationErrors[phoneError.field] = phoneError.message;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      validationErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.termsAccepted) {
-      validationErrors.termsAccepted = "You must accept the Terms & Conditions";
-    }
-
-    if (!formData.privacyAccepted) {
-      validationErrors.privacyAccepted = "You must accept the Privacy Policy";
-    }
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setLoading(false);
-      showToast("An unexpected errror occurred. Please Try again!", "error");
+    // Validate all fields before submission
+    if (!validateForm()) {
       return;
     }
+    
+    setLoading(true);
 
     try {
       const response = await fetch(`${BASE_URL}/api/v1/auth/register`, {
@@ -139,29 +169,28 @@ export default function Register() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
-          subscription: formData.subscriptionPlan,
-          phone_number: formData.phone || null,
-          password: formData.password,
-          confirm_password: formData.confirmPassword,
           first_name: formData.firstName,
           last_name: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          confirm_password: formData.confirmPassword,
+          phone: formData.phone,
+          subscription: "basic",
         }),
       });
-  
+
       const result = await response.json();
-  
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to register");
+
+      if (result?.error) {
+        setError(result.error);
+      } else if (result.status === "success") {
+        showToast("Registration successful! Please sign in.", "success");
+        router.push("/auth/signin?registered=true");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
-  
-      // Save token (optional: for login persistence)
-      localStorage.setItem("access_token", result.data.access_token);
-      localStorage.setItem("user", JSON.stringify(result.data.user));
-      showToast("Registration successful!", "success");
-      router.push("/auth/signin?registered=true");
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Failed to register", "error");
+      setError("An error occurred during registration. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -177,79 +206,109 @@ export default function Register() {
     }
   };
 
+  // If user is signed in or redirecting, show a loading state
+  if (isRedirecting) {
+    return (
+      <LoadingScreen />
+    );
+  }
+
   return (
-    <div className="container mx-auto flex items-center justify-center min-h-screen py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+    <div className="container mx-auto flex items-center justify-center min-h-screen py-12 px-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1 text-center pb-2">
+          <Link href={"/"} className="flex justify-center mb-2">
+            <Image src="/images/horizon-logo.png" alt="Logo" width={60} height={60} className="rounded-full" />
+          </Link>
+          <CardTitle className="text-2xl font-bold">Create an Account</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Join our community and start your journey with us
+          </CardDescription>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2 text-black">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  className={`${errors.firstName ? "border-red-500" : ""}`}
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  placeholder="Enter first name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    required
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="John"
+                    className={`pl-9 ${errors.firstName ? "border-red-500" : ""}`}
+                    aria-invalid={!!errors.firstName}
+                    aria-describedby={errors.firstName ? "firstName-error" : undefined}
+                  />
+                </div>
                 {errors.firstName && (
-                  <p className="text-[#AD0000] text-sm">{errors.firstName}</p>
+                  <p className="text-red-500 text-xs" id="firstName-error">{errors.firstName}</p>
                 )}
               </div>
-              <div className="space-y-2 text-black">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  className={`${errors.lastName ? "border-red-500" : ""}`}
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  placeholder="Enter last name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    required
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Doe"
+                    className={`pl-9 ${errors.lastName ? "border-red-500" : ""}`}
+                    aria-invalid={!!errors.lastName}
+                    aria-describedby={errors.lastName ? "lastName-error" : undefined}
+                  />
+                </div>
                 {errors.lastName && (
-                  <p className="text-[#AD0000] text-sm">{errors.lastName}</p>
+                  <p className="text-red-500 text-xs" id="lastName-error">{errors.lastName}</p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                className={`${errors.email ? "border-red-500" : ""}`}
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="john.doe@example.com"
+                  className={`pl-9 ${errors.email ? "border-red-500" : ""}`}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                />
+              </div>
               {errors.email && (
-                <p className="text-[#AD0000] text-sm">{errors.email}</p>
+                <p className="text-red-500 text-xs" id="email-error">{errors.email}</p>
               )}
             </div>
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  className={`${errors.password ? "border-red-500" : ""}`}
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`pl-9 ${errors.password ? "border-red-500" : ""}`}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 <Button
                   type="button"
@@ -257,28 +316,32 @@ export default function Register() {
                   size="icon"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <PasswordStrength password={formData.password} />
+              {formData.password && <PasswordStrength password={formData.password} />}
               {errors.password && (
-                <p className="text-[#AD0000] text-sm">{errors.password}</p>
+                <p className="text-red-500 text-xs" id="password-error">{errors.password}</p>
               )}
             </div>
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
               <div className="relative">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  className={`${errors.confirmPassword ? "border-red-500" : ""}`}
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   required
-                  placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`pl-9 ${errors.confirmPassword ? "border-red-500" : ""}`}
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
                 />
                 <Button
                   type="button"
@@ -286,17 +349,18 @@ export default function Register() {
                   size="icon"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-[#AD0000] text-sm">{errors.confirmPassword}</p>
+                <p className="text-red-500 text-xs" id="confirmPassword-error">{errors.confirmPassword}</p>
               )}
             </div>
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="phone">Phone Number (Optional)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
               <PhoneInput
                 country={'ng'}
                 value={formData.phone}
@@ -309,29 +373,30 @@ export default function Register() {
                 placeholder="Enter your phone number"
               />
               {errors.phone && (
-                <p className="text-[#AD0000] text-sm">{errors.phone}</p>
+                <p className="text-red-500 text-xs" id="phone-error">{errors.phone}</p>
               )}
             </div>
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="subscriptionPlan">Subscription Plan</Label>
-              <Select
-                value={formData.subscriptionPlan}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, subscriptionPlan: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select subscription plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="basic">Basic</SelectItem>
-                  <SelectItem value="standard">Standard</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* <div className="space-y-2">
+              <Label htmlFor="subscriptionPlan" className="text-sm font-medium">Subscription Plan</Label>
+              <div className="relative">
+                <Users className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <select
+                  id="subscriptionPlan"
+                  name="subscriptionPlan"
+                  value={formData.subscriptionPlan}
+                  onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value })}
+                  className="w-full p-2 border rounded-md pl-9 bg-background"
+                >
+                  <option value="free">Free</option>
+                  <option value="basic">Basic</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+            </div> */}
 
-            <div className="space-y-2 text-black">
-              <Label htmlFor="referralCode">Referral Code (Optional)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="referralCode" className="text-sm font-medium">Referral Code (Optional)</Label>
               <Input
                 id="referralCode"
                 name="referralCode"
@@ -348,19 +413,20 @@ export default function Register() {
                   id="termsAccepted"
                   name="termsAccepted"
                   checked={formData.termsAccepted}
-                  onCheckedChange={(checked: boolean) => 
-                    setFormData(prev => ({ ...prev, termsAccepted: checked }))
-                  }
+                  onCheckedChange={(checked) => setFormData({ ...formData, termsAccepted: checked as boolean })}
+                  className="border-muted-foreground"
+                  aria-invalid={!!errors.termsAccepted}
+                  aria-describedby={errors.termsAccepted ? "terms-error" : undefined}
                 />
-                <Label htmlFor="termsAccepted" className="text-sm">
+                <Label htmlFor="termsAccepted" className="text-sm text-muted-foreground">
                   I accept the{" "}
-                  <Link href="/terms" className="text-[#AD0000] hover:underline">
-                    Terms & Conditions
+                  <Link href="/terms" className="text-[#AD0000] hover:text-red-600 font-medium">
+                    Terms and Conditions
                   </Link>
                 </Label>
               </div>
               {errors.termsAccepted && (
-                <p className="text-[#AD0000] text-sm">{errors.termsAccepted}</p>
+                <p className="text-red-500 text-xs" id="terms-error">{errors.termsAccepted}</p>
               )}
 
               <div className="flex items-center space-x-2">
@@ -368,31 +434,32 @@ export default function Register() {
                   id="privacyAccepted"
                   name="privacyAccepted"
                   checked={formData.privacyAccepted}
-                  onCheckedChange={(checked: boolean) => 
-                    setFormData(prev => ({ ...prev, privacyAccepted: checked }))
-                  }
+                  onCheckedChange={(checked) => setFormData({ ...formData, privacyAccepted: checked as boolean })}
+                  className="border-muted-foreground"
+                  aria-invalid={!!errors.privacyAccepted}
+                  aria-describedby={errors.privacyAccepted ? "privacy-error" : undefined}
                 />
-                <Label htmlFor="privacyAccepted" className="text-sm">
+                <Label htmlFor="privacyAccepted" className="text-sm text-muted-foreground">
                   I accept the{" "}
-                  <Link href="/privacy" className="text-[#AD0000] hover:underline">
+                  <Link href="/privacy" className="text-[#AD0000] hover:text-red-600 font-medium">
                     Privacy Policy
                   </Link>
                 </Label>
               </div>
               {errors.privacyAccepted && (
-                <p className="text-[#AD0000] text-sm">{errors.privacyAccepted}</p>
+                <p className="text-red-500 text-xs" id="privacy-error">{errors.privacyAccepted}</p>
               )}
             </div>
 
             <Button 
               type="submit" 
-              className="w-full bg-[#AD0000] hover:bg-[#8B0000] mt-3" 
-              disabled={loading || Object.keys(errors).length > 0}
+              className="w-full bg-[#AD0000] hover:bg-[#8B0000] transition-colors mt-4" 
+              disabled={loading || Object.values(errors).some(error => error !== null)}
             >
               {loading ? "Creating account..." : "Create Account"}
             </Button>
 
-            <div className="relative">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -406,7 +473,7 @@ export default function Register() {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full border-muted-foreground hover:bg-muted/50"
               onClick={handleGoogleSignIn}
             >
               <Image
@@ -419,12 +486,12 @@ export default function Register() {
               Sign up with Google
             </Button>
 
-            <div className="text-center text-sm">
+            <p className="text-sm text-center text-muted-foreground mt-4">
               Already have an account?{" "}
-              <Link href="/auth/signin" className="text-[#AD0000] hover:text-red-600">
+              <Link href="/auth/signin" className="text-[#AD0000] hover:text-red-600 font-medium">
                 Sign in here
               </Link>
-            </div>
+            </p>
           </form>
         </CardContent>
       </Card>

@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Building2, Globe, Mail, Phone, Link as LinkIcon } from "lucide-react";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import { useToast } from "@/components/ui/toast-context";
+import ProfileProgressBar from "@/components/company/ProfileProgressBar";
+import ProfileCompletionModal from "@/components/company/ProfileCompletionModal";
+import { BASE_URL } from "@/lib/utils";
 
 interface CompanyData {
   company_name: string;
@@ -31,23 +35,46 @@ interface CompanyData {
 
 export default function CompanyDashboard() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [companyId, setCompanyId] = useState<string>("");
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("company");
-    if (!storedData) {
-      router.push("/auth/company-login");
-      return;
-    }
+    const fetchCompanyData = async () => {
+      try {
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+          showToast("Please log in to access the dashboard", "error");
+          router.push("/auth/company-login");
+          return;
+        }
 
-    try {
-      const parsedData = JSON.parse(storedData);
-      setCompanyData(parsedData);
-    } catch (error) {
-      console.error("Error parsing company data:", error);
-      router.push("/auth/company-login");
-    }
-  }, [router]);
+        const response = await fetch(`${BASE_URL}/api/v1/company/me`, {
+          headers: {
+            "Authorization": `Bearer ${accessToken}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCompanyId(data.id);
+          setCompanyData(data);
+        } else {
+          showToast("Failed to load company data", "error");
+        }
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+        showToast("An error occurred while loading your data", "error");
+      }
+    };
+
+    fetchCompanyData();
+  }, [router, showToast]);
+
+  const handleProfileComplete = () => {
+    setShowCelebrationModal(true);
+  };
 
   if (!companyData) {
     return (
@@ -203,7 +230,19 @@ export default function CompanyDashboard() {
             </CardContent>
           </Card>
         </div>
+        
+        {companyId && (
+          <ProfileProgressBar 
+            companyId={companyId} 
+            onComplete={handleProfileComplete} 
+          />
+        )}
       </div>
+      
+      <ProfileCompletionModal 
+        isOpen={showCelebrationModal} 
+        onClose={() => setShowCelebrationModal(false)} 
+      />
     </main>
   );
 } 

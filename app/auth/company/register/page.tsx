@@ -19,7 +19,17 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "@mui/x-date-pickers/icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, storeRedirectUrl } from "@/lib/utils";
+import CountrySelect from "react-select-country-list";
+
+// Define the Country type
+interface Country {
+  value: string;
+  label: string;
+}
+
+// Preload country data
+const countryData = CountrySelect().getData();
 
 export default function CompanyRegister() {
   const router = useRouter();
@@ -30,7 +40,9 @@ export default function CompanyRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [date, setDate] = useState<Dayjs | null>(null);
+  const [yearPopoverOpen, setYearPopoverOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [countryOptions, setCountryOptions] = useState<Country[]>(countryData);
   
   const [formData, setFormData] = useState({
     companyName: "",  
@@ -38,28 +50,111 @@ export default function CompanyRegister() {
     phone: "",
     password: "",
     confirmPassword: "",
-    description: "",
-    yearFounded: "",
-    size: "",
-    niche: "",
-    lastFunding: "",
-    services: "",
-    founder: [""],
     type: "",
     website: "",
+    size: "",
+    yearFounded: "",
     headquarters: "",
-    logo: "",
-    social_media: [] as {platform: string, url: string}[],
+    country: "",
+    niche: "",
   });
 
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    message: "",
+    color: "",
+  });
+
+  // Initialize country options
     useEffect(() => {
-      const storedData = localStorage.getItem("access_token")
-      if (!storedData) {
-        showToast("User not signed up", "error");
-        router.push("/auth/signin");
-        return;
-      }
+    setCountryOptions(CountrySelect().getData());
     }, []);
+
+  // Store the current URL in localStorage when component mounts
+  useEffect(() => {
+    // Use the utility function to store the redirect URL
+    storeRedirectUrl();
+  }, []);
+
+  // Add useEffect for real-time validation
+  useEffect(() => {
+    const errors: Record<string, string> = {};
+
+    // Password validation
+    if (formData.password) {
+      if (formData.password.length < 8) {
+        errors.password = "Password must be at least 8 characters long";
+      } else if (!/[A-Z]/.test(formData.password)) {
+        errors.password = "Password must contain at least one uppercase letter";
+      } else if (!/[a-z]/.test(formData.password)) {
+        errors.password = "Password must contain at least one lowercase letter";
+      } else if (!/[0-9]/.test(formData.password)) {
+        errors.password = "Password must contain at least one number";
+      } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
+        errors.password = "Password must contain at least one special character";
+      }
+    }
+
+    // Confirm password validation
+    if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    setFormErrors(errors);
+  }, [formData.password, formData.confirmPassword]);
+
+  const calculatePasswordStrength = (password: string) => {
+    let score = 0;
+    let message = "";
+    let color = "";
+
+    // Length check
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+
+    // Character type checks
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+
+    // Set message and color based on score
+    switch (score) {
+      case 0:
+      case 1:
+        message = "Very Weak";
+        color = "text-red-500";
+        break;
+      case 2:
+      case 3:
+        message = "Weak";
+        color = "text-orange-500";
+        break;
+      case 4:
+      case 5:
+        message = "Medium";
+        color = "text-yellow-500";
+        break;
+      case 6:
+        message = "Strong";
+        color = "text-green-500";
+        break;
+    }
+
+    return { score, message, color };
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (name === "password") {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
+  };
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
@@ -125,34 +220,34 @@ export default function CompanyRegister() {
     reader.readAsDataURL(file);
   };
 
-  const addSocialMedia = (platform: string) => {
-    // Check if this platform already exists
-    const exists = formData.social_media.some(item => item.platform === platform);
+  // const addSocialMedia = (platform: string) => {
+  //   // Check if this platform already exists
+  //   const exists = formData.social_media.some(item => item.platform === platform);
     
-    if (!exists) {
-      setFormData(prev => ({
-        ...prev,
-        social_media: [...prev.social_media, { platform, url: "" }]
-      }));
-    }
-  };
+  //   if (!exists) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       social_media: [...prev.social_media, { platform, url: "" }]
+  //     }));
+  //   }
+  // };
 
-  const removeSocialMedia = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      social_media: prev.social_media.filter((_, i) => i !== index)
-    }));
-  };
+  // const removeSocialMedia = (index: number) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     social_media: prev.social_media.filter((_, i) => i !== index)
+  //   }));
+  // };
 
-  const updateSocialMediaUrl = (index: number, url: string) => {
-    const updatedSocialMedia = [...formData.social_media];
-    updatedSocialMedia[index].url = url;
+  // const updateSocialMediaUrl = (index: number, url: string) => {
+  //   const updatedSocialMedia = [...formData.social_media];
+  //   updatedSocialMedia[index].url = url;
     
-    setFormData(prev => ({
-      ...prev,
-      social_media: updatedSocialMedia
-    }));
-  };
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     social_media: updatedSocialMedia
+  //   }));
+  // };
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -160,7 +255,7 @@ export default function CompanyRegister() {
     // Required fields validation
     const requiredFields = [
       "companyName", "email", "phone", "password", "confirmPassword", 
-      "description", "yearFounded", "size", "niche", "founder", "type", "website", "headquarters"
+      "type", "website", "size", "yearFounded", "headquarters", "country", "niche"
     ];
     
     requiredFields.forEach(field => {
@@ -169,14 +264,27 @@ export default function CompanyRegister() {
       }
     });
     
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
+    // Email validation with proper format check
+    if (formData.email) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.email = "Please enter a valid email address (e.g., user@example.com)";
+      }
     }
     
     // Password validation
-    if (formData.password && formData.password.length < 8) {
+    if (formData.password) {
+      if (formData.password.length < 8) {
       errors.password = "Password must be at least 8 characters";
+      } else if (!/[A-Z]/.test(formData.password)) {
+        errors.password = "Password must contain at least one uppercase letter";
+      } else if (!/[a-z]/.test(formData.password)) {
+        errors.password = "Password must contain at least one lowercase letter";
+      } else if (!/[0-9]/.test(formData.password)) {
+        errors.password = "Password must contain at least one number";
+      } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
+        errors.password = "Password must contain at least one special character";
+      }
     }
     
     // Password match validation
@@ -185,38 +293,25 @@ export default function CompanyRegister() {
       errors.confirmPassword = "Passwords do not match";
     }
 
-    // Founders Validation
-    if (!formData.founder.some(name => name.trim())) {
-      errors.founder = "At least one founder is required";
-    }
-
     // Website validation
     if (formData.website && !/^(https?:\/\/)?(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(formData.website)) {
       errors.website = "Please enter a valid website URL";
     }
 
-    // Social media validation
-    formData.social_media.forEach((social, index) => {
-      if (social.url && !isValidSocialMediaUrl(social.platform, social.url)) {
-        errors[`social_media_${index}`] = `Please enter a valid ${social.platform} URL`;
+    // Year founded validation - ensure it's a valid number
+    if (formData.yearFounded) {
+      const year = parseInt(formData.yearFounded, 10);
+      const currentYear = new Date().getFullYear();
+      
+      if (isNaN(year)) {
+        errors.yearFounded = "Year founded must be a valid number";
+      } else if (year < 1800 || year > currentYear) {
+        errors.yearFounded = `Year founded must be between 1800 and ${currentYear}`;
       }
-    });
+    }
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };
-
-  const isValidSocialMediaUrl = (platform: string, url: string) => {
-    switch(platform) {
-      case 'LinkedIn':
-        return /^(https?:\/\/)?(www\.)?linkedin\.com\/.*/.test(url);
-      case 'Instagram':
-        return /^(https?:\/\/)?(www\.)?instagram\.com\/.*/.test(url);
-      case 'X':
-        return /^(https?:\/\/)?(www\.)?(twitter\.com|x\.com)\/.*/.test(url);
-      default:
-        return true;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -224,70 +319,58 @@ export default function CompanyRegister() {
     setLoading(true);
     setError(null);
     
-    // if (!validateForm()) {
-    //   setLoading(false);
-
-    //   const errorFields = Object.keys(formErrors)
-    //   .map(key => key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'))
-    //   .join(', ');
+    if (!validateForm()) {
+      setLoading(false);
+      const errorFields = Object.keys(formErrors)
+        .map(key => key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'))
+        .join(', ');
       
-    //   showToast(`Please fill in all required fields: ${errorFields}`, "error");
-    //   return;
-    // }
-    
-    // const dataToSubmit = {
-    //   ...formData,
-    //   founder: formData.founder.filter(name => name.trim()),
-    // };
+      showToast(`Please fill in all required fields: ${errorFields}`, "error");
+      return;
+    }
 
     try {
-      // Get the access token from localStorage
       const accessToken = localStorage.getItem('access_token');
       if (!accessToken) {
         showToast("User not signed up", "error");
+        router.push("/auth/signin");
         return;
       }
 
-      // Make the API request with the bearer token
       const response = await fetch(`${BASE_URL}/api/v1/company/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${accessToken}`
         },
-        body: JSON.stringify(
-          {
+        body: JSON.stringify({
             company_type: formData.type,
             company_name: formData.companyName,
             company_email: formData.email,
             company_phone: formData.phone,
             company_website: formData.website,
             company_size: formData.size,
-            year_founded: formData.yearFounded,
+          year_founded: parseInt(formData.yearFounded, 10), // Convert to number
             headquarters: formData.headquarters,
-            description: formData.description,
-            social_media: formData.social_media,
-            founder: formData.founder,
+          country: formData.country,
             niche: formData.niche,
-            last_funding: formData.lastFunding,
-            logo: formData.logo,
             company_password: formData.password,
-            founders: formData.founder
-          }
-        ),
+        }),
       });
       
       const result = await response.json();
       
       if (!response.ok) {
+        // console.log(result.detail);
+        if (result.detail === "Failed to create company: 400: Company with this email already exists") {
+          result.error = "Company with this email already exists"
+        }
         throw new Error(result.error || result.message || "Registration failed");
       }
 
       if (result.status === "success") {
         showToast("Registration successful! Please log in.", "success");
         router.push("/auth/company-login?registered=true");
-      } else {
-        throw new Error(result.message || "Registration failed");
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred. Please try again later.";
@@ -327,13 +410,7 @@ export default function CompanyRegister() {
         )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <Tabs defaultValue="account" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="account">Account Information</TabsTrigger>
-              <TabsTrigger value="company">Company Details</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="account" className="space-y-4 mt-4">
+          <div className="space-y-4">
               {/* Company Name */}
               <div>
                 <Label htmlFor="companyName">Company Name</Label>
@@ -399,7 +476,7 @@ export default function CompanyRegister() {
                     type={showPassword ? "text" : "password"}
                     required
                     value={formData.password}
-                    onChange={(e) => handleChange(e)}
+                  onChange={handlePasswordChange}
                     className={`mt-1 pr-10 ${formErrors.password ? "border-red-500" : ""}`}
                     placeholder="••••••••"
                   />
@@ -415,6 +492,42 @@ export default function CompanyRegister() {
                     )}
                   </button>
                 </div>
+              {formData.password && (
+                <div className="mt-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1 bg-gray-200 rounded-full">
+                      <div 
+                        className={`h-full rounded-full transition-all ${
+                          passwordStrength.score <= 2 ? 'bg-red-500' :
+                          passwordStrength.score <= 4 ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm ${passwordStrength.color}`}>
+                      {passwordStrength.message}
+                    </span>
+                  </div>
+                  <ul className="mt-2 text-sm text-gray-600 space-y-1">
+                    <li className={formData.password.length >= 8 ? "text-green-500" : ""}>
+                      • At least 8 characters
+                    </li>
+                    <li className={/[A-Z]/.test(formData.password) ? "text-green-500" : ""}>
+                      • One uppercase letter
+                    </li>
+                    <li className={/[a-z]/.test(formData.password) ? "text-green-500" : ""}>
+                      • One lowercase letter
+                    </li>
+                    <li className={/[0-9]/.test(formData.password) ? "text-green-500" : ""}>
+                      • One number
+                    </li>
+                    <li className={/[^A-Za-z0-9]/.test(formData.password) ? "text-green-500" : ""}>
+                      • One special character
+                    </li>
+                  </ul>
+                </div>
+              )}
                 {formErrors.password && (
                   <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
                 )}
@@ -430,7 +543,7 @@ export default function CompanyRegister() {
                     type={showConfirmPassword ? "text" : "password"}
                     required
                     value={formData.confirmPassword}
-                    onChange={(e) => handleChange(e)}
+                  onChange={handlePasswordChange}
                     className={`mt-1 pr-10 ${formErrors.confirmPassword ? "border-red-500" : ""}`}
                     placeholder="••••••••"
                   />
@@ -446,16 +559,17 @@ export default function CompanyRegister() {
                     )}
                   </button>
                 </div>
+              {formData.confirmPassword && !formErrors.confirmPassword && (
+                <p className="mt-1 text-sm text-green-600">Passwords match</p>
+              )}
                 {formErrors.confirmPassword && (
                   <p className="mt-1 text-sm text-red-600">{formErrors.confirmPassword}</p>
                 )}
               </div>
-            </TabsContent>
             
-            <TabsContent value="company" className="space-y-4 mt-4">
               {/* Company Type */}
               <div>
-                <Label htmlFor="type"  className="mb-2 mt-2">Company Type</Label>
+              <Label htmlFor="type">Company Type</Label>
                 <Select
                   value={formData.type}
                   onValueChange={(value) => handleSelectChange("type", value)}
@@ -478,27 +592,10 @@ export default function CompanyRegister() {
                   <p className="mt-1 text-sm text-red-600">{formErrors.type}</p>
                 )}
               </div>
-              
-              {/* Description */}
-              <div>
-                <Label htmlFor="description" className="mb-2 mt-2">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  required
-                  value={formData.description}
-                  onChange={(e) => handleChange(e)}
-                  className={`mt-1 ${formErrors.description ? "border-red-500" : ""}`}
-                  placeholder="Briefly describe your company..."
-                />
-                {formErrors.description && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
-                )}
-              </div>
 
               {/* Website */}
               <div>
-                <Label htmlFor="website" className="mb-2 mt-2">Website</Label>
+              <Label htmlFor="website">Website</Label>
                 <Input
                   id="website"
                   name="website"
@@ -514,87 +611,36 @@ export default function CompanyRegister() {
                 )}
               </div>
 
-              {/* Headquarters */}
+            {/* Company Size */}
               <div>
-                <Label htmlFor="headquarters" className="mb-2 mt-2">Headquarters</Label>
-                <Input
-                  id="headquarters"
-                  name="headquarters"
-                  type="text"
-                  required
-                  value={formData.headquarters}
-                  onChange={(e) => handleChange(e)}
-                  className={`mt-1 ${formErrors.headquarters ? "border-red-500" : ""}`}
-                  placeholder="City, Country"
-                />
-                {formErrors.headquarters && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.headquarters}</p>
-                )}
-              </div>
-
-              {/* Founder */}
-              <div>
-                <Label htmlFor="founder" className="mb-1 mt-2">Founder(s)</Label>
-                <div className="space-y-2">
-                  {formData.founder.map((founderName, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        id={`founder-${index}`}
-                        name={`founder-${index}`}
-                        type="text"
-                        value={founderName}
-                        onChange={(e) => {
-                          const newFounders = [...formData.founder];
-                          newFounders[index] = e.target.value;
-                          setFormData((prev) => ({
-                            ...prev,
-                            founder: newFounders,
-                          }));
-                          
-                          // Add a new empty input when typing in the last input field
-                          if (index === formData.founder.length - 1 && e.target.value.trim() !== "") {
-                            setFormData((prev) => ({
-                              ...prev,
-                              founder: [...prev.founder, ""],
-                            }));
-                          }
-                        }}
-                        className={`mt-1 ${formErrors.founder ? "border-red-500" : ""}`}
-                        placeholder={`Founder ${index + 1}`}
-                      />
-                      {formData.founder.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="flex-shrink-0"
-                          onClick={() => {
-                            if (formData.founder.length > 1) {
-                              const newFounders = [...formData.founder];
-                              newFounders.splice(index, 1);
-                              setFormData((prev) => ({
-                                ...prev,
-                                founder: newFounders,
-                              }));
-                            }
-                          }}
-                        >
-                          <span className="sr-only">Remove</span>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                {formErrors.founder && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.founder}</p>
+              <Label htmlFor="size">Company Size</Label>
+              <Select 
+                value={formData.size}
+                onValueChange={(value) => handleSelectChange("size", value)}
+              >
+                <SelectTrigger className={`w-full ${formErrors.size ? "border-red-500" : ""}`}>
+                  <SelectValue placeholder="Select company size" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="1-10">1 to 10</SelectItem>
+                    <SelectItem value="11-50">11 to 50</SelectItem>
+                    <SelectItem value="51-200">51 to 200</SelectItem>
+                    <SelectItem value="201-500">201 to 500</SelectItem>
+                    <SelectItem value="501-1000">501 to 1000</SelectItem>
+                    <SelectItem value="1000+">Over 1000</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              {formErrors.size && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.size}</p>
                 )}
               </div>
 
               {/* Year Founded */}
               <div>
-                <Label htmlFor="yearFounded"  className="mb-2 mt-2">Year Founded</Label>
-                <Popover>
+              <Label htmlFor="yearFounded">Year Founded</Label>
+              <Popover open={yearPopoverOpen} onOpenChange={setYearPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
@@ -622,6 +668,8 @@ export default function CompanyRegister() {
                                     value: newDate.format("YYYY") 
                                   }
                                 });
+                              // Close the popover after selection
+                              setYearPopoverOpen(false);
                               }
                             }}
                             views={['year']}
@@ -682,35 +730,52 @@ export default function CompanyRegister() {
                 )}
               </div>
               
-              {/* Company Size */}
+            {/* Headquarters */}
               <div>
-                <Label htmlFor="size" className="mb-2 mt-2">Company Size</Label>
+              <Label htmlFor="headquarters">Headquarters</Label>
+              <Input
+                id="headquarters"
+                name="headquarters"
+                type="text"
+                required
+                value={formData.headquarters}
+                onChange={(e) => handleChange(e)}
+                className={`mt-1 ${formErrors.headquarters ? "border-red-500" : ""}`}
+                placeholder="City, Country"
+              />
+              {formErrors.headquarters && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.headquarters}</p>
+              )}
+            </div>
+
+            {/* Country */}
+            <div>
+              <Label htmlFor="country">Country</Label>
                 <Select 
-                  value={formData.size}
-                  onValueChange={(value) => handleSelectChange("size", value)}
+                value={formData.country}
+                onValueChange={(value) => handleSelectChange("country", value)}
                 >
-                  <SelectTrigger className={`w-full ${formErrors.size ? "border-red-500" : ""}`}>
-                    <SelectValue placeholder="Select company size" />
+                <SelectTrigger className={`w-full ${formErrors.country ? "border-red-500" : ""}`}>
+                  <SelectValue placeholder="Select your country" />
                   </SelectTrigger>
-                  <SelectContent>
+                <SelectContent className="max-h-[300px] overflow-y-auto">
                     <SelectGroup>
-                      <SelectItem value="1-10">1 to 10</SelectItem>
-                      <SelectItem value="11-50">11 to 50</SelectItem>
-                      <SelectItem value="51-200">51 to 200</SelectItem>
-                      <SelectItem value="201-500">201 to 500</SelectItem>
-                      <SelectItem value="501-1000">501 to 1000</SelectItem>
-                      <SelectItem value="1000+">Over 1000</SelectItem>
+                    {countryOptions.map((country) => (
+                      <SelectItem key={country.value} value={country.value}>
+                        {country.label}
+                      </SelectItem>
+                    ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                {formErrors.size && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.size}</p>
+              {formErrors.country && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.country}</p>
                 )}
               </div>
 
               {/* Company Niche */}
               <div>
-                <Label htmlFor="niche" className="mb-2 mt-2">Company Niche</Label>
+              <Label htmlFor="niche">Company Niche</Label>
                 <Select
                   value={formData.niche}
                   onValueChange={(value) => handleSelectChange("niche", value)}
@@ -732,273 +797,12 @@ export default function CompanyRegister() {
                   <p className="mt-1 text-sm text-red-600">{formErrors.niche}</p>
                 )}
               </div>
-
-              {/* Services */}
-              <div>
-                <Label htmlFor="services" className="mb-2 mt-2">Services Offered</Label>
-                <Textarea
-                  id="services"
-                  name="services"
-                  value={formData.services}
-                  onChange={(e) => handleChange(e)}
-                  className={`mt-1 ${formErrors.services ? "border-red-500" : ""}`}
-                  placeholder="List the services your company offers..."
-                  required
-                />
-                {formErrors.services && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.services}</p>
-                )}
               </div>
-
-              {/* Funding Round */}
-              <div>
-                <Label htmlFor="lastFunding" className="mb-2 mt-2">Last Funding Round</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={`w-full justify-start text-left font-normal ${
-                        !formData.lastFunding && "text-muted-foreground"
-                      }`}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.lastFunding ? dayjs(formData.lastFunding).format("MMM D, YYYY") : <span>Select funding date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DemoContainer components={['DateCalendar']}>
-                        <DemoItem>
-                          <DateCalendar
-                            maxDate={dayjs()}
-                            value={formData.lastFunding ? dayjs(formData.lastFunding) : null}
-                            onChange={(newDate) => {
-                              if (newDate) {
-                                handleChange({
-                                  target: { 
-                                    name: "lastFunding", 
-                                    value: newDate.format("YYYY-MM-DD") 
-                                  }
-                                });
-                              }
-                            }}
-                            sx={{
-                              width: '100%',
-                              height: 'auto',
-                              '& .MuiPickersCalendarHeader-root': {
-                                paddingLeft: '16px',
-                                paddingRight: '16px',
-                                marginTop: '8px',
-                              },
-                              '& .MuiDayCalendar-header': {
-                                paddingLeft: '16px',
-                                paddingRight: '16px',
-                              },
-                              '& .MuiDayCalendar-monthContainer': {
-                                paddingLeft: '16px',
-                                paddingRight: '16px',
-                                paddingBottom: '16px',
-                              },
-                              '& .MuiPickersDay-root.Mui-selected': {
-                                backgroundColor: '#AD0000',
-                              },
-                              '& .MuiPickersDay-root.Mui-selected:hover': {
-                                backgroundColor: '#890000',
-                              },
-                              '& .MuiPickersDay-root.Mui-selected:focus': {
-                                backgroundColor: '#AD0000',
-                              },
-                              '& .MuiDateCalendar-root .MuiButtonBase-root.MuiPickersDay-root:not(.Mui-selected):hover': {
-                                backgroundColor: 'rgba(173, 0, 0, 0.1)',
-                              },
-                              '& .MuiDateCalendar-root .MuiButtonBase-root.MuiPickersDay-root:focus': {
-                                backgroundColor: 'rgba(173, 0, 0, 0.2)',
-                              },
-                              '& .MuiPickersCalendarHeader-switchViewButton': {
-                                color: '#AD0000',
-                              },
-                              '& .MuiPickersArrowSwitcher-button': {
-                                color: '#AD0000',
-                              },
-                              '& .MuiYearCalendar-root .MuiPickersYear-yearButton.Mui-selected': {
-                                backgroundColor: '#AD0000',
-                              },
-                              '& .MuiYearCalendar-root .MuiPickersYear-yearButton:not(.Mui-selected):hover': {
-                                backgroundColor: 'rgba(173, 0, 0, 0.1)',
-                              }
-                            }}
-                          />
-                        </DemoItem>
-                      </DemoContainer>
-                    </LocalizationProvider>
-                  </PopoverContent>
-                </Popover>
-                {formErrors.lastFunding && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.lastFunding}</p>
-                )}
-              </div>
-
-              {/* Logo Upload */}
-              <div>
-                <Label htmlFor="logo" className="mb-2 mt-2">Company Logo</Label>
-                <div className="mt-1 flex items-center">
-                  {formData.logo ? (
-                    <div className="relative h-20 w-20 overflow-hidden rounded-md border border-gray-200">
-                      <Image
-                        src={formData.logo}
-                        alt="Company logo preview"
-                        layout="fill"
-                        objectFit="contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            logo: ""
-                          }));
-                        }}
-                        className="absolute right-1 top-1 rounded-full bg-white p-1 text-gray-500 shadow-sm hover:text-gray-700"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex h-20 w-20 items-center justify-center rounded-md border-dashed"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Plus className="h-5 w-5" />
-                    </Button>
-                  )}
-                  <input
-                    type="file"
-                    id="logo"
-                    name="logo"
-                    ref={fileInputRef}
-                    onChange={handleLogoUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <div className="ml-5">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Upload Logo
-                    </Button>
-                    <p className="mt-1 text-xs text-gray-500">
-                      PNG, JPG, GIF up to 5MB
-                    </p>
-                  </div>
-                </div>
-                {formErrors.logo && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.logo}</p>
-                )}
-              </div>
-
-              {/* Social Media */}
-              <div>
-                <Label htmlFor="social" className="mb-2 mt-2">Social Media</Label>
-                <div className="mt-2 space-y-4">
-                  {/* Available platforms */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={`flex items-center ${
-                        formData.social_media.some(s => s.platform === "LinkedIn") 
-                          ? "bg-blue-50 text-blue-700" 
-                          : ""
-                      }`}
-                      onClick={() => addSocialMedia("LinkedIn")}
-                      disabled={formData.social_media.some(s => s.platform === "LinkedIn")}
-                    >
-                      <Linkedin className="mr-2 h-4 w-4" />
-                      LinkedIn
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={`flex items-center ${
-                        formData.social_media.some(s => s.platform === "Instagram") 
-                          ? "bg-pink-50 text-pink-700" 
-                          : ""
-                      }`}
-                      onClick={() => addSocialMedia("Instagram")}
-                      disabled={formData.social_media.some(s => s.platform === "Instagram")}
-                    >
-                      <Instagram className="mr-2 h-4 w-4" />
-                      Instagram
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={`flex items-center ${
-                        formData.social_media.some(s => s.platform === "X") 
-                          ? "bg-gray-100 text-gray-900" 
-                          : ""
-                      }`}
-                      onClick={() => addSocialMedia("X")}
-                      disabled={formData.social_media.some(s => s.platform === "X")}
-                    >
-                      <Twitter className="mr-2 h-4 w-4" />
-                      X (Twitter)
-                    </Button>
-                  </div>
-
-                  {/* Added social media inputs */}
-                  {formData.social_media.length > 0 && (
-                    <div className="space-y-2 rounded-md border border-gray-200 p-3">
-                      {formData.social_media.map((social, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="flex w-24 flex-shrink-0 items-center">
-                            {social.platform === "LinkedIn" && <Linkedin className="mr-2 h-4 w-4" />}
-                            {social.platform === "Instagram" && <Instagram className="mr-2 h-4 w-4" />}
-                            {social.platform === "X" && <Twitter className="mr-2 h-4 w-4" />}
-                            <span className="text-sm">{social.platform}:</span>
-                          </div>
-                          <Input
-                            type="url"
-                            value={social.url}
-                            onChange={(e) => updateSocialMediaUrl(index, e.target.value)}
-                            placeholder={`Your ${social.platform} profile URL`}
-                            className={formErrors[`social_media_${index}`] ? "border-red-500" : ""}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="flex-shrink-0"
-                            onClick={() => removeSocialMedia(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      {formData.social_media.some((_, index) => formErrors[`social_media_${index}`]) && (
-                        <p className="mt-1 text-sm text-red-600">
-                          Please enter valid social media URLs
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
 
           <Button
             type="submit"
             className="mt-8 w-full dark:bg-[#AD0000] dark:text-white dark:hover:bg-[#890000] dark:hover:text-white hover:cursor-pointer"
             disabled={loading}
-            onClick={handleSubmit}
           >
             {loading ? "Registering..." : "Register Company"}
           </Button>
