@@ -1,17 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  Search,
-  Filter,
-  Building2,
-  Globe,
-  Users,
-  Target,
-  Briefcase,
-  Banknote,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import CompanyCard from "@/components/CompanyCard";
+
+import { useSearchParams } from "next/navigation";
+
 import CompanyFilters from "@/components/CompanyFilters";
 import { BASE_URL } from "@/lib/utils";
 import Link from "next/link";
@@ -29,6 +23,7 @@ interface Pagination {
 }
 
 export default function CompaniesPage() {
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -37,6 +32,8 @@ export default function CompaniesPage() {
     niche: "",
     yearFounded: "",
   });
+  const search = searchParams.getAll("location");
+  console.log(search);
   const [initialFilters, setInitialFilters] = useState({
     location: "",
     size: "",
@@ -129,96 +126,101 @@ export default function CompaniesPage() {
     }
   };
 
-  // // Fetch initial companies and handle URL parameters on load
-  // useEffect(() => {
-  //   const fetchInitialCompanies = async () => {
-  //     try {
-  //       setIsLoading(true);
+  // Fetch initial companies and handle URL parameters on load
+  useEffect(() => {
+    const fetchInitialCompanies = async () => {
+      try {
+        setIsLoading(true);
 
-  //       // Parse URL parameters
-  //       const urlParams = new URLSearchParams(window.location.search);
-  //       const countryParam = urlParams.get("country");
-  //       const nicheParam = urlParams.get("niche");
-  //       const sizeParam = urlParams.get("size");
-  //       const yearFoundedParam = urlParams.get("year_founded");
-  //       const searchParam = urlParams.get("search_term");
-  //       const pageParam = urlParams.get("page");
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const countryParam = urlParams.get("country");
+        const nicheParam = urlParams.get("niche");
+        const sizeParam = urlParams.get("size");
+        const yearFoundedParam = urlParams.get("year_founded");
+        const searchParam = urlParams.get("search_term");
+        const pageParam = urlParams.get("page");
 
-  //       // Update filters and search state if URL parameters exist
-  //       const filtersFromURL = {
-  //         location: countryParam || "",
-  //         niche: nicheParam || "",
-  //         size: sizeParam || "",
-  //         yearFounded: yearFoundedParam || "",
-  //       };
+        // Update filters and search state if URL parameters exist
+        const filtersFromURL = {
+          location: countryParam || "",
+          niche: nicheParam || "",
+          size: sizeParam || "",
+          yearFounded: yearFoundedParam || "",
+        };
 
-  //       // Set initial filters for the CompanyFilters component
-  //       setInitialFilters(filtersFromURL);
+        // Set initial filters for the CompanyFilters component
+        setInitialFilters(filtersFromURL);
 
-  //       // Update filters state
-  //       setFilters(filtersFromURL);
+        // Update filters state
+        setFilters(filtersFromURL);
 
-  //       // Update search query if present
-  //       if (searchParam) {
-  //         setSearchQuery(searchParam);
-  //       }
+        // Update search query if present
+        if (searchParam) {
+          setSearchQuery(searchParam);
+        }
 
-  //       // Update page if present
-  //       if (pageParam) {
-  //         setPagination((prev) => ({
-  //           ...prev,
-  //           page: parseInt(pageParam, 10) || 1,
-  //         }));
-  //       }
+        // Update page if present
+        if (pageParam) {
+          setPagination((prev) => ({
+            ...prev,
+            page: parseInt(pageParam, 10) || 1,
+          }));
+        }
 
-  //       // Build query parameters
-  //       const params = new URLSearchParams({
-  //         ...(countryParam && { country: countryParam }),
-  //         ...(nicheParam && { niche: nicheParam }),
-  //         ...(sizeParam && { size: sizeParam }),
-  //         ...(yearFoundedParam && { year_founded_min: yearFoundedParam }),
-  //         ...(yearFoundedParam && { year_founded_max: yearFoundedParam }),
-  //         ...(searchParam && { search_term: searchParam }),
-  //         page: pageParam || "1",
-  //         per_page: pagination.per_page.toString(),
-  //       });
+        // Build query parameters
+        const params = new URLSearchParams({
+          ...(countryParam && { country: countryParam }),
+          ...(nicheParam && { niche: nicheParam }),
+          ...(sizeParam && { size: sizeParam }),
+          ...(yearFoundedParam && { year_founded_min: yearFoundedParam }),
+          ...(yearFoundedParam && { year_founded_max: yearFoundedParam }),
+          ...(searchParam && { search_term: searchParam }),
+          page: pageParam || "1",
+          per_page: pagination.per_page.toString(),
+        });
 
-  //       // Fetch companies with filters
-  //       const hasParams =
-  //         countryParam ||
-  //         nicheParam ||
-  //         sizeParam ||
-  //         yearFoundedParam ||
-  //         searchParam;
-  //       const url = hasParams
-  //         ? `${BASE_URL}/public/companies/search?${params}`
-  //         : `${BASE_URL}/api/v1/company/all?page=${pagination.page}&per_page=${pagination.per_page}`;
+        // Fetch companies with filters
+        const hasParams =
+          countryParam ||
+          nicheParam ||
+          sizeParam ||
+          yearFoundedParam ||
+          searchParam;
+        const url = hasParams
+          ? `${BASE_URL}/public/companies/search?${params}`
+          : `${BASE_URL}/api/v1/company/all?page=${pagination.page}&per_page=${pagination.per_page}`;
 
-  //       const response = await fetch(url, {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //         },
-  //         credentials: "include",
-  //       });
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          credentials: "include",
+        });
 
-  //       if (!response.ok)
-  //         throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
 
-  //       const { data, pagination: paginationData } = await response.json();
-  //       setCompanies(data);
-  //       setPagination(paginationData);
-  //     } catch (error) {
-  //       showToast("Failed to load companies", "error");
-  //       console.error("Error loading companies:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+        const { data, pagination: paginationData } = await response.json();
+        setCompanies(data);
+        setPagination((prev) => ({
+          ...prev,
+          total: paginationData.total,
+          total_pages: paginationData.total_pages,
+        }));
+      } catch (error) {
+        showToast("Failed to load companies", "error");
+        console.error("Error loading companies:", error);
+        setError("Failed to load companies. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  //   fetchInitialCompanies();
-  // }, []);
+    fetchInitialCompanies();
+  }, []);
 
   useEffect(() => {
     // Skip the initial render
@@ -241,25 +243,7 @@ export default function CompaniesPage() {
     }
   }, [filters, searchQuery]);
 
-  // Fetch companies when page changes
-  useEffect(() => {
-    if (pagination.page > 1) {
-      fetchCompanies(searchQuery !== "");
-    }
-  }, [pagination.page]);
-
-  // Debounced fetch when filters or search change
-  useEffect(() => {
-    const getData = setTimeout(() => {
-      if (!isLoading) {
-        // Prevent duplicate fetches during initial load
-        fetchCompanies(true);
-      }
-    }, 500); // Reduced from 1500ms to 500ms for better responsiveness
-
-    return () => clearTimeout(getData);
-  }, [searchQuery, filters]);
-
+  // Handle page changes
   const handlePageChange = (newPage: number) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
   };
@@ -321,63 +305,58 @@ export default function CompaniesPage() {
           </div>
         </div>
 
-        {/* Loading and Error States */}
-        {/* {isLoading && (
+        {/* Loading State */}
+        {isLoading && (
           <div className="text-center py-12 col-span-full">
             <LoadingScreen />
             <p className="text-xl text-gray-600">Loading companies...</p>
           </div>
-        )} */}
+        )}
 
-        {error && (
+        {/* Error State */}
+        {error && !isLoading && (
           <div className="text-center py-12 col-span-full">
             <p className="text-xl text-red-600">{error}</p>
           </div>
         )}
 
         {/* Companies Grid */}
-        {
-          // (isLoading && (
-          //   <div className="text-center py-12 col-span-full">
-          //     <LoadingScreen />
-          //     <p className="text-xl text-gray-600">Loading companies...</p>
-          //   </div>
-          // )) ||
-          !isLoading && !error && (
-            <>
-              <div className="grid gap-4 md:gap-6" suppressHydrationWarning>
-                {/* Table Header */}
-                <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_1fr_1fr_80px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
-                  <div className="text-left font-medium text-sm text-gray-700">
-                    Company
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Niche
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Services
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Size (employees)
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Website
-                  </div>
-                  <div></div>
+        {!isLoading && !error && (
+          <>
+            <div className="grid gap-4 md:gap-6" suppressHydrationWarning>
+              {/* Table Header */}
+              <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_1fr_1fr_80px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
+                <div className="text-left font-medium text-sm text-gray-700">
+                  Company
                 </div>
-
-                {companies.length === 0 && !isLoading ? (
-                  <div className="text-center py-12 col-span-full">
-                    <p className="text-xl text-gray-600">No Companies Found</p>
-                  </div>
-                ) : (
-                  companies.map((company) => (
-                    <CompanyCard key={company.id} company={company} />
-                  ))
-                )}
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Niche
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Services
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Size (employees)
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Website
+                </div>
+                <div></div>
               </div>
 
-              {/* Pagination Controls */}
+              {companies.length === 0 ? (
+                <div className="text-center py-12 col-span-full">
+                  <p className="text-xl text-gray-600">No Companies Found</p>
+                </div>
+              ) : (
+                companies.map((company) => (
+                  <CompanyCard key={company.id} company={company} />
+                ))
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            {companies.length > 0 && (
               <div className="mt-8">
                 <Pagination
                   currentPage={pagination.page}
@@ -385,9 +364,9 @@ export default function CompaniesPage() {
                   onPageChange={handlePageChange}
                 />
               </div>
-            </>
-          )
-        }
+            )}
+          </>
+        )}
       </div>
     </div>
   );
