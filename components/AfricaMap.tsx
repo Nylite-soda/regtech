@@ -451,11 +451,11 @@ export const AfricaMap = () => {
   const stats = useMemo(() => getSelectedStats(), [getSelectedStats]);
 
   return (
-    <div className="bg-[#080808] min-h-screen">
+    <div className="bg-[#080808] py-24 lg:py-32 min-h-screen lg:px-6">
       <div className="max-w-[1440px] mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-white text-2xl md:text-3xl font-bold">
+            <h1 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold">
               African RegTech Landscape
             </h1>
             <p className="text-[#A0A0A0] mt-2">
@@ -468,7 +468,7 @@ export const AfricaMap = () => {
                 setSelectedRegion(null);
                 setSelectedCountry(null);
               }}
-              className="flex items-center gap-2 text-[#E7E7E7] hover:text-white text-sm bg-[#1E1E1E] px-4 py-2 rounded-md transition-all hover:bg-[#2D2D2D] border border-[#363636] hover:border-[#AD0000]"
+              className="flex items-center gap-2 text-[#E7E7E7] hover:text-white text-sm bg-[#1E1E1E] px-4 py-2 rounded-md transition-all hover:bg-[#2D2D2D] border border-[#363636] hover:border-[#AD0000] w-full sm:w-auto"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -478,12 +478,12 @@ export const AfricaMap = () => {
           )}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-[400px] flex flex-col gap-6">
+        <div className="flex flex-col lg:flex-row gap-3 md:gap-8 lg:mt-20">
+          <div className="w-full lg:w-[400px] flex flex-col gap-6 order-2 lg:order-1">
             <Card className="bg-[#1E1E1E] border-[#363636] transition-all duration-300 hover:border-[#AD0000] shadow-lg">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                     <h3 className="text-white text-xl font-bold flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-[#AD0000]" />
                       {stats.title}
@@ -493,7 +493,7 @@ export const AfricaMap = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-[#2D2D2D] p-5 rounded-lg grid grid-cols-2 gap-5">
+                  <div className="bg-[#2D2D2D] p-3 sm:p-5 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
                     {Object.entries(stats.data).map(([key, value]) => (
                       <div 
                         key={key}
@@ -511,7 +511,7 @@ export const AfricaMap = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 mt-6">
                   <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#AD0000]" />
                     Regions
@@ -576,13 +576,13 @@ export const AfricaMap = () => {
             </Card>
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 order-1 lg:order-2 min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
             <Card className={`
               bg-[${THEME.secondary}] border-[${THEME.border}]
               transition-all duration-300 hover:border-[${THEME.primary}]
               shadow-lg h-full
             `}>
-              <CardContent className="p-6">
+              <CardContent className="p-3 sm:p-6">
                 <style jsx global>{`
                   .custom-scrollbar::-webkit-scrollbar {
                     width: 4px;
@@ -598,114 +598,127 @@ export const AfricaMap = () => {
                   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                     background: #AD0000;
                   }
+                  
+                  // @media (max-width: 768px) {
+                  //   .responsive-map {
+                  //     transform: scale(0.8);
+                  //     transform-origin: center center;
+                  //   }
+                  // }
+                  
+                  }
                 `}</style>
-                <ComposableMap
-                  projection="geoMercator"
-                  projectionConfig={{
-                    scale: 420,
-                    center: [15, 0],
-                  }}
-                  width={800}
-                  height={600}
-                  className="transition-all duration-300"
-                >
-                  <Geographies geography={africaData}>
-                    {({ geographies }) =>
-                      geographies.map((geo) => {
-                        const isHovered = hoveredRegion && 
-                          regions[hoveredRegion as keyof typeof regions]?.countries.includes(geo.properties.name);
-                        return (
-                          <Geography
-                            key={geo.rsmKey}
-                            geography={geo}
-                            onClick={() => {
-                              const countryName = geo.properties.name;
-                              console.log("Clicked country:", countryName);
-                              
-                              const normalizedGeoName = countryName.toLowerCase().trim();
-                              let matchedCountry = null;
-                              
-                              // Special handling for Guinea variations
-                              if (normalizedGeoName.includes('guinea')) {
-                                if (normalizedGeoName.includes('equatorial') || normalizedGeoName === 'eq. guinea') {
-                                  matchedCountry = "Equatorial Guinea";
-                                } else if (normalizedGeoName.includes('bissau')) {
-                                  matchedCountry = "Guinea-Bissau";
-                                } else if (normalizedGeoName === 'guinea') {
-                                  matchedCountry = "Guinea";
-                                }
-                              } else {
-                                // Try exact match first
-                                const exactMatch = Object.keys(countryData).find(name => 
-                                  name.toLowerCase() === normalizedGeoName
-                                );
+                <div className="w-full h-full py-4 md:py-0 overflow-hidden">
+                  <ComposableMap
+                    projection="geoMercator"
+                    projectionConfig={{
+                      scale: 420,
+                      center: [15, 0],
+                    }}
+                    width={800}
+                    height={600}
+                    className="transition-all duration-300 responsive-map"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxHeight: '600px'
+                    }}
+                  >
+                    <Geographies geography={africaData}>
+                      {({ geographies }) =>
+                        geographies.map((geo) => {
+                          const isHovered = hoveredRegion && 
+                            regions[hoveredRegion as keyof typeof regions]?.countries.includes(geo.properties.name);
+                          return (
+                            <Geography
+                              key={geo.rsmKey}
+                              geography={geo}
+                              onClick={() => {
+                                const countryName = geo.properties.name;
                                 
-                                // Try name mapping
-                                const mappedName = countryNameMapping[countryName];
+                                const normalizedGeoName = countryName.toLowerCase().trim();
+                                let matchedCountry = null;
                                 
-                                // Try strict partial match for non-Guinea countries
-                                const partialMatch = !normalizedGeoName.includes('guinea') ? 
-                                  Object.keys(countryData).find(name => {
-                                    const normalizedName = name.toLowerCase();
-                                    // Only match if the geo name contains all words from the country name in sequence
-                                    return normalizedName.split(/\s+/).every((word, index, words) => {
-                                      const position = normalizedGeoName.indexOf(word);
-                                      if (position === -1) return false;
-                                      
-                                      // For multi-word country names, ensure words appear in sequence
-                                      if (index > 0) {
-                                        const prevWord = words[index - 1];
-                                        const prevPosition = normalizedGeoName.indexOf(prevWord);
-                                        return prevPosition < position;
-                                      }
-                                      return true;
-                                    });
-                                  }) : null;
-                                
-                                matchedCountry = exactMatch || 
-                                                (mappedName && countryData[mappedName] ? mappedName : null) || 
-                                                partialMatch;
-                              }
-                              
-                              console.log("Matched country:", matchedCountry);
-                              
-                              if (matchedCountry) {
-                                setSelectedCountry(matchedCountry);
-                                Object.entries(regions).forEach(([region, data]) => {
-                                  if (data.countries.includes(matchedCountry)) {
-                                    setSelectedRegion(region);
+                                // Special handling for Guinea variations
+                                if (normalizedGeoName.includes('guinea')) {
+                                  if (normalizedGeoName.includes('equatorial') || normalizedGeoName === 'eq. guinea') {
+                                    matchedCountry = "Equatorial Guinea";
+                                  } else if (normalizedGeoName.includes('bissau')) {
+                                    matchedCountry = "Guinea-Bissau";
+                                  } else if (normalizedGeoName === 'guinea') {
+                                    matchedCountry = "Guinea";
                                   }
-                                });
-                              }
-                            }}
-                            style={{
-                              default: {
-                                fill: isHovered ? '#363636' : getCountryColor(geo),
-                                stroke: "#363636",
-                                strokeWidth: 0.5,
-                                outline: "none",
-                                transition: 'all 0.3s',
-                              },
-                              hover: {
-                                fill: "#AD0000",
-                                stroke: "#363636",
-                                strokeWidth: 0.5,
-                                outline: "none",
-                                transition: 'all 0.3s',
-                              },
-                              pressed: {
-                                fill: "#AD0000",
-                                stroke: "#363636",
-                                strokeWidth: 0.5,
-                                outline: "none",
-                              },
-                            }}
-                          />
-                        );
-                      })
-                    }
-                  </Geographies>
-                </ComposableMap>
+                                } else {
+                                  // Try exact match first
+                                  const exactMatch = Object.keys(countryData).find(name => 
+                                    name.toLowerCase() === normalizedGeoName
+                                  );
+                                  
+                                  // Try name mapping
+                                  const mappedName = countryNameMapping[countryName];
+                                  
+                                  // Try strict partial match for non-Guinea countries
+                                  const partialMatch = !normalizedGeoName.includes('guinea') ? 
+                                    Object.keys(countryData).find(name => {
+                                      const normalizedName = name.toLowerCase();
+                                      // Only match if the geo name contains all words from the country name in sequence
+                                      return normalizedName.split(/\s+/).every((word, index, words) => {
+                                        const position = normalizedGeoName.indexOf(word);
+                                        if (position === -1) return false;
+                                        
+                                        // For multi-word country names, ensure words appear in sequence
+                                        if (index > 0) {
+                                          const prevWord = words[index - 1];
+                                          const prevPosition = normalizedGeoName.indexOf(prevWord);
+                                          return prevPosition < position;
+                                        }
+                                        return true;
+                                      });
+                                    }) : null;
+                                  
+                                  matchedCountry = exactMatch || 
+                                                  (mappedName && countryData[mappedName] ? mappedName : null) || 
+                                                  partialMatch;
+                                }
+                                
+                                if (matchedCountry) {
+                                  setSelectedCountry(matchedCountry);
+                                  Object.entries(regions).forEach(([region, data]) => {
+                                    if (data.countries.includes(matchedCountry)) {
+                                      setSelectedRegion(region);
+                                    }
+                                  });
+                                }
+                              }}
+                              style={{
+                                default: {
+                                  fill: isHovered ? '#363636' : getCountryColor(geo),
+                                  stroke: "#363636",
+                                  strokeWidth: 0.5,
+                                  outline: "none",
+                                  transition: 'all 0.3s',
+                                },
+                                hover: {
+                                  fill: "#AD0000",
+                                  stroke: "#363636",
+                                  strokeWidth: 0.5,
+                                  outline: "none",
+                                  transition: 'all 0.3s',
+                                },
+                                pressed: {
+                                  fill: "#AD0000",
+                                  stroke: "#363636",
+                                  strokeWidth: 0.5,
+                                  outline: "none",
+                                },
+                              }}
+                            />
+                          );
+                        })
+                      }
+                    </Geographies>
+                  </ComposableMap>
+                </div>
               </CardContent>
             </Card>
           </div>

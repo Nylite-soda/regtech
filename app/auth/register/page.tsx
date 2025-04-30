@@ -16,7 +16,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { BASE_URL, storeRedirectUrl, isUserSignedIn } from "@/lib/utils";
+import { BASE_URL, isUserSignedIn, storeRedirectUrl } from "@/lib/utils";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 
 // Define the structure of our form errors
@@ -66,23 +66,18 @@ export default function Register() {
     privacyAccepted: null,
   });
 
-  // Redirect if user is already signed in
+  // Redirect if user is NOT signed in
   useEffect(() => {
     const checkAuth = async () => {
-      if (isUserSignedIn()) {
+      if (!isUserSignedIn()) {
         setIsRedirecting(true);
-        router.push("/");
+        storeRedirectUrl();
+        router.push("/auth/signin");
       }
     };
     
     checkAuth();
   }, [router]);
-
-  // Store the current URL in localStorage when component mounts
-  useEffect(() => {
-    // Use the utility function to store the redirect URL
-    storeRedirectUrl();
-  }, []);
 
   // Validate a single field and return the error message or null
   const validateField = (name: string, value: string): string | null => {
@@ -206,7 +201,7 @@ export default function Register() {
     }
   };
 
-  // If user is signed in or redirecting, show a loading state
+  // If user is not signed in or redirecting, show a loading state
   if (isRedirecting) {
     return (
       <LoadingScreen />
@@ -377,24 +372,6 @@ export default function Register() {
               )}
             </div>
 
-            {/* <div className="space-y-2">
-              <Label htmlFor="subscriptionPlan" className="text-sm font-medium">Subscription Plan</Label>
-              <div className="relative">
-                <Users className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <select
-                  id="subscriptionPlan"
-                  name="subscriptionPlan"
-                  value={formData.subscriptionPlan}
-                  onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value })}
-                  className="w-full p-2 border rounded-md pl-9 bg-background"
-                >
-                  <option value="free">Free</option>
-                  <option value="basic">Basic</option>
-                  <option value="premium">Premium</option>
-                </select>
-              </div>
-            </div> */}
-
             <div className="space-y-2">
               <Label htmlFor="referralCode" className="text-sm font-medium">Referral Code (Optional)</Label>
               <Input
@@ -497,4 +474,4 @@ export default function Register() {
       </Card>
     </div>
   );
-} 
+}

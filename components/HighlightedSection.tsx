@@ -1,7 +1,11 @@
-import React from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const companies = [
   {
@@ -61,147 +65,198 @@ const companies = [
   },
 ];
 
+const categories = ["AML", "KYC", "Regulatory", "Compliance", "SupTech"];
+
 const HighlightedSection = () => {
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    const container = document.getElementById('companies-container');
+    if (container) {
+      const scrollAmount = direction === 'left' ? -630 : 630;
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      setScrollPosition(container.scrollLeft + scrollAmount);
+    }
+  };
+
   return (
-    <section className="flex flex-col w-full mx-auto mt-10 p-3 md:p-6 justify-center gap-5 max-w-7xl">
-      <div className="p-3 w-fit font-family:'Satoshi-Medium',Helvetica] rounded-tr-xl pr-8 bg-[#AD0000] font-medium text-white text-xl md:text-2xl">
-          Highlighted Companies
-      </div>
-      <div className="relative flex max-w-full  md:items-center items-end justify-between mx-5 md:mx-0">
-        <div className="flex flex-col gap-3">
-          <span className="text-gray-400 font-medium">Categories:</span>
-          <div className="flex gap-3 items-center flex-wrap">
+    <section className="w-full py-10 lg:py-16 pb-20 mx-auto mt-10 px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className={cn(
+        "flex flex-col gap-8",
+        "animate-in fade-in-50 duration-1000"
+      )}>
+        {/* Header */}
+        <div className={cn(
+          "inline-flex items-center px-6 py-3",
+          "bg-gradient-to-r from-red-600 to-red-800",
+          "dark:from-red-500 dark:to-red-700",
+          "rounded-tr-2xl rounded-bl-2xl",
+          "shadow-lg",
+          "w-fit"
+        )}>
+          <h2 className="text-xl md:text-2xl font-semibold text-white">
+            Highlighted Companies
+          </h2>
+        </div>
+
+        {/* Categories and Navigation */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col gap-3">
+            <span className="text-gray-500 dark:text-gray-400 font-medium">
+              Categories:
+            </span>
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant="outline"
+                  onClick={() => setActiveCategory(activeCategory === category ? null : category)}
+                  className={cn(
+                    "rounded-xl border-2 font-medium",
+                    "transition-all duration-300",
+                    "hover:scale-105 active:scale-95",
+                    activeCategory === category
+                      ? "border-red-600 bg-red-600 text-white dark:border-red-500 dark:bg-red-500"
+                      : "border-gray-200 dark:border-gray-700 hover:border-red-600 dark:hover:border-red-500"
+                  )}
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3">
             <Button
-              variant="secondary"
-              className="hover:cursor-pointer px-4 py-1.5 active:bg-[#323232] active:text-white border-2 rounded-xl border-gray-300 font-medium"
+              variant="outline"
+              onClick={() => handleScroll('left')}
+              className={cn(
+                "w-12 h-12 rounded-full p-0",
+                "bg-gray-900 dark:bg-gray-800",
+                "border-none text-white",
+                "hover:bg-red-600 dark:hover:bg-red-500",
+                "transition-all duration-300",
+                "hover:scale-110 active:scale-95"
+              )}
             >
-              AML
+              <ChevronLeft className="h-6 w-6" />
             </Button>
             <Button
-              variant="secondary"
-              className="hover:cursor-pointer px-4 py-1.5 active:bg-[#323232] active:text-white border-2 rounded-xl border-gray-300 font-medium"
+              variant="outline"
+              onClick={() => handleScroll('right')}
+              className={cn(
+                "w-12 h-12 rounded-full p-0",
+                "bg-gray-900 dark:bg-gray-800",
+                "border-none text-white",
+                "hover:bg-red-600 dark:hover:bg-red-500",
+                "transition-all duration-300",
+                "hover:scale-110 active:scale-95"
+              )}
             >
-              KYC
-            </Button>
-            <Button
-              variant="secondary"
-              className="hover:cursor-pointer px-4 py-1.5 active:bg-[#323232] active:text-white border-2 rounded-xl border-gray-300 font-medium"
-            >
-              Regulatory
-            </Button>
-            <Button
-              variant="secondary"
-              className="hover:cursor-pointer px-4 py-1.5 active:bg-[#323232] active:text-white border-2 rounded-xl border-gray-300 font-medium"
-            >
-              Compliance
-            </Button>
-            <Button
-              variant="secondary"
-              className="hover:cursor-pointer px-4 py-1.5 active:bg-[#323232] active:text-white border-2 rounded-xl border-gray-300 font-medium"
-            >
-              SupTech
+              <ChevronRight className="h-6 w-6" />
             </Button>
           </div>
         </div>
 
-        <div className="flex gap-2 md:gap-5 absolute bottom-0 -right-2">
-          <Button
-            variant="outline"
-            className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] bg-[#373737] rounded-[35px] rotate-180 p-0 border-none hover:bg-[#AD0000] hover:cursor-pointer"
-            aria-label="Previous company"
-          >
-            <img
-              className="w-[25px] md:w-[25px] md:h-[35px] -rotate-180"
-              alt="Arrow right"
-              src="/images/arrow-right-1.svg"
-            />
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-[35px] h-[35px] md:w-[50px] md:h-[50px] bg-[#373737] rounded-[35px] p-0 border-none hover:bg-[#AD0000] hover:cursor-pointer"
-            aria-label="Next company"
-          >
-            <img
-              className="w-[25px] md:w-[25px] md:h-[35px]"
-              alt="Arrow right"
-              src="/images/arrow-right-3.svg"
-            />
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-5 w-full overflow-x-auto no-scrollbar p-2">
-        {companies.map((company) => (
-          <Card
-            key={company.id}
-            className="relative w-[325px] md:w-[630px] h-[400px] md:h-[380px] rounded-2xl flex-shrink-0 drop-shadow-lg border border-gray-300 hover:scale-[1.01] transition"
-          >
-            <CardContent className=" relative flex flex-col h-full md:h-[380px] items-start gap-5 pt-[25px] md:pt-[42px] px-[30px] w-full">
-              <div className="flex items-center gap-5 lg:gap-[70px] w-full">
-                <div className="flex items-center gap-3.5">
-                  <img
-                    className="w-[95px] md:w-[120px] h-[95x] md:h-[120px] object-cover rounded-2xl border-gray-300 border-2"
-                    alt={`${company.name} logo`}
-                    src={company.logo}
-                  />
-
-                  <div className="flex flex-col w-[246px] items-start">
-                    <h3 className="[font-family:'Satoshi-Medium',Helvetica] text-black font-medium dark:text-white text-2xl md:text-4xl">
-                      {company.name}
-                    </h3>
-
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <p className="[font-family:'Satoshi-Medium',Helvetica] text-[#373737] font-medium dark:text-[#e7e7e7] text-base md:text-lg leading-6">
+        {/* Companies List */}
+        <div 
+          id="companies-container"
+          className={cn(
+            "flex gap-6 overflow-x-auto pb-8",
+            "scroll-smooth scrollbar-hide",
+            "snap-x snap-mandatory",
+            "no-scrollbar"
+          )}
+        >
+          {companies.map((company) => (
+            <Card
+              key={company.id}
+              className={cn(
+                "w-[325px] md:w-[630px] shrink-0",
+                "snap-center",
+                "border border-gray-200 dark:border-gray-800",
+                "bg-white dark:bg-gray-900",
+                "shadow-lg hover:shadow-xl",
+                "transition-all duration-300",
+                "hover:scale-[1.01]",
+                "animate-in fade-in-50 duration-400"
+              )}
+            >
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "w-24 h-24 md:w-28 md:h-28",
+                      "rounded-2xl overflow-hidden",
+                      "border-2 border-gray-200 dark:border-gray-700"
+                    )}>
+                      <img
+                        src={company.logo}
+                        alt={`${company.name} logo`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className={cn(
+                        "text-2xl md:text-3xl font-semibold",
+                        "text-gray-900 dark:text-white"
+                      )}>
+                        {company.name}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
                         {company.category}
                       </p>
+                      <div className="flex items-center gap-2">
+                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {company.rating}
+                        </span>
+                      </div>
                     </div>
-
-                    <Link href="/companies">
-                      <Button className="mt-1 md:hidden w-[90px] h-8 hover:bg-black hover:scale-[1.02] hover:cursor-pointer dark:bg-white rounded [font-family:'Satoshi-Bold',Helvetica] font-bold bg-[#080808] text-xs">
-                        View profile
-                      </Button>
-                    </Link>
                   </div>
+                  <Link href={`/companies/${company.id}`}>
+                    <Button
+                      className={cn(
+                        "bg-gray-900 dark:bg-white",
+                        "text-white dark:text-gray-900",
+                        "hover:bg-red-600 dark:hover:bg-red-500",
+                        "hover:text-white dark:hover:text-white",
+                        "transition-all duration-300",
+                        "hover:scale-105"
+                      )}
+                    >
+                      View Profile
+                    </Button>
+                  </Link>
                 </div>
 
-                <Link href="/companies">
-                <Button className="hidden md:block w-[120px] h-12 hover:bg-black hover:scale-[1.02] hover:cursor-pointer dark:bg-white rounded-xl [font-family:'Satoshi-Bold',Helvetica] font-bold bg-[#080808] text-base">
-                  View profile
-                </Button>
-                </Link>
-              </div>
-
-              <div className="flex flex-1 flex-col items-start gap-[30px] w-full">
-                <p className="[font-family:'Satoshi-Medium',Helvetica] text-gray-400 font-medium dark:text-[#e7e7e7] text-base tracking-wide leading-[22px]">
+                <p className="text-gray-600 dark:text-gray-300 line-clamp-3">
                   {company.description}
                 </p>
 
-                <div className="absolute flex justify-start gap-3 w-full items-start bottom-6">
-                  <div className="flex flex-col items-start gap-2 w-[40%]">
-                    <span className="[font-family:'Satoshi-Medium',Helvetica] text-gray-500 font-medium dark:text-[#e7e7e7] text-base text-center leading-[14px] whitespace-nowrap">
-                      Location:
+                <div className="flex items-center gap-6 pt-4">
+                  <div className="space-y-1">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      Location
                     </span>
-
-                    <span className="[font-family:'Satoshi-Medium',Helvetica] font-medium text-gray-400 dark:text-white text-base md:text-lg leading-6">
+                    <p className="text-gray-900 dark:text-white font-medium">
                       {company.location}
-                    </span>
+                    </p>
                   </div>
-
-                  <div className="flex flex-col items-start gap-2">
-                    <span className="[font-family:'Satoshi-Medium',Helvetica] font-medium text-gray-500 dark:text-[#e7e7e7] text-base text-center leading-[14px] whitespace-nowrap">
-                      Founded:
+                  <div className="space-y-1">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      Founded
                     </span>
-
-                    <span className="[font-family:'Satoshi-Medium',Helvetica] font-medium text-gray-400 dark:text-white text-lg leading-6">
+                    <p className="text-gray-900 dark:text-white font-medium">
                       {company.founded}
-                    </span>
+                    </p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </section>
   );

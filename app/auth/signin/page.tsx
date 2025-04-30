@@ -113,7 +113,6 @@ export default function SignIn() {
       });
   
       const result = await response.json();
-      console.log(result.detail)
   
       if (result?.detail) {
         if (result.detail === "Invalid user credentials") {

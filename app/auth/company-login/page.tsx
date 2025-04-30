@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { save, BASE_URL, getAndClearRedirectUrl } from "@/lib/utils";
+import { BASE_URL, getAndClearRedirectUrl } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 
 export default function CompanyLogin() {
@@ -68,6 +68,7 @@ export default function CompanyLogin() {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,21 +91,25 @@ export default function CompanyLogin() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          // Remove user token from headers
         },
         body: JSON.stringify(formData),
-      });
+      })
       
       const result = await response.json();
       
       if (result.status !== "success") {
-        setError(result.message || "Invalid email or password");
+        if (response.status === 401) {
+          setError("Invalid company credentials");
+        } else if (response.status === 404) {
+          setError("Company not found");
+        }
       } else if (result.status === "success") {
         localStorage.setItem("company", JSON.stringify(result.data));
         localStorage.setItem("access_token", result.access_token);  
         showToast(`Welcome back!`, "success");
         const redirectUrl = getAndClearRedirectUrl();
-        router.push(redirectUrl);
+        router.push(`/dashboard/company/$`);
       }
     } catch (err) {
       setError("An error occurred. Please try again later.");

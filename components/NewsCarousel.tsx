@@ -4,43 +4,39 @@ import React, { useState, useEffect, useRef } from "react";
 import { ChevronUp, ChevronDown, Pause, Play } from "lucide-react";
 import { Button } from "./ui/button";
 
-const NewsCarousel = () => {
-  // Sample news data
-  const newsItems = [
-    {
-      title: "Breaking: Global Climate Summit Announces Ambitious Targets",
-      summary:
-        "World leaders gather to discuss critical climate change mitigation strategies.",
-      timestamp: "2 hours ago",
-    },
-    {
-      title: "Tech Innovation: AI Breakthrough in Medical Diagnostics",
-      summary:
-        "New machine learning model shows unprecedented accuracy in disease detection.",
-      timestamp: "4 hours ago",
-    },
-    {
-      title: "Economic Outlook: Global Markets Show Resilience",
-      summary: "Analysts predict steady growth despite ongoing challenges.",
-      timestamp: "6 hours ago",
-    },
-    {
-      title: "Space Exploration: Mars Mission Reaches Milestone",
-      summary: "Rover discovers potential signs of ancient microbial activity.",
-      timestamp: "8 hours ago",
-    },
-  ];
+const newsItems = [
+  {
+    title: "RegTech Africa Conference 2025 Announced",
+    summary: "Annual gathering of regulatory technology leaders set for Lagos, featuring global experts and innovative solutions.",
+    timestamp: "2 hours ago",
+  },
+  {
+    title: "New Compliance Framework for African Fintech",
+    summary: "Pan-African regulatory body introduces comprehensive guidelines for fintech operations across the continent.",
+    timestamp: "4 hours ago",
+  },
+  {
+    title: "AI in Regulatory Reporting Shows Promise",
+    summary: "Study reveals 60% efficiency improvement in compliance processes through AI-powered reporting tools.",
+    timestamp: "6 hours ago",
+  },
+  {
+    title: "Digital Currency Regulations Update",
+    summary: "African central banks collaborate on unified regulatory approach for digital currencies and assets.",
+    timestamp: "8 hours ago",
+  },
+];
 
+const NewsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  let intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Autoplay functionality
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % newsItems.length);
-      }, 5000); // Change slide every 5 seconds
+      }, 5000);
     } else {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
@@ -52,17 +48,14 @@ const NewsCarousel = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPlaying, newsItems.length]);
+  }, [isPlaying]);
 
-  // Navigation handlers
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % newsItems.length);
   };
 
   const handlePrevious = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + newsItems.length) % newsItems.length
-    );
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + newsItems.length) % newsItems.length);
   };
 
   const togglePlayPause = () => {
@@ -70,8 +63,7 @@ const NewsCarousel = () => {
   };
 
   return (
-    <div className="w-full h-44 bg-black text-white flex flex-col self-center relative overflow-hidden">
-      {/* News Content */}
+    <div className="w-full h-44 bg-gray-900 text-white flex flex-col relative overflow-hidden  shadow-lg">
       <div className="flex-grow relative overflow-hidden">
         {newsItems.map((item, index) => (
           <div
@@ -88,10 +80,10 @@ const NewsCarousel = () => {
               <h2 className="md:text-2xl text-lg font-bold md:leading-normal leading-5">
                 {item.title}
               </h2>
-              <p className="text-white mt-2 mb-3 md:text-sm md:mb-3 md:leading-normal leading-none">
+              <p className="text-gray-300 mt-2 mb-3 md:text-sm md:mb-3 md:leading-normal leading-none line-clamp-2">
                 {item.summary}
               </p>
-              <span className="text-gray-300 text-xs md:text-sm">
+              <span className="text-gray-400 text-xs md:text-sm">
                 {item.timestamp}
               </span>
             </div>
@@ -99,40 +91,38 @@ const NewsCarousel = () => {
         ))}
       </div>
 
-      {/* Control Buttons */}
-      <div className="absolute top-0 h-full right-0 p-2 flex justify-center items-center">
+      <div className="absolute top-0 h-full right-3 p-2 flex justify-center items-center">
         <div className="flex flex-col space-y-2">
           <Button
             onClick={handlePrevious}
             size="icon"
-            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000]/90 transition"
           >
-            <ChevronUp />
+            <ChevronUp className="h-4 w-4" />
           </Button>
           <Button
             onClick={handleNext}
             size="icon"
-            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000]/90 transition"
           >
-            <ChevronDown />
+            <ChevronDown className="h-4 w-4" />
           </Button>
           <Button
             onClick={togglePlayPause}
             size="icon"
-            className="bg-[#AD0000] text-white hover:bg-[#AD0000] transition"
+            className="bg-[#AD0000] text-white hover:bg-[#AD0000]/90 transition"
           >
-            {isPlaying ? <Pause /> : <Play />}
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="absolute bottom-0 left-0 right-0 flex justify-center p-2">
         {newsItems.map((_, index) => (
           <span
             key={index}
-            className={`h-2 w-2 mx-1 rounded-full ${
-              index === currentIndex ? "bg-[#AD0000]" : "bg-white"
+            className={`h-2 w-2 mx-1 rounded-full transition-colors duration-300 ${
+              index === currentIndex ? "bg-[#AD0000]" : "bg-white/30"
             }`}
           />
         ))}

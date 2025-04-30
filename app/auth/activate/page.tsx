@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast-context";
+import { storeRedirectUrl } from "@/lib/utils";
 
 export default function ActivateAccount() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function ActivateAccount() {
         }
 
         showToast("Account activated successfully! You can now sign in.", "success");
+        storeRedirectUrl()
         router.push("/auth/signin");
       } catch (error) {
         setError(error instanceof Error ? error.message : "Failed to activate account");
@@ -67,7 +69,10 @@ export default function ActivateAccount() {
             <div className="space-y-4">
               <p className="text-red-500 text-center">{error}</p>
               <Button
-                onClick={() => router.push("/auth/signin")}
+                onClick={() => {
+                  storeRedirectUrl();
+                  router.push("/auth/signin")
+                }}
                 className="w-full bg-[#AD0000] hover:bg-[#8B0000]"
               >
                 Return to Sign In

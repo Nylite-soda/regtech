@@ -9,7 +9,7 @@ type ProfileData = {
   subscription: string,
   phone_number: number | null,
   password: string,
-  confirm_password: string,
+  confirm_new_password: string,
   first_name: string,
   last_name: string,
   email: string;

@@ -132,7 +132,7 @@ export function validateCompanyFields(role: string, fields: Record<string, strin
 
 export function validateWebsite(website: string): ValidationError | null {
   if (!website) return null; // Website is optional
-  if (!/^https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/.test(website)) {
+  if (!/^(http:\/\/|https:\/\/)?(www.)?([a-zA-Z0-9]+).[a-zA-Z0-9]*.[a-z]{3}.?([a-z]+)?$/.test(website)) {
     return {
       field: "companyWebsite",
       message: "Please enter a valid website URL (e.g., https://example.com)"

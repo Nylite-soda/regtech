@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 import { 
   CreditCard, 
   Lock, 
@@ -12,10 +15,14 @@ import {
   Calendar,
   CreditCard as CardIcon,
   MapPin,
-  Receipt
+  Receipt,
+  Sparkles,
+  Zap,
+  Shield
 } from 'lucide-react';
 import Link from 'next/link';
 import { getItem } from '@/lib/utils';
+import Script from 'next/script';
 
 interface Plan {
   name: 'Basic' | 'Standard' | 'Premium';
@@ -26,15 +33,17 @@ interface Plan {
   };
   features: string[];
   description: string;
+  icon: React.ReactElement;
+  gradient: string;
 }
 
 const plans: Plan[] = [
   {
     name: 'Basic',
     price: {
-      monthly: 29,
-      quarterly: 79,
-      annual: 299,
+      monthly: 0,
+      quarterly: 0,
+      annual: 0,
     },
     features: [
       'Access to basic company profiles',
@@ -44,13 +53,15 @@ const plans: Plan[] = [
       'Monthly newsletter',
     ],
     description: 'Perfect for individuals and small teams',
+    icon: <Shield className="w-6 h-6" />,
+    gradient: 'from-emerald-500 to-teal-500'
   },
   {
     name: 'Standard',
     price: {
-      monthly: 49,
-      quarterly: 139,
-      annual: 499,
+      monthly: 9,
+      quarterly: 213,
+      annual: 799,
     },
     features: [
       'All Basic features',
@@ -62,13 +73,15 @@ const plans: Plan[] = [
       'Company favorites',
     ],
     description: 'Ideal for growing businesses',
+    icon: <Sparkles className="w-6 h-6" />,
+    gradient: 'from-violet-500 to-purple-500'
   },
   {
     name: 'Premium',
     price: {
-      monthly: 99,
-      quarterly: 279,
-      annual: 999,
+      monthly: 112,
+      quarterly: 302,
+      annual: 1132,
     },
     features: [
       'All Standard features',
@@ -80,409 +93,319 @@ const plans: Plan[] = [
       'Competitor analysis',
     ],
     description: 'For enterprise-level needs',
+    icon: <Zap className="w-6 h-6" />,
+    gradient: 'from-orange-500 to-red-500'
   },
 ];
+
+const paymentPlanIds: Record<string, Record<string, number>> = {
+  Standard: {
+    monthly: 140582,
+    quarterly: 1005,
+    annual: 1006,
+  },
+  Premium: {
+    monthly: 140583,
+    quarterly: 1008,
+    annual: 1009,
+  },
+};
+
 
 interface CheckoutForm {
   plan: Plan['name'];
   billingCycle: 'monthly' | 'quarterly' | 'annual';
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
   name: string;
   email: string;
-  address: string;
-  city: string;
-  country: string;
-  postalCode: string;
+  phone: string;
 }
 
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
 export default function CheckoutPage() {
-  const [step, setStep] = useState<'plan' | 'review' | 'payment' | 'confirmation'>('plan');
+  const [step, setStep] = useState<'plan' | 'review' | 'confirmation'>('plan');
+  const [selectedCycle, setSelectedCycle] = useState<'monthly' | 'quarterly' | 'annual'>('monthly');
   const [form, setForm] = useState<CheckoutForm>({
     plan: 'Standard',
     billingCycle: 'monthly',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
     name: '',
     email: '',
-    address: '',
-    city: '',
-    country: '',
-    postalCode: '',
+    phone: '',
   });
-  const [paymentError, setPaymentError] = useState<string | null>(null);
-
-  const handlePlanSelect = (plan: Plan['name'], cycle: 'monthly' | 'quarterly' | 'annual') => {
-    setForm({ ...form, plan, billingCycle: cycle });
-    setStep('review');
-  };
-
-  const handlePaymentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPaymentError(null);
-    
-    // Simulate payment processing
-    try {
-      // Add your payment processing logic here
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setStep('confirmation');
-    } catch (error) {
-      setPaymentError('Payment processing failed. Please try again or use a different payment method.');
-    }
-  };
 
   const selectedPlan = plans.find(p => p.name === form.plan)!;
   const price = selectedPlan.price[form.billingCycle];
+  const paymentPlanId = paymentPlanIds[form.plan][form.billingCycle];
+
+  const config = {
+    public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY!,
+    tx_ref: Date.now().toString(),
+    amount: price,
+    currency: 'NGN',
+    payment_options: 'card, mobilemoney, banktransfer, ussd',
+    customer: {
+      email: form.email,
+      phone_number: form.phone,
+      name: form.name,
+    },
+    customizations: {
+      title: `${form.plan} Plan Subscription`,
+      description: `${form.billingCycle} subscription to ${form.plan} plan`,
+      logo: '/images/horizon-logo.png',
+    },
+    payment_plan: paymentPlanId.toString(),
+  };
+
+  const handleFlutterPayment = useFlutterwave(config);
+
+  const handlePlanSelect = (plan: Plan['name']) => {
+    setForm({ ...form, plan, billingCycle: selectedCycle });
+    setStep('review');
+  };
+
+  const handlePayment = () => {
+    handleFlutterPayment({
+      callback: (response) => {
+        if (response.status === 'successful') {
+          setStep('confirmation');
+        }
+        closePaymentModal();
+      },
+      onClose: () => {},
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-30">
-      {/* Header */}
-      <div className="bg-white border-gray-300 border-b sticky top-[120px] z-1">
-        <div className="container mx-auto px-4 py-6 md:ml-15">
-            <h1 className="text-2xl font-bold">Checkout</h1>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b dark:bg-gradient-to-br dark:from-gray-900 dark:to-black from-gray-50 to-gray-100">
+      <div className="max-w-7xl mx-auto mt-[70px] px-4 lg:px-14 py-16">
+      <Script
+        src="https://checkout.flutterwave.com/v3.js"
+        strategy="beforeInteractive"
+      />
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Select the perfect plan for your needs. Upgrade or downgrade at any time.
+          </p>
+        </motion.div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Progress Steps */}
-          <div className="max-w-3xl mx-auto mb-12">
-            <div className="relative">
-              {/* Progress Line */}
-              <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-200">
-                <div 
-                  className="h-full bg-[#AD0000] transition-all duration-300"
-                  style={{
-                    width: step === 'plan' ? '0%' : step === 'review' ? '50%' : '100%'
-                  }}
-                />
-              </div>
-
-              {/* Steps */}
-              <div className="relative flex justify-between">
-                {/* Step 1 */}
-                <div className="flex flex-col items-center">
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
-                      step === 'plan' || step === 'review' || step === 'payment' || step === 'confirmation'
-                        ? 'bg-[#AD0000] text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    1
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    step === 'plan' ? 'text-[#AD0000]' : 'text-gray-600'
-                  }`}>
-                    Select Plan
-                  </span>
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex flex-col items-center">
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
-                      step === 'review' || step === 'payment' || step === 'confirmation'
-                        ? 'bg-[#AD0000] text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    2
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    step === 'review' ? 'text-[#AD0000]' : 'text-gray-600'
-                  }`}>
-                    Review Order
-                  </span>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex flex-col items-center">
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
-                      step === 'payment' || step === 'confirmation'
-                        ? 'bg-[#AD0000] text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    3
-                  </div>
-                  <span className={`text-sm font-medium ${
-                    step === 'payment' ? 'text-[#AD0000]' : 'text-gray-600'
-                  }`}>
-                    Payment
-                  </span>
-                </div>
-              </div>
+        {step === 'plan' && (
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            className="space-y-8"
+          >
+            <div className="flex justify-center gap-4 p-1 bg-gray-100 rounded-lg w-fit mx-auto mb-12">
+              {(['monthly', 'quarterly', 'annual'] as const).map((cycle) => (
+                <button
+                  key={cycle}
+                  onClick={() => setSelectedCycle(cycle)}
+                  className={clsx(
+                    'px-6 py-2 rounded-md text-sm font-medium transition-all duration-200',
+                    selectedCycle === cycle 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  )}
+                >
+                  {cycle.charAt(0).toUpperCase() + cycle.slice(1)}
+                </button>
+              ))}
             </div>
-          </div>
 
-          {/* Plan Selection */}
-          {step === 'plan' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Select Your Plan</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.name}
-                      className="flex flex-col justify-between rounded-lg border p-6 hover:border-[#AD0000]/50 cursor-pointer transition-all duration-300"
-                      onClick={() => handlePlanSelect(plan.name, 'monthly')}
-                    >
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">{plan.name}</h3>
-                        <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
-                        <div className="mb-4">
-                          <span className="text-2xl font-bold">${plan.price.monthly}</span>
-                          <span className="text-gray-600">/month</span>
-                        </div>
-                        <ul className="space-y-2 mb-6">
-                          {plan.features.map((feature, index) => (
-                            <li key={index} className="flex items-center gap-2 text-sm">
-                              <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <button className="w-full py-2 bg-[#AD0000] text-white rounded-lg hover:bg-[#AD0000]/90">
-                        Select Plan
-                      </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {plans.map((plan) => (
+                <motion.div
+                  key={plan.name}
+                  whileHover={{ scale: 1.02 }}
+                  className={clsx(
+                    'relative bg-white rounded-2xl shadow-xl overflow-hidden',
+                    plan.name === 'Standard' && 'ring-2 ring-[#AD0000]',
+                    plan.name !== 'Standard' && "scale-[0.9]"
+                  )}
+                >
+                  {plan.name === 'Standard' && (
+                    <div className="absolute top-0 right-0 bg-[#AD0000] text-white px-4 py-1 rounded-bl-lg text-sm font-medium">
+                      Popular
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
+                  <div className={clsx(
+                    'px-6 py-4 bg-gradient-to-r text-white',
+                    plan.gradient
+                  )}>
+                    <div className="flex items-center gap-2 mb-4">
+                      {plan.icon}
+                      <h3 className="text-xl font-semibold">{plan.name}</h3>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold">${plan.price[selectedCycle]}</span>
+                      <span className="opacity-80">/{selectedCycle}</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <p className="text-gray-600 mb-6">{plan.description}</p>
+                    <ul className="space-y-4 mb-8">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-3 text-gray-700">
+                          <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={() => handlePlanSelect(plan.name)}
+                      className={clsx(
+                        'w-full py-3 rounded-lg text-white font-medium transition-all duration-200',
+                        plan.price[selectedCycle] === 0 
+                          ? 'bg-red-500 hover:bg-red-600' 
+                          : 'bg-gradient-to-r from-red-500 to-red-500 hover:from-red-600 hover:to-red-600'
+                      )}
+                    >
+                      {plan.price[selectedCycle] === 0 ? 'Start Free' : 'Select Plan'}
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          )}
+          </motion.div>
+        )}
 
-          {/* Review Order */}
-          {step === 'review' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Review Your Order</h2>
+        {step === 'review' && (
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h2 className="text-2xl font-bold mb-6">Complete Your Order</h2>
+              <div className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#AD0000] focus:border-[#AD0000] transition-all duration-200"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#AD0000] focus:border-[#AD0000] transition-all duration-200"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#AD0000] focus:border-[#AD0000] transition-all duration-200"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-medium">{form.plan} Plan</h3>
+                      <h3 className="font-medium text-gray-900">{form.plan} Plan</h3>
                       <p className="text-sm text-gray-600">
                         {form.billingCycle.charAt(0).toUpperCase() + form.billingCycle.slice(1)} billing
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${price}</p>
+                      <p className="text-lg font-bold text-gray-900">${price}</p>
                       <p className="text-sm text-gray-600">per {form.billingCycle}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <h3 className="font-medium">Tax (VAT)</h3>
-                      <p className="text-sm text-gray-600">Based on your location</p>
-                    </div>
-                    <p className="font-medium">${(price * 0.15).toFixed(2)}</p>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-[#AD0000]/5 rounded-lg">
-                    <h3 className="font-medium">Total</h3>
-                    <p className="text-xl font-bold">${(price * 1.15).toFixed(2)}</p>
-                  </div>
                 </div>
-                <div className="flex gap-4 mt-6">
+
+                <div className="flex gap-4">
                   <button
                     onClick={() => setStep('plan')}
-                    className="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200"
                   >
                     Back
                   </button>
                   <button
-                    onClick={() => setStep('payment')}
-                    className="flex-1 py-2 bg-[#AD0000] text-white rounded-lg hover:bg-[#AD0000]/90"
+                    onClick={handlePayment}
+                    disabled={!form.name || !form.email || !form.phone}
+                    className="flex-1 py-3 bg-gradient-to-r from-red-800 to-red-500 hover:from-red-600 hover:to-red-600 text-white rounded-lg transition-all duration-200 disabled:opacity-50"
                   >
-                    Continue to Payment
+                    Complete Purchase
                   </button>
                 </div>
               </div>
             </div>
-          )}
+          </motion.div>
+        )}
 
-          {/* Payment Form */}
-          {step === 'payment' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Payment Details</h2>
-                <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                  {/* Card Details */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Card Number
-                      </label>
-                      <div className="relative">
-                        <CardIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={form.cardNumber}
-                          onChange={(e) => setForm({ ...form, cardNumber: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                          placeholder="1234 5678 9012 3456"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Expiry Date
-                        </label>
-                        <input
-                          type="text"
-                          value={form.expiryDate}
-                          onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                          placeholder="MM/YY"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          CVV
-                        </label>
-                        <input
-                          type="text"
-                          value={form.cvv}
-                          onChange={(e) => setForm({ ...form, cvv: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                          placeholder="123"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Billing Information */}
-                  <div className="space-y-4">
-                    <h3 className="font-medium">Billing Information</h3>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        value={form.address}
-                        onChange={(e) => setForm({ ...form, address: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          value={form.city}
-                          onChange={(e) => setForm({ ...form, city: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Postal Code
-                        </label>
-                        <input
-                          type="text"
-                          value={form.postalCode}
-                          onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#AD0000] focus:border-[#AD0000]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {paymentError && (
-                    <div className="flex items-center gap-2 text-red-600">
-                      <XCircle className="w-5 h-5" />
-                      <p>{paymentError}</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setStep('review')}
-                      className="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 py-2 bg-[#AD0000] text-white rounded-lg hover:bg-[#AD0000]/90"
-                    >
-                      Complete Payment
-                    </button>
-                  </div>
-                </form>
+        {step === 'confirmation' && (
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-10 h-10 text-red-500" />
               </div>
-            </div>
-          )}
-
-          {/* Confirmation */}
-          {step === 'confirmation' && (
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-8 h-8 text-green-500" />
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Thank You!</h2>
-              <p className="text-gray-600 mb-6">
-                Your subscription has been successfully activated. You can now access all features of
-                your {form.plan} plan.
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Welcome Aboard!</h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Your {form.plan} plan is now active. Get ready to explore all the amazing features!
               </p>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center justify-center gap-2">
-                  <Building2 className="w-5 h-5 text-gray-400" />
-                  <span>{form.plan} Plan</span>
+              <div className="grid grid-cols-3 gap-6 mb-8">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <Building2 className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                  <p className="font-medium text-gray-900">{form.plan}</p>
+                  <p className="text-sm text-gray-600">Plan</p>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-400" />
-                  <span>
-                    {form.billingCycle.charAt(0).toUpperCase() + form.billingCycle.slice(1)} billing
-                  </span>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <Calendar className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                  <p className="font-medium text-gray-900">
+                    {form.billingCycle.charAt(0).toUpperCase() + form.billingCycle.slice(1)}
+                  </p>
+                  <p className="text-sm text-gray-600">Billing</p>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Receipt className="w-5 h-5 text-gray-400" />
-                  <span>${(price * 1.15).toFixed(2)}</span>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <Receipt className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                  <p className="font-medium text-gray-900">${price}</p>
+                  <p className="text-sm text-gray-600">Amount</p>
                 </div>
               </div>
               <Link
                 href="/dashboard"
-                className="inline-block px-6 py-2 bg-[#AD0000] text-white rounded-lg hover:bg-[#AD0000]/90"
+                className="inline-block px-8 py-3 bg-gradient-to-r from-red-800 to-red-500 hover:from-red-600 hover:to-red-600 text-white rounded-lg transition-all duration-200"
               >
                 Go to Dashboard
               </Link>
             </div>
-          )}
-        </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
-} 
+}

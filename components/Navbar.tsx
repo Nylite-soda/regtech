@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Briefcase, Menu, Moon, User, LogOut, Sun, Home, Building2, Newspaper, CreditCard, Search, LayoutDashboard, UserPlus } from "lucide-react";
-import { getItem, logout } from "@/lib/utils";
+import { getItem, logout, storeRedirectUrl } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/lib/theme-provider";
@@ -24,13 +24,13 @@ const navigationItems = [
     items: [],
     status: "",
   },
-  {
-    title: "News",
-    href: "https://regtechafrica.com/",
-    icon: Newspaper,
-    items: [],
-    status: "",
-  },
+  // {
+  //   title: "News",
+  //   href: "https://regtechafrica.com/",
+  //   icon: Newspaper,
+  //   items: [],
+  //   status: "",
+  // },
   {
     title: "Pricing",
     href: "/checkout",
@@ -113,12 +113,15 @@ const Navbar = () => {
                 />
                 <div className="absolute inset-0 rounded-full bg-[#AD0000]/10 dark:bg-[#FF4C4C]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              <span className="ml-3 text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-[#AD0000] dark:group-hover:text-[#FF4C4C]">
+              <span className="ml-3 min-w-[145px] text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-[#AD0000] dark:group-hover:text-[#FF4C4C]">
                 Regtech Horizon
               </span>
             </Link>
           </div>
 
+          {/* Right side buttons with improved spacing */}
+          <div className="flex items-center space-x-4">
+            
           {/* Desktop Navigation with improved spacing */}
           <div className="hidden lg:flex items-center space-x-8 mx-8">
             {navItems.map((item) => (
@@ -136,9 +139,9 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-
+          
           {/* Search bar for desktop */}
-          <div className="hidden lg:flex items-center flex-1 max-w-md">
+          <div className="hidden xl:flex items-center flex-1 max-w-md">
             <form onSubmit={handleSearch} className="w-full">
               <div className="relative">
                 <input
@@ -158,8 +161,6 @@ const Navbar = () => {
             </form>
           </div>
 
-          {/* Right side buttons with improved spacing */}
-          <div className="flex items-center space-x-4">
             {/* Theme Toggle - Desktop only */}
             <Button
               variant="ghost"
@@ -177,7 +178,11 @@ const Navbar = () => {
                     variant="ghost" 
                     className="relative h-10 px-4 flex items-center space-x-2 hover:bg-white/20 dark:hover:bg-[#2A2A2A]/20 transition-all duration-300 hover:scale-105"
                   >
-                    <User className="h-5 w-5" />
+                    {user.avatar ? (
+                      <Image src={user.avatar} alt="User Avatar" width={25} height={25} className="rounded-full" />
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
                     <span className="text-sm font-medium">{user.first_name}</span>
                     {/* Notification badge */}
                     <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-[#AD0000] dark:bg-[#FF4C4C] animate-pulse" />
@@ -212,9 +217,9 @@ const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/auth/register" className="hidden lg:block">
-                <Button className="h-10 px-6 bg-[#AD0000] text-white hover:bg-[#AD0000]/90 text-sm transition-all duration-300 hover:scale-105">
-                  Register
+              <Link href="/auth/signin" className="hidden lg:block">
+                <Button onClick={storeRedirectUrl} className="h-10 px-6 bg-[#AD0000] text-white hover:bg-[#AD0000]/90 text-sm transition-all duration-300 hover:scale-105">
+                  Sign In
                 </Button>
               </Link>
             )}
@@ -315,7 +320,7 @@ const Navbar = () => {
               {user ? (
                 <Link
                   href={`/dashboard/user/${user.id}`}
-                  className="block w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-[#B0B0B0] hover:text-[#AD0000] dark:hover:text-[#FF4C4C] hover:bg-white/20 dark:hover:bg-[#2A2A2A]/20 hover:scale-[1.02] hover:shadow-sm dark:hover:shadow-black/10"
+                  className="block w-full px-4 py-2.5 text-sm text-center font-medium rounded-lg transition-all duration-300 text-gray-700 dark:text-[#B0B0B0] hover:text-[#AD0000] dark:hover:text-[#FF4C4C] hover:bg-white/20 dark:hover:bg-[#2A2A2A]/20 hover:scale-[1.02] hover:shadow-sm dark:hover:shadow-black/10"
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="h-4 w-4 mr-2 inline-block" />
@@ -323,12 +328,15 @@ const Navbar = () => {
                 </Link>
               ) : (
                 <Link
-                  href="/auth/register"
-                  className="block w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 bg-[#AD0000] text-white hover:bg-[#AD0000]/90 hover:scale-[1.02] hover:shadow-sm dark:hover:shadow-black/10"
-                  onClick={() => setIsOpen(false)}
+                  href="/auth/signin"
+                  className="block w-full px-4 py-2.5 text-sm text-center font-medium rounded-lg transition-all duration-300 bg-[#AD0000] text-white hover:bg-[#AD0000]/90 hover:scale-[1.02] hover:shadow-sm dark:hover:shadow-black/10"
+                  onClick={() => {
+                    storeRedirectUrl();
+                    setIsOpen(false)
+                  }}
                 >
                   <UserPlus className="h-4 w-4 mr-2 inline-block" />
-                  Register
+                  Sign In
                 </Link>
               )}
             </div>

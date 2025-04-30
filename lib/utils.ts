@@ -66,3 +66,29 @@ export function isUserSignedIn(): boolean {
   
   return !!(accessToken && user);
 }
+
+type SessionData = {
+  email: string;
+  password: string;
+  companyName: string;
+  companyId: number;
+};
+
+// utils.ts
+export const secureStorage = {
+  setSession: (data: SessionData) => {
+    sessionStorage.setItem('company_session', JSON.stringify(data));
+  },
+  encryptSet: (key: string, value: string) => {
+    const encrypted = btoa(unescape(encodeURIComponent(value)));
+    localStorage.setItem(key, encrypted);
+  },
+  decryptGet: (key: string) => {
+    const value = localStorage.getItem(key);
+    return value ? decodeURIComponent(escape(atob(value))) : null;
+  },
+  remove: (key: string) => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  }
+};
