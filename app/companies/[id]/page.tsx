@@ -32,8 +32,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BASE_URL, getItem } from "@/lib/utils";
+import {
+  BASE_URL,
+  getItem,
+  isUserSignedIn,
+  storeRedirectUrl,
+} from "@/lib/utils";
 import { BackButton } from "@/components/ui/back-button";
+import { useRouter } from "next/navigation";
 
 interface CompanyProfile {
   id: number;
@@ -98,6 +104,20 @@ export default function CompanyProfilePage({
   const [company, setCompany] = useState<CompanyProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!isUserSignedIn()) {
+        setIsRedirecting(true);
+        storeRedirectUrl();
+        router.push("/auth/signin");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
