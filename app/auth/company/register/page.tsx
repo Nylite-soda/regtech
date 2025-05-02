@@ -9,18 +9,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/ui/toast-context";
-import dayjs, { Dayjs } from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import dayjs, { Dayjs } from "dayjs";
+import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CalendarIcon } from "@mui/x-date-pickers/icons";
 import { BASE_URL, isUserSignedIn, storeRedirectUrl } from "@/lib/utils";
 import CountrySelect from "react-select-country-list";
 import { LoadingScreen } from "@/components/ui/loading-screen";
-import { validateEmail, validatePassword, validatePhone, validateConfirmPassword, validateWebsite } from "@/lib/validation";
+import {
+  validateEmail,
+  validatePassword,
+  validatePhone,
+  validateConfirmPassword,
+  validateWebsite,
+} from "@/lib/validation";
 
 // Define the Country type
 interface Country {
@@ -53,7 +70,7 @@ interface FormFieldProps {
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-  touched:boolean
+  touched: boolean;
 }
 
 // Preload country data
@@ -66,7 +83,7 @@ const COMPANY_TYPES = [
   { value: "Enterprise", label: "Enterprise" },
   { value: "Public", label: "Public Company" },
   { value: "NGO", label: "NGO/Non-profit" },
-  { value: "Government", label: "Government" }
+  { value: "Government", label: "Government" },
 ];
 
 const COMPANY_SIZES = [
@@ -75,7 +92,7 @@ const COMPANY_SIZES = [
   { value: "51-200", label: "51 to 200" },
   { value: "201-500", label: "201 to 500" },
   { value: "501-1000", label: "501 to 1000" },
-  { value: "1000+", label: "Over 1000" }
+  { value: "1000+", label: "Over 1000" },
 ];
 
 const COMPANY_NICHES = [
@@ -83,11 +100,11 @@ const COMPANY_NICHES = [
   { value: "Compliance", label: "Compliance" },
   { value: "KYC", label: "KYC" },
   { value: "Regulatory", label: "Regulatory" },
-  { value: "Suptech", label: "SupTech" }
+  { value: "Suptech", label: "SupTech" },
 ];
 
 const INITIAL_FORM_STATE: FormData = {
-  companyName: "",  
+  companyName: "",
   email: "",
   phone: "",
   password: "",
@@ -107,14 +124,17 @@ const PASSWORD_CRITERIA = [
   { check: (pwd: string) => /[A-Z]/.test(pwd), label: "One uppercase letter" },
   { check: (pwd: string) => /[a-z]/.test(pwd), label: "One lowercase letter" },
   { check: (pwd: string) => /[0-9]/.test(pwd), label: "One number" },
-  { check: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd), label: "One special character" }
+  {
+    check: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    label: "One special character",
+  },
 ];
 
 const PASSWORD_STRENGTH_MESSAGES = [
   { score: 0, message: "Very Weak", color: "text-red-500" },
   { score: 1, message: "Weak", color: "text-orange-500" },
   { score: 2, message: "Medium", color: "text-yellow-500" },
-  { score: 3, message: "Strong", color: "text-green-500" }
+  { score: 3, message: "Strong", color: "text-green-500" },
 ];
 
 export default function CompanyRegister() {
@@ -130,7 +150,9 @@ export default function CompanyRegister() {
   const [countryOptions, setCountryOptions] = useState<Country[]>(countryData);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_STATE);
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
@@ -140,30 +162,30 @@ export default function CompanyRegister() {
 
   useEffect(() => {
     setCountryOptions(CountrySelect().getData());
-    
+
     const checkAuth = async () => {
       if (!isUserSignedIn()) {
         setIsRedirecting(true);
-        storeRedirectUrl()
+        storeRedirectUrl();
         router.push("/auth/signin");
       }
     };
-    
+
     checkAuth();
   }, [router]);
 
   // Calculate password strength based on validation criteria
   const calculatePasswordStrength = (password: string) => {
     let score = 0;
-    
+
     // Count passed criteria
-    PASSWORD_CRITERIA.forEach(criterion => {
+    PASSWORD_CRITERIA.forEach((criterion) => {
       if (criterion.check(password)) score++;
     });
-    
+
     // Additional points for length
     if (password.length >= 12) score++;
-    
+
     // Set message and color based on score
     let message, color;
     if (score <= 2) {
@@ -179,14 +201,14 @@ export default function CompanyRegister() {
       message = "Strong";
       color = "text-green-500";
     }
-    
+
     return { score, message, color };
   };
 
   // Handle password input changes
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     handleChange(e);
-    
+
     if (e.target.name === "password") {
       setPasswordStrength(calculatePasswordStrength(e.target.value));
     }
@@ -195,22 +217,22 @@ export default function CompanyRegister() {
   // Generic handler for input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setTouchedFields(prev => ({ ...prev, [name]: true }));
-    
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setTouchedFields((prev) => ({ ...prev, [name]: true }));
+
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: "" }));
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   // Handle select field changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setTouchedFields(prev => ({ ...prev, [name]: true })); // Mark as touched
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setTouchedFields((prev) => ({ ...prev, [name]: true })); // Mark as touched
+
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: "" }));
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -222,10 +244,12 @@ export default function CompanyRegister() {
     // Required fields validation
     Object.entries(formData).forEach(([key, value]) => {
       if (!value) {
-        errors[key] = `${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} is required`;
+        errors[key] = `${
+          key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")
+        } is required`;
       }
     });
-    
+
     // Email validation
     const emailError = validateEmail(formData.email);
     if (emailError) {
@@ -239,7 +263,10 @@ export default function CompanyRegister() {
     }
 
     // Confirm password validation
-    const confirmPasswordError = validateConfirmPassword(formData.confirmPassword, formData.password);
+    const confirmPasswordError = validateConfirmPassword(
+      formData.confirmPassword,
+      formData.password
+    );
     if (confirmPasswordError) {
       errors.confirmPassword = confirmPasswordError.message;
     }
@@ -254,7 +281,7 @@ export default function CompanyRegister() {
     if (formData.companyName && formData.companyName.length < 3) {
       errors.companyName = "Company name must be at least 3 characters";
     }
-    
+
     // Website validation (if provided)
     if (formData.website) {
       const websiteError = validateWebsite(formData.website);
@@ -262,7 +289,7 @@ export default function CompanyRegister() {
         errors.website = websiteError.message;
       }
     }
-    
+
     // Year founded validation
     if (formData.yearFounded) {
       const year = parseInt(formData.yearFounded, 10);
@@ -270,7 +297,7 @@ export default function CompanyRegister() {
         errors.yearFounded = `Year founded must be between 1800 and ${currentYear}`;
       }
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -287,31 +314,38 @@ export default function CompanyRegister() {
   }, [formData]);
 
   // Form submission handler
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-  
+
     // Mark all fields as touched on submit
     const allFields = Object.keys(formData);
-    const newTouched = allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {});
+    const newTouched = allFields.reduce(
+      (acc, field) => ({ ...acc, [field]: true }),
+      {}
+    );
     setTouchedFields(newTouched);
-  
+
     if (!validate()) {
       setLoading(false);
       const errorFields = Object.keys(formErrors)
-        .map(key => key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'))
-        .join(', ');
-      
+        .map(
+          (key) =>
+            key.charAt(0).toUpperCase() +
+            key.slice(1).replace(/([A-Z])/g, " $1")
+        )
+        .join(", ");
+
       showToast(`Please address the following issues: ${errorFields}`, "error");
       return;
     }
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         showToast("Authentication required", "error");
-        storeRedirectUrl()
+        storeRedirectUrl();
         router.push("/auth/signin");
         return;
       }
@@ -320,7 +354,7 @@ export default function CompanyRegister() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           company_type: formData.type,
@@ -336,13 +370,15 @@ export default function CompanyRegister() {
           company_password: formData.password,
         }),
       });
-      
+
       const result = await response.json();
-      
+
       if (!response.ok) {
-        const errorMessage = result.detail === "Failed to create company: 400: Company with this email already exists" 
-          ? "Company with this email already exists"
-          : result.error || result.message || "Registration failed";
+        const errorMessage =
+          result.detail ===
+          "Failed to create company: 400: Company with this email already exists"
+            ? "Company with this email already exists"
+            : result.error || result.message || "Registration failed";
         throw new Error(errorMessage);
       }
 
@@ -351,7 +387,10 @@ export default function CompanyRegister() {
         router.push("/auth/company-login?registered=true");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred. Please try again later.";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again later.";
       setError(errorMessage);
       showToast(errorMessage, "error");
       console.error(err);
@@ -443,7 +482,11 @@ export default function CompanyRegister() {
                   required
                   value={formData.password}
                   onChange={handlePasswordChange}
-                  className={`mt-1 pr-10 ${formErrors.password && touchedFields.password ? "border-red-500" : ""}`}
+                  className={`mt-1 pr-10 ${
+                    formErrors.password && touchedFields.password
+                      ? "border-red-500"
+                      : ""
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -458,42 +501,55 @@ export default function CompanyRegister() {
                   )}
                 </button>
               </div>
-              
+
               {/* Password strength indicator */}
               {formData.password && (
                 <div className="mt-1">
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1 bg-gray-200 rounded-full">
-                      <div 
+                      <div
                         className={`h-full rounded-full transition-all ${
-                          passwordStrength.score <= 2 ? 'bg-red-500' :
-                          passwordStrength.score <= 4 ? 'bg-yellow-500' :
-                          'bg-green-500'
+                          passwordStrength.score <= 2
+                            ? "bg-red-500"
+                            : passwordStrength.score <= 4
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
                         }`}
-                        style={{ width: `${(passwordStrength.score / 6) * 100}%` }}
+                        style={{
+                          width: `${(passwordStrength.score / 6) * 100}%`,
+                        }}
                       />
                     </div>
                     <span className={`text-sm ${passwordStrength.color}`}>
                       {passwordStrength.message}
                     </span>
                   </div>
-                  
+
                   {/* Password criteria checklist */}
                   <ul className="mt-2 text-sm text-gray-600 space-y-1">
                     {PASSWORD_CRITERIA.map((criterion, index) => (
-                      <li key={index} className={criterion.check(formData.password) ? "text-green-500" : ""}>
+                      <li
+                        key={index}
+                        className={
+                          criterion.check(formData.password)
+                            ? "text-green-500"
+                            : ""
+                        }
+                      >
                         • {criterion.label}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-              
+
               {formErrors.password && touchedFields.password && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.password}
+                </p>
               )}
             </div>
-            
+
             {/* Confirm Password */}
             <div>
               <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -505,7 +561,11 @@ export default function CompanyRegister() {
                   required
                   value={formData.confirmPassword}
                   onChange={handlePasswordChange}
-                  className={`mt-1 pr-10 ${formErrors.confirmPassword && touchedFields.confirmPassword ? "border-red-500" : ""}`}
+                  className={`mt-1 pr-10 ${
+                    formErrors.confirmPassword && touchedFields.confirmPassword
+                      ? "border-red-500"
+                      : ""
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -520,33 +580,46 @@ export default function CompanyRegister() {
                   )}
                 </button>
               </div>
-              
-              {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                <p className="mt-1 text-sm text-green-600">Passwords match</p>
-              )}
-              
+
+              {formData.confirmPassword &&
+                formData.password === formData.confirmPassword && (
+                  <p className="mt-1 text-sm text-green-600">Passwords match</p>
+                )}
+
               {formErrors.confirmPassword && touchedFields.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.confirmPassword}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.confirmPassword}
+                </p>
               )}
 
               {formErrors.password && touchedFields.password && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.password}
+                </p>
               )}
             </div>
-          
+
             {/* Company Type */}
             <div>
-              <Label htmlFor="type" className="mb-2">Company Type</Label>
+              <Label htmlFor="type" className="mb-2">
+                Company Type
+              </Label>
               <Select
                 value={formData.type}
                 onValueChange={(value) => handleSelectChange("type", value)}
               >
-                <SelectTrigger className={`w-full ${formErrors.type && touchedFields.type ? "border-red-500" : ""}`}>
+                <SelectTrigger
+                  className={`w-full ${
+                    formErrors.type && touchedFields.type
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select company type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {COMPANY_TYPES.map(type => (
+                    {COMPANY_TYPES.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
@@ -573,17 +646,25 @@ export default function CompanyRegister() {
 
             {/* Company Size */}
             <div>
-              <Label htmlFor="size" className="mb-2">Company Size</Label>
-              <Select 
+              <Label htmlFor="size" className="mb-2">
+                Company Size
+              </Label>
+              <Select
                 value={formData.size}
                 onValueChange={(value) => handleSelectChange("size", value)}
               >
-                <SelectTrigger className={`w-full ${formErrors.size && touchedFields.size ? "border-red-500" : ""}`}>
+                <SelectTrigger
+                  className={`w-full ${
+                    formErrors.size && touchedFields.size
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select company size" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {COMPANY_SIZES.map(size => (
+                    {COMPANY_SIZES.map((size) => (
                       <SelectItem key={size.value} value={size.value}>
                         {size.label}
                       </SelectItem>
@@ -598,14 +679,20 @@ export default function CompanyRegister() {
 
             {/* Year Founded */}
             <div>
-              <Label htmlFor="yearFounded" className="mb-2">Year Founded</Label>
+              <Label htmlFor="yearFounded" className="mb-2">
+                Year Founded
+              </Label>
               <Popover open={yearPopoverOpen} onOpenChange={setYearPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={`w-full justify-start text-left font-normal ${
                       !formData.yearFounded && "text-muted-foreground"
-                    } ${formErrors.yearFounded && touchedFields.yearFounded ? "border-red-500" : ""}`}
+                    } ${
+                      formErrors.yearFounded && touchedFields.yearFounded
+                        ? "border-red-500"
+                        : ""
+                    }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formData.yearFounded || <span>Select year</span>}
@@ -613,7 +700,7 @@ export default function CompanyRegister() {
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DateCalendar']}>
+                    <DemoContainer components={["DateCalendar"]}>
                       <DemoItem>
                         <DateCalendar
                           maxDate={dayjs()}
@@ -624,38 +711,40 @@ export default function CompanyRegister() {
                               const e = {
                                 target: {
                                   name: "yearFounded",
-                                  value: newDate.format("YYYY")
-                                }
+                                  value: newDate.format("YYYY"),
+                                },
                               } as ChangeEvent<HTMLInputElement>;
                               handleChange(e);
                               setYearPopoverOpen(false);
                             }
                           }}
-                          views={['year']}
+                          views={["year"]}
                           openTo="year"
                           sx={{
-                            width: '100%',
-                            height: 'auto',
-                            '& .MuiPickersCalendarHeader-root': {
-                              paddingLeft: '16px',
-                              paddingRight: '16px',
-                              marginTop: '8px',
+                            width: "100%",
+                            height: "auto",
+                            "& .MuiPickersCalendarHeader-root": {
+                              paddingLeft: "16px",
+                              paddingRight: "16px",
+                              marginTop: "8px",
                             },
-                            '& .MuiPickersDay-root.Mui-selected': {
-                              backgroundColor: '#AD0000',
+                            "& .MuiPickersDay-root.Mui-selected": {
+                              backgroundColor: "#AD0000",
                             },
-                            '& .MuiPickersDay-root.Mui-selected:hover': {
-                              backgroundColor: '#890000',
+                            "& .MuiPickersDay-root.Mui-selected:hover": {
+                              backgroundColor: "#890000",
                             },
-                            '& .MuiPickersDay-root.Mui-selected:focus': {
-                              backgroundColor: '#AD0000',
+                            "& .MuiPickersDay-root.Mui-selected:focus": {
+                              backgroundColor: "#AD0000",
                             },
-                            '& .MuiYearCalendar-root .MuiPickersYear-yearButton.Mui-selected': {
-                              backgroundColor: '#AD0000',
-                            },
-                            '& .MuiYearCalendar-root .MuiPickersYear-yearButton:not(.Mui-selected):hover': {
-                              backgroundColor: 'rgba(173, 0, 0, 0.1)',
-                            }
+                            "& .MuiYearCalendar-root .MuiPickersYear-yearButton.Mui-selected":
+                              {
+                                backgroundColor: "#AD0000",
+                              },
+                            "& .MuiYearCalendar-root .MuiPickersYear-yearButton:not(.Mui-selected):hover":
+                              {
+                                backgroundColor: "rgba(173, 0, 0, 0.1)",
+                              },
                           }}
                         />
                       </DemoItem>
@@ -664,10 +753,12 @@ export default function CompanyRegister() {
                 </PopoverContent>
               </Popover>
               {formErrors.yearFounded && touchedFields.yearFounded && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.yearFounded}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.yearFounded}
+                </p>
               )}
             </div>
-            
+
             {/* Headquarters */}
             <FormField
               label="Headquarters"
@@ -682,12 +773,20 @@ export default function CompanyRegister() {
 
             {/* Country */}
             <div>
-              <Label htmlFor="country" className="mb-2">Country</Label>
-              <Select 
+              <Label htmlFor="country" className="mb-2">
+                Country
+              </Label>
+              <Select
                 value={formData.country}
                 onValueChange={(value) => handleSelectChange("country", value)}
               >
-                <SelectTrigger className={`w-full ${formErrors.country&& touchedFields.country ? "border-red-500" : ""}`}>
+                <SelectTrigger
+                  className={`w-full ${
+                    formErrors.country && touchedFields.country
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px] overflow-y-auto">
@@ -701,23 +800,33 @@ export default function CompanyRegister() {
                 </SelectContent>
               </Select>
               {formErrors.country && touchedFields.country && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.country}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.country}
+                </p>
               )}
             </div>
 
             {/* Company Niche */}
             <div>
-              <Label htmlFor="niche" className="mb-2">Company Niche</Label>
+              <Label htmlFor="niche" className="mb-2">
+                Company Niche
+              </Label>
               <Select
                 value={formData.niche}
                 onValueChange={(value) => handleSelectChange("niche", value)}
               >
-                <SelectTrigger className={`w-full ${formErrors.niche && touchedFields.niche ? "border-red-500" : ""}`}>
+                <SelectTrigger
+                  className={`w-full ${
+                    formErrors.niche && touchedFields.niche
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                >
                   <SelectValue placeholder="Select your niche" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {COMPANY_NICHES.map(niche => (
+                    {COMPANY_NICHES.map((niche) => (
                       <SelectItem key={niche.value} value={niche.value}>
                         {niche.label}
                       </SelectItem>
@@ -759,7 +868,16 @@ export default function CompanyRegister() {
 }
 
 // Reusable form field component
-function FormField({ label, name, type, placeholder, value, onChange, error, touched }: FormFieldProps) {
+function FormField({
+  label,
+  name,
+  type,
+  placeholder,
+  value,
+  onChange,
+  error,
+  touched,
+}: FormFieldProps) {
   return (
     <div>
       <Label htmlFor={name}>{label}</Label>
@@ -773,9 +891,7 @@ function FormField({ label, name, type, placeholder, value, onChange, error, tou
         className={`mt-1 ${error && touched ? "border-red-500" : ""}`}
         placeholder={placeholder}
       />
-      {error && touched && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
+      {error && touched && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
 }

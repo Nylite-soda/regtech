@@ -10,47 +10,42 @@ import { storeRedirectUrl } from "@/lib/utils";
 
 const footerData = {
   locations: [
-    "Nigeria Companies",
-    "South Africa Companies",
-    "Cameroon Companies",
-    "Kenya Companies",
-    "Uganda Companies",
-    "Egypt Companies",
+    "Nigeria",
+    "South Africa",
+    "Cameroon",
+    "Kenya",
+    "Uganda",
+    "Egypt",
   ],
-  
-  categories: [
-    "AML",
-    "SupTech",
-    "Compliance",
-    "Regulatory"
-  ],
-  
+
+  categories: ["AML", "SupTech", "Compliance", "Regulatory"],
+
   resourceLinks: [
     {
       text: "Pricing",
-      href: "/checkout"
+      href: "/checkout",
     },
     {
       text: "Privacy Policy",
-      href: "/privacy"
+      href: "/privacy",
     },
     {
       text: "Terms and Conditions",
-      href: "/terms"
+      href: "/terms",
     },
     {
       text: "Regtech news",
-      href: "https://regtechafrica.com/"
+      href: "https://regtechafrica.com/",
     },
-    {
-      text: "Events",
-      href: "/events"
-    },
-    {
-      text: "Place an ad",
-      href: "/advertise"
-    },
-  ]
+    // {
+    //   text: "Events",
+    //   href: "/events",
+    // },
+    // {
+    //   text: "Place an ad",
+    //   href: "/advertise",
+    // },
+  ],
 };
 
 const Footer = () => {
@@ -81,16 +76,16 @@ const Footer = () => {
   return (
     <footer className="w-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-black transition-colors duration-300 ease-in-out flex flex-col items-start gap-5 mx-auto pt-10 px-6 md:px-10 overflow-hidden border-t border-gray-200 dark:border-gray-800">
       <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-900 to-transparent mb-5" />
-      
+
       <div className="flex items-start justify-between w-full flex-wrap lg:flex-nowrap gap-10">
         {/* Brand Section */}
-        <FooterBrand 
-          companyData={companyData} 
-          handleCompanyCreation={handleCompanyCreation} 
+        <FooterBrand
+          companyData={companyData}
+          handleCompanyCreation={handleCompanyCreation}
         />
 
         {/* Footer Links */}
-        <FooterLinks 
+        <FooterLinks
           locations={footerData.locations}
           categories={footerData.categories}
           resourceLinks={footerData.resourceLinks}

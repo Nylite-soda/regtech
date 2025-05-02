@@ -9,6 +9,7 @@ import {
   Bell,
   Building,
   Activity,
+  Building2,
 } from "lucide-react";
 import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "../ui/toast-context";
 import { useRouter } from "next/navigation";
+import { UserData } from "@/types";
+import Link from "next/link";
+import Image from "next/image";
 
 interface StatItem {
   title: string;
@@ -44,6 +48,7 @@ interface NotificationItem {
 
 interface CompanyItem {
   id: string;
+  logo?: string;
   name: string;
   industry: string;
   lastUpdated: string;
@@ -94,12 +99,7 @@ export function Overview({ className }: { className?: string }) {
       const result = await response.json();
 
       if (!response.ok) {
-        const errorMessage =
-          result.detail ===
-          "Failed to create company: 400: Company with this email already exists"
-            ? "Company with this email already exists"
-            : result.error || result.message || "Registration failed";
-        throw new Error(errorMessage);
+        throw new Error("Could not fetch dashboard data");
       }
 
       if (result.status === "success") {
@@ -109,6 +109,17 @@ export function Overview({ className }: { className?: string }) {
             .filter((n: NotificationItem) => n.read)
             .map((n: NotificationItem) => n.id)
         );
+        const user = {
+          first_name: result.data.user.first_name,
+          last_name: result.data.user.last_name,
+          email: result.data.user.email,
+          phone_number: result.data.user.phone_number,
+          avatar: result.data.user.avatar,
+          role: result.data.user.role,
+          status: result.data.user.status,
+          subscription: result.data.user.subscription,
+        };
+        localStorage.setItem("user", JSON.stringify(user));
       }
     } catch (err) {
       const errorMessage =
@@ -450,9 +461,11 @@ function CompanyList({
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">My Companies</h2>
-        <Button className="bg-[#AD0000] hover:bg-[#AD0000]/90">
-          Add New Company
-        </Button>
+        <Link href="/auth/company/register">
+          <Button className="bg-[#AD0000] hover:bg-[#AD0000]/90">
+            Add New Company
+          </Button>
+        </Link>
       </div>
 
       {isLoading ? (
@@ -466,9 +479,12 @@ function CompanyList({
           <Building className="mx-auto h-10 w-10 mb-4" />
           <p className="text-lg">You haven't added any companies yet</p>
           <p className="text-sm mt-2">Start by adding your first company</p>
-          <Button className="mt-4 bg-[#AD0000] hover:bg-[#AD0000]/90">
-            Add Company
-          </Button>
+
+          <Link href="/auth/company/register">
+            <Button className="mt-4 bg-[#AD0000] hover:bg-[#AD0000]/90">
+              Add Company
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="space-y-4">
@@ -701,9 +717,22 @@ function CompanyListItem({ company }: { company: CompanyItem }) {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
+    <div className="card flex items-center justify-between p-4 hover:shadow-sm transition-shadow">
       <div className="space-y-1">
-        <h3 className="font-medium">{company.name}</h3>
+        <span className="flex gap-3">
+          {company.logo ? (
+            <Image
+              src={company.logo}
+              alt="logo"
+              width={30}
+              height={30}
+              className="rounded-sm"
+            />
+          ) : (
+            <Building2 className="w-6 h-6" />
+          )}
+          <h3 className="font-medium">{company.name}</h3>
+        </span>
         <p className="text-sm text-gray-500">{company.industry}</p>
         <p className="text-xs text-gray-400">Updated {company.lastUpdated}</p>
       </div>
@@ -711,9 +740,14 @@ function CompanyListItem({ company }: { company: CompanyItem }) {
         <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor()}`}>
           {company.status.replace("_", " ")}
         </span>
-        <Button variant="outline" size="sm">
-          Manage
-        </Button>
+        <Link
+          onClick={() => localStorage.setItem("company_id", company.id)}
+          href={`/dashboard/company/${company.id}`}
+        >
+          <Button variant="outline" size="sm">
+            Manage
+          </Button>
+        </Link>
       </div>
     </div>
   );

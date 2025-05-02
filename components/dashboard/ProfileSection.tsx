@@ -9,6 +9,7 @@ import { SectionWrapper } from "../SectionWrapper";
 import { UserData } from "@/types";
 import * as z from "zod";
 import { useState } from "react";
+import Router from "next/router";
 
 // Validation schema
 const profileSchema = z.object({
@@ -174,9 +175,8 @@ export function ProfileSection({ userData }: ProfileSectionProps) {
         throw new Error(errorMessage);
       }
 
-      const result = await response.json();
       showToast("Your profile has been updated successfully!", "success");
-      router.refresh(); // Refresh to get updated data
+      Router.reload(); // Refresh to get updated data
     } catch (error: any) {
       if (
         error.message?.includes("network") ||

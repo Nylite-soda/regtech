@@ -89,6 +89,7 @@ export interface UserData {
     social?: {
       linkedin?: string;
       twitter?: string;
+      instagram?: string;
       website?: string;
     };
   }

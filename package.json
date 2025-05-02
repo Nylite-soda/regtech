@@ -62,6 +62,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.17",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/lodash": "^4.17.16",
     "@types/node": "^20.17.28",
     "@types/react": "^19.0.12",

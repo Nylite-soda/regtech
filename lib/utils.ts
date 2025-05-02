@@ -23,7 +23,7 @@ export function getItem(name:string){
 }
 
 // API Base URL configuration
-export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://api.regtechhorizon.com:8000";
 
 // Logout function to remove user data from localStorage
 export function logout() {
@@ -91,4 +91,10 @@ export const secureStorage = {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
   }
+};
+
+export const handleContactSupport = () => {
+  // Implement your support contact logic here
+  console.log("Redirecting to support...");
+  window.open("mailto:info@regtechhorizon.com", "_blank");
 };

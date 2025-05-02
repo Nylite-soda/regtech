@@ -1,11 +1,12 @@
 // components/dashboard/SecuritySettings.tsx
-'use client';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Shield, Lock, Eye, EyeOff, Check } from 'lucide-react';
-import { UserData } from '@/types';
-import { BASE_URL } from '@/lib/utils';
-import { useToast } from '@/components/ui/toast-context';
+"use client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Shield, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
+import { UserData } from "@/types";
+import { BASE_URL } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast-context";
+import { validatePassword } from "@/lib/validation";
 
 interface SecuritySettingsProps {
   user: UserData;
@@ -19,71 +20,138 @@ interface PasswordFormData {
 
 export default function SecuritySettings({ user }: SecuritySettingsProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<PasswordFormData>();
   const { showToast } = useToast();
+  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm<PasswordFormData>({
+    defaultValues: {
+      current_password: "",
+      new_password: "",
+      confirm_new_password: "",
+    },
+  });
 
   const onSubmit = async (data: PasswordFormData) => {
+    setError("");
+
+    // Validate password
+    const passwordError = validatePassword(data.new_password);
+    if (passwordError) {
+      setError(passwordError.message);
+      return;
+    }
+
+    // Check if passwords match
+    if (data.new_password !== data.confirm_new_password) {
+      setError("New passwords do not match!");
+      showToast("New passwords do not match.", "error");
+      return;
+    }
+
+    // Check password length
+    if (data.new_password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      showToast("Password must be at least 8 characters long.", "error");
+      return;
+    }
+
     try {
       const response = await fetch(`${BASE_URL}/api/v1/users/change-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Password change failed');
+        throw new Error(errorData.detail || "Password change failed");
       }
 
-      showToast('Password updated successfully!', 'success');
+      showToast("Password updated successfully!", "success");
       reset();
     } catch (error: any) {
-      showToast(error.message, 'error');
+      setError(error.message || "Password change failed");
+      showToast(error.message || "Password change failed", "error");
     }
   };
 
   return (
-    <SectionWrapper icon={<Shield className="w-5 h-5" />} title="Security Settings">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="relative">
+    <SectionWrapper
+      icon={<Shield className="w-5 h-5" />}
+      title="Security Settings"
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+        <h3 className="font-medium">Change Password</h3>
+        <div className="space-y-4">
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              {...register("current_password", { required: true })}
+              placeholder="Current Password"
+              className="w-full p-3 border rounded-lg pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+
           <input
-            type={showPassword ? 'text' : 'password'}
-            {...register('current_password', { required: true })}
-            placeholder="Current Password"
-            className="w-full p-3 border rounded-lg pr-10"
+            type={showPassword ? "text" : "password"}
+            {...register("new_password", { required: true })}
+            placeholder="New Password"
+            className="w-full p-3 border rounded-lg"
           />
+
+          <input
+            type={showPassword ? "text" : "password"}
+            {...register("confirm_new_password", { required: true })}
+            placeholder="Confirm New Password"
+            className="w-full p-3 border rounded-lg"
+          />
+
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            type="submit"
+            className="px-4 py-2 bg-[#AD0000] text-white rounded-lg flex items-center"
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            <Lock className="w-4 h-4 mr-2" />
+            Change Password
           </button>
         </div>
-        {/* Add similar fields for new password and confirmation */}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-[#AD0000] text-white rounded-lg flex items-center"
-        >
-          <Lock className="w-4 h-4 mr-2" />
-          Change Password
-        </button>
+        {error && (
+          <div className="p-3 mt-2 rounded-md flex items-center gap-2 bg-red-100 text-red-800">
+            <ShieldAlert className="w-5 h-5" />
+            <span>{error}</span>
+          </div>
+        )}
       </form>
     </SectionWrapper>
   );
 }
 
-const SectionWrapper = ({ 
-  icon, 
-  title, 
-  children 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  children: React.ReactNode 
+const SectionWrapper = ({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
 }) => (
   <div className="bg-white rounded-lg shadow-sm p-6">
     <h2 className="text-xl font-semibold mb-4 flex items-center">
