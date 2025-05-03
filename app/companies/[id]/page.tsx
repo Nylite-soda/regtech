@@ -139,8 +139,8 @@ export default function CompanyProfilePage({
         console.log(data);
         setCompany({
           id: data.id,
-          name: data.company_name,
-          website: data.company_website,
+          name: data.company_name || data.name,
+          website: data.company_website || data.website,
           services: data.services,
           lastFundingDate: data.last_funding_date,
           acquisitions: data.acquisitions ?? 0,
