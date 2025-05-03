@@ -139,8 +139,8 @@ export default function CompanyProfilePage({
         console.log(data);
         setCompany({
           id: data.id,
-          name: data.company_name || data.name,
-          website: data.company_website || data.website,
+          name: data.name || data.company_name,
+          website: data.website || data.company_website,
           services: data.services,
           lastFundingDate: data.last_funding_date,
           acquisitions: data.acquisitions ?? 0,
@@ -152,8 +152,8 @@ export default function CompanyProfilePage({
           foundedYear: data.year_founded,
           description: data.description,
           contact: {
-            email: data.company_email,
-            phone: data.company_phone,
+            email: data.email || data.company_email,
+            phone: data.phone || data.company_phone,
             social: {
               linkedin: data.social_media_linkedIn,
               twitter: data.social_media_X,
