@@ -147,7 +147,7 @@ export default function CompanyProfilePage({
           employees: data.company_size,
           niche: data.niche,
           type: data.company_type,
-          location: data.country,
+          location: data.headquarters,
           logo: data.logo,
           foundedYear: data.year_founded,
           description: data.description,
