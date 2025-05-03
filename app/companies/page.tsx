@@ -33,7 +33,6 @@ export default function CompaniesPage() {
     yearFounded: "",
   });
   const search = searchParams.getAll("location");
-  console.log(search);
   const [initialFilters, setInitialFilters] = useState({
     location: "",
     size: "",
