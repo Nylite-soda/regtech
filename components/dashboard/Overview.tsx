@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import useSWR from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BASE_URL, cn, storeRedirectUrl } from "@/lib/utils";
+import { BASE_URL, cn, logout, storeRedirectUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "../ui/toast-context";
@@ -97,6 +97,14 @@ export function Overview({ className }: { className?: string }) {
       });
 
       const result = await response.json();
+
+      if (result.detail === "Could not validate credentials!") {
+        showToast("Expired! Kindly sign in", "error");
+        logout();
+        setData(undefined);
+        router.push("/auth/signin");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Could not fetch dashboard data");

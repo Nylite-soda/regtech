@@ -548,7 +548,7 @@ export default function Register() {
               {loading ? "Creating account..." : "Create Account"}
             </Button>
 
-            <div className="relative my-6">
+            {/* <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -573,7 +573,7 @@ export default function Register() {
                 className="mr-2"
               />
               Sign up with Google
-            </Button>
+            </Button> */}
 
             <p className="text-sm text-center text-muted-foreground mt-4">
               Already have an account?{" "}
