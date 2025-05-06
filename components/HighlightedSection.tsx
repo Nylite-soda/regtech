@@ -1,103 +1,202 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const companies = [
+interface Company {
+  id: string;
+  name: string;
+  niche: string;
+  description: string;
+  location: string;
+  foundedYear: number;
+  logo: string;
+}
+
+export const companies: Company[] = [
   {
-    id: 1,
+    id: "1",
     name: "PaySwift",
-    category: "Fintech & Payments",
+    niche: "KYC",
     description:
       "PaySwift is a seamless payment processing platform that enables businesses to accept online and offline transactions with secure, instant settlements.",
     location: "Nairobi, Kenya",
-    founded: "2018",
-    rating: "4.7",
-    logo: "/images/image-1.png",
+    foundedYear: 2018,
+    logo: "https://images.pexels.com/photos/38568/apple-imac-ipad-workplace-38568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
-    id: 2,
+    id: "2",
     name: "MediLink",
-    category: "HealthTech",
+    niche: "AML",
     description:
       "MediLink connects patients with top healthcare providers, offering telemedicine, electronic health records, and AI-powered diagnostics for improved healthcare access.",
     location: "Cape Town, South Africa",
-    founded: "2020",
-    rating: "4.6",
-    logo: "/images/image-3.png",
+    foundedYear: 2020,
+    logo: "https://images.pexels.com/photos/5327921/pexels-photo-5327921.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
-    id: 3,
+    id: "3",
     name: "AgriTech Solutions",
-    category: "Agriculture & AgriTech",
+    niche: "SupTech",
     description:
       "AgriTech Solutions leverages AI and IoT to optimize farming efficiency, reduce waste, and provide real-time insights for better crop management.",
     location: "Accra, Ghana",
-    founded: "2015",
-    rating: "4.4",
-    logo: "/images/image-1.png",
+    foundedYear: 2015,
+    logo: "https://images.pexels.com/photos/8117242/pexels-photo-8117242.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
-    id: 4,
+    id: "4",
     name: "EduPro",
-    category: "EdTech",
+    niche: "EdTech",
     description:
       "EduPro is a personalized e-learning platform that provides interactive courses, AI tutors, and skill-based training programs for students and professionals.",
     location: "Abuja, Nigeria",
-    founded: "2019",
-    rating: "4.8",
-    logo: "/images/image-3.png",
+    foundedYear: 2019,
+    logo: "https://images.pexels.com/photos/5676744/pexels-photo-5676744.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
-    id: 5,
+    id: "5",
     name: "EcoCharge",
-    category: "Renewable Energy",
+    niche: "Renewable Energy",
     description:
       "EcoCharge provides affordable solar and renewable energy solutions, helping households and businesses reduce carbon footprints and achieve energy independence.",
     location: "Kigali, Rwanda",
-    founded: "2016",
-    rating: "4.7",
-    logo: "/images/image-1.png",
+    foundedYear: 2016,
+    logo: "https://images.pexels.com/photos/9875441/pexels-photo-9875441.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
 ];
 
-const categories = ["AML", "KYC", "Regulatory", "Compliance", "SupTech"];
+export const niches = ["AML", "KYC", "Regulatory", "Compliance", "SupTech"];
 
 const HighlightedSection = () => {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const [activeNiche, setActiveNiche] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isScrolledToStart, setIsScrolledToStart] = useState(true);
+  const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [viewportSize, setViewportSize] = useState<
+    "mobile" | "tablet" | "desktop"
+  >("desktop");
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  const handleScroll = (direction: 'left' | 'right') => {
-    const container = document.getElementById('companies-container');
+  // Calculate filtered companies based on active filters
+  const filteredCompanies = companies.filter((company) => {
+    return !activeNiche || company.niche === activeNiche;
+  });
+
+  useEffect(() => {
+    const animationTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
+    // Check viewport size
+    const checkViewportSize = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setViewportSize("mobile");
+      } else if (width < 1024) {
+        setViewportSize("tablet");
+      } else {
+        setViewportSize("desktop");
+      }
+    };
+
+    // Initial check for viewport size
+    checkViewportSize();
+
+    // Add resize listener for responsive behavior
+    window.addEventListener("resize", checkViewportSize);
+
+    const checkScrollPosition = () => {
+      if (containerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+        setIsScrolledToStart(scrollLeft <= 0);
+        setIsScrolledToEnd(scrollLeft + clientWidth >= scrollWidth - 10);
+
+        // Calculate scroll progress percentage
+        const maxScroll = scrollWidth - clientWidth;
+        const progress = maxScroll > 0 ? scrollLeft / maxScroll : 0;
+        setScrollProgress(progress);
+      }
+    };
+
+    const container = containerRef.current;
     if (container) {
-      const scrollAmount = direction === 'left' ? -630 : 630;
-      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      setScrollPosition(container.scrollLeft + scrollAmount);
+      container.addEventListener("scroll", checkScrollPosition);
+      // Initial check
+      checkScrollPosition();
+    }
+
+    return () => {
+      clearTimeout(animationTimeout);
+      if (container) {
+        container.removeEventListener("scroll", checkScrollPosition);
+      }
+      window.removeEventListener("resize", checkViewportSize);
+    };
+  }, []);
+
+  const handleScroll = (direction: "left" | "right") => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      // Calculate scroll amount based on container width
+      const scrollAmount =
+        direction === "left" ? -containerWidth * 0.8 : containerWidth * 0.8;
+      containerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      handleScroll("left");
+    } else if (event.key === "ArrowRight") {
+      handleScroll("right");
     }
   };
 
   return (
-    <section className="w-full py-10 lg:py-16 pb-20 mx-auto mt-10 px-4 sm:px-6 lg:px-8 max-w-7xl">
-      <div className={cn(
-        "flex flex-col gap-8",
-        "animate-in fade-in-50 duration-1000"
-      )}>
+    <section
+      className="w-full py-10 lg:py-16 pb-20 mx-auto mt-10 px-4 sm:px-6 lg:px-8 max-w-7xl"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      aria-label="Company highlights section"
+    >
+      <div
+        className={cn(
+          "flex flex-col gap-8",
+          "animate-in fade-in-50 duration-1000"
+        )}
+      >
         {/* Header */}
-        <div className={cn(
-          "inline-flex items-center px-6 py-3",
-          "bg-gradient-to-r from-red-600 to-red-800",
-          "dark:from-red-500 dark:to-red-700",
-          "rounded-tr-2xl rounded-bl-2xl",
-          "shadow-lg",
-          "w-fit"
-        )}>
-          <h2 className="text-xl md:text-2xl font-semibold text-white">
-            Highlighted Companies
-          </h2>
+        <div className="flex flex-col gap-4">
+          <div
+            className={cn(
+              "inline-flex items-center px-4 sm:px-6 py-2 sm:py-3",
+              "bg-gradient-to-r from-red-600 to-red-800",
+              "dark:from-red-500 dark:to-red-700",
+              "rounded-tr-2xl rounded-bl-2xl",
+              "shadow-lg",
+              "w-fit",
+              "transform transition-all duration-500 hover:scale-105",
+              "group"
+            )}
+          >
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white">
+              <span className="inline-block group-hover:animate-pulse">
+                Highlighted Companies
+              </span>
+            </h2>
+          </div>
+
+          <p className="text-gray-600 dark:text-gray-300 ml-2 max-w-xl">
+            Discover innovative companies across Africa making a difference in
+            various sectors.
+          </p>
         </div>
 
         {/* Categories and Navigation */}
@@ -106,156 +205,273 @@ const HighlightedSection = () => {
             <span className="text-gray-500 dark:text-gray-400 font-medium">
               Categories:
             </span>
-            <div className="flex flex-wrap gap-3">
-              {categories.map((category) => (
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setActiveNiche(null)}
+                className={cn(
+                  "rounded-xl border-2 font-medium text-xs sm:text-sm",
+                  "transition-all duration-300 transform",
+                  "hover:scale-105 active:scale-95",
+                  !activeNiche
+                    ? "border-red-600 bg-red-600/10 text-red-600 dark:border-red-500 dark:bg-red-500/10 dark:text-red-500 font-semibold"
+                    : "border-gray-200 dark:border-gray-700 hover:border-red-600 dark:hover:border-red-500"
+                )}
+              >
+                All
+              </Button>
+              {niches.map((niche) => (
                 <Button
-                  key={category}
+                  key={niche}
                   variant="outline"
-                  onClick={() => setActiveCategory(activeCategory === category ? null : category)}
+                  onClick={() =>
+                    setActiveNiche(activeNiche === niche ? null : niche)
+                  }
                   className={cn(
-                    "rounded-xl border-2 font-medium",
-                    "transition-all duration-300",
+                    "rounded-xl border-2 font-medium text-xs sm:text-sm",
+                    "transition-all duration-300 transform",
                     "hover:scale-105 active:scale-95",
-                    activeCategory === category
-                      ? "border-red-600 bg-red-600 text-white dark:border-red-500 dark:bg-red-500"
+                    activeNiche === niche
+                      ? "border-red-600 bg-red-600/10 text-red-600 dark:border-red-500 dark:bg-red-500/10 dark:text-red-500 font-semibold"
                       : "border-gray-200 dark:border-gray-700 hover:border-red-600 dark:hover:border-red-500"
                   )}
                 >
-                  {category}
+                  {niche}
                 </Button>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => handleScroll('left')}
-              className={cn(
-                "w-12 h-12 rounded-full p-0",
-                "bg-gray-900 dark:bg-gray-800",
-                "border-none text-white",
-                "hover:bg-red-600 dark:hover:bg-red-500",
-                "transition-all duration-300",
-                "hover:scale-110 active:scale-95"
-              )}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleScroll('right')}
-              className={cn(
-                "w-12 h-12 rounded-full p-0",
-                "bg-gray-900 dark:bg-gray-800",
-                "border-none text-white",
-                "hover:bg-red-600 dark:hover:bg-red-500",
-                "transition-all duration-300",
-                "hover:scale-110 active:scale-95"
-              )}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
+          {/* Navigation controls with progress indicator */}
+          <div className="flex flex-col gap-2 self-end md:self-auto">
+            {/* Progress bar */}
+            <div className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-red-600 dark:bg-red-500 transition-all duration-300 ease-out"
+                style={{ width: `${scrollProgress * 100}%` }}
+              />
+            </div>
+            <div className="flex gap-3 self-end">
+              <Button
+                variant="outline"
+                onClick={() => handleScroll("left")}
+                disabled={isScrolledToStart}
+                className={cn(
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-full p-0",
+                  "bg-gray-900 dark:bg-gray-800",
+                  "border-none text-white",
+                  "hover:bg-red-600 dark:hover:bg-red-500",
+                  "transition-all duration-300",
+                  "hover:scale-110 active:scale-95",
+                  "disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-gray-900 dark:disabled:hover:bg-gray-800"
+                )}
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleScroll("right")}
+                disabled={isScrolledToEnd}
+                className={cn(
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-full p-0",
+                  "bg-gray-900 dark:bg-gray-800",
+                  "border-none text-white",
+                  "hover:bg-red-600 dark:hover:bg-red-500",
+                  "transition-all duration-300",
+                  "hover:scale-110 active:scale-95",
+                  "disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-gray-900 dark:disabled:hover:bg-gray-800"
+                )}
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Companies List */}
-        <div 
-          id="companies-container"
+        <div
+          ref={containerRef}
           className={cn(
-            "flex gap-6 overflow-x-auto pb-8",
-            "scroll-smooth scrollbar-hide",
+            "flex gap-4 sm:gap-6 overflow-x-auto pb-8",
+            "scroll-smooth",
             "snap-x snap-mandatory",
-            "no-scrollbar"
+            "no-scrollbar",
+            "-mx-4 px-4"
           )}
+          style={{
+            scrollbarWidth: "none" /* Firefox */,
+            msOverflowStyle: "none" /* IE and Edge */,
+          }}
+          aria-label="Companies carousel"
+          tabIndex={0}
         >
-          {companies.map((company) => (
-            <Card
-              key={company.id}
-              className={cn(
-                "w-[325px] md:w-[630px] shrink-0",
-                "snap-center",
-                "border border-gray-200 dark:border-gray-800",
-                "bg-white dark:bg-gray-900",
-                "shadow-lg hover:shadow-xl",
-                "transition-all duration-300",
-                "hover:scale-[1.01]",
-                "animate-in fade-in-50 duration-400"
-              )}
-            >
-              <CardContent className="p-6 space-y-6">
-                <div className="flex items-start justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className={cn(
-                      "w-24 h-24 md:w-28 md:h-28",
-                      "rounded-2xl overflow-hidden",
-                      "border-2 border-gray-200 dark:border-gray-700"
-                    )}>
+          {filteredCompanies.length > 0 ? (
+            filteredCompanies.map((company, index) => (
+              <Card
+                key={company.id}
+                className={cn(
+                  "min-w-[320px] w-[320px] sm:w-[360px] md:w-[380px] lg:w-[400px] shrink-0",
+                  "snap-center",
+                  "border border-gray-200 dark:border-gray-800",
+                  "bg-white dark:bg-gray-900",
+                  "shadow-lg hover:shadow-xl",
+                  "transition-all duration-300 transform",
+                  "hover:scale-[1.02]",
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-4",
+                  "focus-within:ring-2 focus-within:ring-red-600 dark:focus-within:ring-red-500 focus-within:ring-opacity-50"
+                )}
+                style={{
+                  transitionDelay: `${index * 75}ms`,
+                }}
+              >
+                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col min-h-[330px]">
+                  {/* Header - Logo, Title, Niche */}
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div
+                      className={cn(
+                        "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
+                        "rounded-2xl overflow-hidden",
+                        "border border-gray-200 dark:border-gray-700",
+                        "bg-gray-100 dark:bg-gray-800",
+                        "transition-transform duration-500",
+                        "hover:rotate-3 hover:scale-105",
+                        "group-hover:rotate-3 group-hover:scale-105"
+                      )}
+                    >
                       <img
                         src={company.logo}
                         alt={`${company.name} logo`}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className={cn(
-                        "text-2xl md:text-3xl font-semibold",
-                        "text-gray-900 dark:text-white"
-                      )}>
+                    <div className="space-y-1 flex-1">
+                      <h3
+                        className={cn(
+                          "text-lg sm:text-xl md:text-2xl font-semibold",
+                          "text-gray-900 dark:text-white"
+                        )}
+                      >
                         {company.name}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        {company.category}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                        <span className="text-gray-600 dark:text-gray-300">
-                          {company.rating}
-                        </span>
+                      <div className="text-sm px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 inline-block">
+                        {company.niche}
                       </div>
                     </div>
+
+                    {/* Desktop View Button (hidden on mobile/tablet) */}
+                    {viewportSize === "desktop" && (
+                      <div>
+                        <Link
+                          href={`/companies/${company.id}`}
+                          id={`company-${company.id}`}
+                          aria-label={`View ${company.name} profile`}
+                        >
+                          <Button
+                            className={cn(
+                              "bg-gray-900 dark:bg-white",
+                              "text-white dark:text-gray-900",
+                              "hover:bg-red-600 dark:hover:bg-red-500",
+                              "hover:text-white dark:hover:text-white",
+                              "transition-all duration-300",
+                              "hover:scale-105",
+                              "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
+                            )}
+                          >
+                            View Profile
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                  <Link href={`/companies/${company.id}`}>
-                    <Button
-                      className={cn(
-                        "bg-gray-900 dark:bg-white",
-                        "text-white dark:text-gray-900",
-                        "hover:bg-red-600 dark:hover:bg-red-500",
-                        "hover:text-white dark:hover:text-white",
-                        "transition-all duration-300",
-                        "hover:scale-105"
+
+                  {/* Description */}
+                  <div className="flex-grow">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base overflow-hidden relative">
+                      {company.description.length > 120 ? (
+                        <>
+                          <span className="line-clamp-3">
+                            {company.description}
+                          </span>
+                          <span className="absolute bottom-0 right-0 bg-gradient-to-l from-white dark:from-gray-900 to-transparent w-16 h-full pointer-events-none"></span>
+                        </>
+                      ) : (
+                        company.description
                       )}
-                    >
-                      View Profile
-                    </Button>
-                  </Link>
-                </div>
+                    </p>
+                  </div>
 
-                <p className="text-gray-600 dark:text-gray-300 line-clamp-3">
-                  {company.description}
+                  {/* Company Details - Location and Founded */}
+                  <div className="flex items-center gap-4 sm:gap-6 mt-auto">
+                    <div className="space-y-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Location
+                      </span>
+                      <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                        {company.location}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Founded
+                      </span>
+                      <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                        {company.foundedYear}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mobile/Tablet View Button (hidden on desktop) */}
+                  {viewportSize !== "desktop" && (
+                    <div className="w-full mt-4 flex justify-end">
+                      <Link
+                        href={`/companies/${company.id}`}
+                        id={`company-${company.id}-mobile`}
+                        className="w-full"
+                        aria-label={`View ${company.name} profile`}
+                      >
+                        <Button
+                          className={cn(
+                            "bg-gray-900 dark:bg-white",
+                            "text-white dark:text-gray-900",
+                            "hover:bg-red-600 dark:hover:bg-red-500",
+                            "hover:text-white dark:hover:text-white",
+                            "transition-all duration-300",
+                            "hover:scale-105",
+                            "w-full",
+                            "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
+                          )}
+                        >
+                          View Profile
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="w-full flex items-center justify-center py-10">
+              <div className="text-center space-y-4">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No companies found with the current filters.
                 </p>
-
-                <div className="flex items-center gap-6 pt-4">
-                  <div className="space-y-1">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Location
-                    </span>
-                    <p className="text-gray-900 dark:text-white font-medium">
-                      {company.location}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Founded
-                    </span>
-                    <p className="text-gray-900 dark:text-white font-medium">
-                      {company.founded}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setActiveNiche(null);
+                  }}
+                  className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
