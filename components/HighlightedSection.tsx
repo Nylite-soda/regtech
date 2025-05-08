@@ -121,9 +121,7 @@ const HighlightedSection = () => {
             description: company.description || "No description available",
             location: company.headquarters || "Unknown",
             year_founded: company.year_founded || null,
-            logo:
-              company.logo ||
-              "https://via.placeholder.com/100x100.png?text=No+Logo", // Fallback logo
+            logo: company.logo || "/images/logos/placeholder-logo.svg", // Fallback logo
           }));
           setCompanies(formattedCompanies);
         } else {
@@ -367,8 +365,7 @@ const HighlightedSection = () => {
                       >
                         <img
                           src={
-                            company.logo ||
-                            "https://via.placeholder.com/100x100.png?text=No+Logo"
+                            company.logo || "/images/logos/placeholder-logo.svg"
                           }
                           alt={`${company.name} logo`}
                           className="w-full h-full object-cover"
@@ -376,7 +373,7 @@ const HighlightedSection = () => {
                           onError={(e) => {
                             // Fallback if image fails to load
                             e.currentTarget.src =
-                              "https://via.placeholder.com/100x100.png?text=No+Logo";
+                              "/images/logos/placeholder-logo.svg";
                           }}
                         />
                       </div>

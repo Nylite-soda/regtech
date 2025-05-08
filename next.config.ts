@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
         hostname: "*",
       },
     ],
-    domains: ['via.placeholder.com', 'placehold.co'],
   },
   typescript: {
     ignoreBuildErrors: true,
