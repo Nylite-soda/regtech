@@ -18,72 +18,6 @@ interface Company {
   logo: string;
 }
 
-export const companies: Company[] = [
-  {
-    id: "0681a221-dee8-7c26-8000-b65616efa06f",
-    name: "Regfyl",
-    niche: "AML",
-    description: `Regfyl is a pioneering AI-powered SaaS company focused on transforming anti-money 
-laundering (AML) and fraud detection processes across Africa. Founded in 2023, Regfyl offers a 
-suite of automated solutions designed to assist financial institutions in adhering to compliance 
-regulations while enhancing fraud prevention capabilities. 
-Regfyl's journey began with the vision of providing AI-driven tools tailored specifically for the 
-African financial sector. The company’s flagship product is designed to address key pain points in 
-AML compliance, including transaction monitoring, risk assessment, and regulatory reporting. 
-Regfyl raised $1.2 million in pre-seed funding from prominent fintech venture capitalists and 
-continues to grow its customer base across Nigerian banks, fintechs, and microfinance 
-institutions. 
-Key milestones include: 
-● Winner JP Morgan prize Oxbridge AI Challenge - December 2023 
-● Participated in Techstars Oakland powered by JP Morgan - March-May 2024 
-● Secured $1.1 million in pre-seed funding - August 2024 
-● Onboarded 50+ financial institutions in Nigeria - January 2025`,
-    location: "Lagos, Nigeria",
-    year_founded: 2023,
-    logo: "https://images.pexels.com/photos/38568/apple-imac-ipad-workplace-38568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: "2",
-    name: "MediLink",
-    niche: "AML",
-    description:
-      "MediLink connects patients with top healthcare providers, offering telemedicine, electronic health records, and AI-powered diagnostics for improved healthcare access.",
-    location: "Cape Town, South Africa",
-    year_founded: 2020,
-    logo: "https://images.pexels.com/photos/5327921/pexels-photo-5327921.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: "3",
-    name: "AgriTech Solutions",
-    niche: "SupTech",
-    description:
-      "AgriTech Solutions leverages AI and IoT to optimize farming efficiency, reduce waste, and provide real-time insights for better crop management.",
-    location: "Accra, Ghana",
-    year_founded: 2015,
-    logo: "https://images.pexels.com/photos/8117242/pexels-photo-8117242.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: "4",
-    name: "EduPro",
-    niche: "EdTech",
-    description:
-      "EduPro is a personalized e-learning platform that provides interactive courses, AI tutors, and skill-based training programs for students and professionals.",
-    location: "Abuja, Nigeria",
-    year_founded: 2019,
-    logo: "https://images.pexels.com/photos/5676744/pexels-photo-5676744.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    id: "5",
-    name: "EcoCharge",
-    niche: "Renewable Energy",
-    description:
-      "EcoCharge provides affordable solar and renewable energy solutions, helping households and businesses reduce carbon footprints and achieve energy independence.",
-    location: "Kigali, Rwanda",
-    year_founded: 2016,
-    logo: "https://images.pexels.com/photos/9875441/pexels-photo-9875441.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-];
-
 export const niches = ["AML", "KYC", "Regulatory", "Compliance", "SupTech"];
 
 const HighlightedSection = () => {
@@ -101,9 +35,12 @@ const HighlightedSection = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   // Calculate filtered companies based on active filters
-  const filteredCompanies = companies.filter((company) => {
-    return !activeNiche || company.niche === activeNiche;
-  });
+  // Added null check to make sure companies is an array before filtering
+  const filteredCompanies = Array.isArray(companies)
+    ? companies.filter(
+        (company) => !activeNiche || company.niche === activeNiche
+      )
+    : [];
 
   useEffect(() => {
     const animationTimeout = setTimeout(() => {
@@ -164,26 +101,36 @@ const HighlightedSection = () => {
         const response = await fetch(
           `${BASE_URL}/api/v1/company/all?per_page=7`
         );
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
         const result = await response.json();
 
-        if (result.status === "success") {
+        if (
+          result &&
+          result.status === "success" &&
+          Array.isArray(result.data)
+        ) {
           // Map backend data to our component format if needed
           const formattedCompanies = result.data.map((company: any) => ({
-            id: company.id,
-            name: company.name,
-            niche: company.niche,
-            description: company.description,
-            location: company.headquarters,
-            year_founded: company.year_founded,
+            id: company.id || String(Math.random()),
+            name: company.name || "Unnamed Company",
+            niche: company.niche || "Other",
+            description: company.description || "No description available",
+            location: company.headquarters || "Unknown",
+            year_founded: company.year_founded || null,
             logo: company.logo || "/placeholder-logo.png", // Fallback logo
           }));
           setCompanies(formattedCompanies);
         } else {
-          setError("Failed to load companies");
+          console.error("Invalid API response:", result);
+          setError("Failed to load companies - Invalid data format");
         }
       } catch (err) {
+        console.error("API fetch error:", err);
         setError("An error occurred while fetching companies");
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -378,68 +325,139 @@ const HighlightedSection = () => {
           aria-label="Companies carousel"
           tabIndex={0}
         >
-          {!loading && !error && filteredCompanies.length > 0 ? (
-            filteredCompanies.map((company, index) => (
-              <Card
-                key={company.id}
-                className={cn(
-                  "min-w-[320px] w-[320px] sm:w-[360px] md:w-[380px] lg:w-[400px] shrink-0",
-                  "snap-center",
-                  "border border-gray-200 dark:border-gray-800",
-                  "bg-white dark:bg-gray-900",
-                  "shadow-lg hover:shadow-xl",
-                  "transition-all duration-300 transform",
-                  "hover:scale-[1.02]",
-                  isVisible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-4",
-                  "focus-within:ring-2 focus-within:ring-red-600 dark:focus-within:ring-red-500 focus-within:ring-opacity-50"
-                )}
-                style={{
-                  transitionDelay: `${index * 75}ms`,
-                }}
-              >
-                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col min-h-[330px]">
-                  {/* Header - Logo, Title, Niche */}
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div
-                      className={cn(
-                        "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
-                        "rounded-2xl overflow-hidden",
-                        "border border-gray-200 dark:border-gray-700",
-                        "bg-gray-100 dark:bg-gray-800",
-                        "transition-transform duration-500",
-                        "hover:rotate-3 hover:scale-105",
-                        "group-hover:rotate-3 group-hover:scale-105"
-                      )}
-                    >
-                      <img
-                        src={company.logo}
-                        alt={`${company.name} logo`}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="space-y-1 flex-1">
-                      <h3
+          {!loading &&
+          !error &&
+          filteredCompanies &&
+          filteredCompanies.length > 0
+            ? filteredCompanies.map((company, index) => (
+                <Card
+                  key={company.id || index}
+                  className={cn(
+                    "min-w-[320px] w-[320px] sm:w-[360px] md:w-[380px] lg:w-[400px] shrink-0",
+                    "snap-center",
+                    "border border-gray-200 dark:border-gray-800",
+                    "bg-white dark:bg-gray-900",
+                    "shadow-lg hover:shadow-xl",
+                    "transition-all duration-300 transform",
+                    "hover:scale-[1.02]",
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4",
+                    "focus-within:ring-2 focus-within:ring-red-600 dark:focus-within:ring-red-500 focus-within:ring-opacity-50"
+                  )}
+                  style={{
+                    transitionDelay: `${index * 75}ms`,
+                  }}
+                >
+                  <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col min-h-[330px]">
+                    {/* Header - Logo, Title, Niche */}
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div
                         className={cn(
-                          "text-lg sm:text-xl md:text-2xl font-semibold",
-                          "text-gray-900 dark:text-white"
+                          "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
+                          "rounded-2xl overflow-hidden",
+                          "border border-gray-200 dark:border-gray-700",
+                          "bg-gray-100 dark:bg-gray-800",
+                          "transition-transform duration-500",
+                          "hover:rotate-3 hover:scale-105",
+                          "group-hover:rotate-3 group-hover:scale-105"
                         )}
                       >
-                        {company.name}
-                      </h3>
-                      <div className="text-sm px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 inline-block">
-                        {company.niche}
+                        <img
+                          src={company.logo || "/placeholder-logo.png"}
+                          alt={`${company.name} logo`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            e.currentTarget.src = "/placeholder-logo.png";
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <h3
+                          className={cn(
+                            "text-lg sm:text-xl md:text-2xl font-semibold",
+                            "text-gray-900 dark:text-white"
+                          )}
+                        >
+                          {company.name || "Unnamed Company"}
+                        </h3>
+                        <div className="text-sm px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 inline-block">
+                          {company.niche || "Other"}
+                        </div>
+                      </div>
+
+                      {/* Desktop View Button (hidden on mobile/tablet) */}
+                      {viewportSize === "desktop" && (
+                        <div>
+                          <Link
+                            href={`/companies/${company.id}`}
+                            id={`company-${company.id}`}
+                            aria-label={`View ${company.name} profile`}
+                          >
+                            <Button
+                              className={cn(
+                                "bg-gray-900 dark:bg-white",
+                                "text-white dark:text-gray-900",
+                                "hover:bg-red-600 dark:hover:bg-red-500",
+                                "hover:text-white dark:hover:text-white",
+                                "transition-all duration-300",
+                                "hover:scale-105",
+                                "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
+                              )}
+                            >
+                              View Profile
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex-grow">
+                      <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base overflow-hidden relative">
+                        {company.description &&
+                        company.description.length > 120 ? (
+                          <>
+                            <span className="line-clamp-3">
+                              {company.description}
+                            </span>
+                            <span className="absolute bottom-0 right-0 bg-gradient-to-l from-white dark:from-[#121212] to-transparent w-16 h-full pointer-events-none"></span>
+                          </>
+                        ) : (
+                          company.description || "No description available"
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Company Details - Location and Founded */}
+                    <div className="flex items-center gap-4 sm:gap-6 mt-auto">
+                      <div className="space-y-1 max-w-[50%]">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Location
+                        </span>
+                        <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                          {company.location || "N/A"}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Founded
+                        </span>
+                        <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
+                          {company.year_founded || "N/A"}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Desktop View Button (hidden on mobile/tablet) */}
-                    {viewportSize === "desktop" && (
-                      <div>
+                    {/* Mobile/Tablet View Button (hidden on desktop) */}
+                    {viewportSize !== "desktop" && (
+                      <div className="w-full mt-4 flex justify-end">
                         <Link
                           href={`/companies/${company.id}`}
-                          id={`company-${company.id}`}
+                          id={`company-${company.id}-mobile`}
+                          className="w-full"
                           aria-label={`View ${company.name} profile`}
                         >
                           <Button
@@ -450,6 +468,7 @@ const HighlightedSection = () => {
                               "hover:text-white dark:hover:text-white",
                               "transition-all duration-300",
                               "hover:scale-105",
+                              "w-full",
                               "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
                             )}
                           >
@@ -458,91 +477,30 @@ const HighlightedSection = () => {
                         </Link>
                       </div>
                     )}
-                  </div>
-
-                  {/* Description */}
-                  <div className="flex-grow">
-                    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base overflow-hidden relative">
-                      {company.description.length > 120 ? (
-                        <>
-                          <span className="line-clamp-3">
-                            {company.description}
-                          </span>
-                          <span className="absolute bottom-0 right-0 bg-gradient-to-l from-white dark:from-[#121212] to-transparent w-16 h-full pointer-events-none"></span>
-                        </>
-                      ) : (
-                        company.description
-                      )}
+                  </CardContent>
+                </Card>
+              ))
+            : !loading && (
+                <div className="w-full flex items-center justify-center py-10">
+                  <div className="text-center space-y-4">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {error
+                        ? "Error loading companies"
+                        : "No companies found with the current filters."}
                     </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setActiveNiche(null);
+                        !error && window.location.reload();
+                      }}
+                      className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
+                    >
+                      {error ? "Try Again" : "Reset Filters"}
+                    </Button>
                   </div>
-
-                  {/* Company Details - Location and Founded */}
-                  <div className="flex items-center gap-4 sm:gap-6 mt-auto">
-                    <div className="space-y-1 max-w-[50%]">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Location
-                      </span>
-                      <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
-                        {company.location || "N/A"}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Founded
-                      </span>
-                      <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
-                        {company.year_founded || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Mobile/Tablet View Button (hidden on desktop) */}
-                  {viewportSize !== "desktop" && (
-                    <div className="w-full mt-4 flex justify-end">
-                      <Link
-                        href={`/companies/${company.id}`}
-                        id={`company-${company.id}-mobile`}
-                        className="w-full"
-                        aria-label={`View ${company.name} profile`}
-                      >
-                        <Button
-                          className={cn(
-                            "bg-gray-900 dark:bg-white",
-                            "text-white dark:text-gray-900",
-                            "hover:bg-red-600 dark:hover:bg-red-500",
-                            "hover:text-white dark:hover:text-white",
-                            "transition-all duration-300",
-                            "hover:scale-105",
-                            "w-full",
-                            "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
-                          )}
-                        >
-                          View Profile
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="w-full flex items-center justify-center py-10">
-              <div className="text-center space-y-4">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No companies found with the current filters.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setActiveNiche(null);
-                  }}
-                  className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            </div>
-          )}
+                </div>
+              )}
         </div>
       </div>
     </section>
