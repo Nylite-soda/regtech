@@ -84,6 +84,7 @@ const COMPANY_TYPES = [
   { value: "Public", label: "Public Company" },
   { value: "NGO", label: "NGO/Non-profit" },
   { value: "Government", label: "Government" },
+  { value: "Private", label: "Private" },
 ];
 
 const COMPANY_SIZES = [

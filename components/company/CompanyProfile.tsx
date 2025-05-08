@@ -174,14 +174,14 @@ export default function CompanyProfile() {
           // Transform API data to form structure
           const transformedData = {
             id: data.id,
-            company_name: data.company_name || "",
-            company_email: data.company_email || "",
-            company_phone: data.company_phone || "",
-            company_website: data.company_website || "",
+            company_name: data.name || "",
+            company_email: data.email || "",
+            company_phone: data.phone || "",
+            company_website: data.website || "",
             description: data.description || "",
             company_type: data.company_type || "",
             company_size: data.company_size || "",
-            year_founded: data.year_founded ? String(data.year_founded) : "",
+            year_founded: data.year_founded || "N/A",
             headquarters: data.headquarters || "",
             founder: data.founders || [],
             services: data.services || [],
@@ -874,6 +874,7 @@ export default function CompanyProfile() {
                     <SelectItem value="Public">Public Company</SelectItem>
                     <SelectItem value="NGO">NGO/Non-profit</SelectItem>
                     <SelectItem value="Government">Government</SelectItem>
+                    <SelectItem value="Private">Private</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

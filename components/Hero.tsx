@@ -15,6 +15,7 @@ import { useToast } from "./ui/toast-context";
 import CompanyCard from "./CompanyCard";
 import { CompanyService } from "@/types";
 import _ from "lodash";
+import { Virtuoso } from "react-virtuoso";
 
 interface Company {
   id: string;
@@ -40,7 +41,7 @@ const Hero: React.FC = () => {
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [companies, setCompanies] = useState<Company[]>([]);
+  // const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] =
     useState<number>(-1);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -58,60 +59,61 @@ const Hero: React.FC = () => {
     { name: "Ghana", code: "GH" },
   ];
 
-  // Create debounced API fetch function
-  const fetchCompanies = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-      });
+  // // Create debounced API fetch function
+  // const fetchCompanies = useCallback(async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/api/v1/company/all`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //       },
+  //       credentials: "include",
+  //     });
 
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+  //     if (!response.ok)
+  //       throw new Error(`HTTP error! status: ${response.status}`);
 
-      const { data } = await response.json();
+  //     const { data } = await response.json();
 
-      // Add sample descriptions for improved UI if they don't exist
-      const enhancedData = data.map((company: Company) => ({
-        ...company,
-        description:
-          company.description ||
-          `Leading RegTech provider specializing in ${company.niche} solutions.`,
-      }));
+  //     // Add sample descriptions for improved UI if they don't exist
+  //     const enhancedData = data.map((company: Company) => ({
+  //       ...company,
+  //       description:
+  //         company.description ||
+  //         `Leading RegTech provider specializing in ${company.niche} solutions.`,
+  //     }));
 
-      setCompanies(enhancedData);
-    } catch (error) {
-      showToast("Failed to load companies", "error");
-      console.error("Error loading companies:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [showToast]);
+  //     setCompanies(enhancedData);
+  //   } catch (error) {
+  //     showToast("Failed to load companies", "error");
+  //     console.error("Error loading companies:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [showToast]);
 
-  // Debounced version of fetchCompanies
-  const debouncedFetchCompanies = useCallback(
-    _.debounce(() => {
-      fetchCompanies();
-    }, 300),
-    [fetchCompanies]
-  );
+  // // Debounced version of fetchCompanies
+  // const debouncedFetchCompanies = useCallback(
+  //   _.debounce(() => {
+  //     fetchCompanies();
+  //   }, 300),
+  //   [fetchCompanies]
+  // );
 
-  // Fetch companies data
-  useEffect(() => {
-    if (mounted) {
-      debouncedFetchCompanies();
-    }
+  // // Fetch companies data
+  // useEffect(() => {
+  //   if (mounted) {
+  //     debouncedFetchCompanies();
+  //   }
 
-    return () => {
-      debouncedFetchCompanies.cancel();
-    };
-  }, [mounted, debouncedFetchCompanies]);
+  //   return () => {
+  //     debouncedFetchCompanies.cancel();
+  //   };
+  // }, [mounted, debouncedFetchCompanies]);
 
+  // Load search history from localStorage
   // Load search history from localStorage
   useEffect(() => {
     const savedHistory = localStorage.getItem("searchHistory");
@@ -192,27 +194,42 @@ const Hero: React.FC = () => {
 
   // Create debounced search function
   const debouncedSearch = useCallback(
-    _.debounce((query: string) => {
+    _.debounce(async (query: string) => {
       if (!query.trim()) {
         setFilteredCompanies([]);
         setIsLoading(false);
         return;
       }
 
-      const lowercaseQuery = query.toLowerCase();
-      const filtered = companies.filter(
-        (company) =>
-          (company.name &&
-            company.name.toLowerCase().includes(lowercaseQuery)) ||
-          (company.location &&
-            company.location.toLowerCase().includes(lowercaseQuery)) ||
-          (company.niche &&
-            company.niche.toLowerCase().includes(lowercaseQuery))
-      );
-      setFilteredCompanies(filtered);
-      setIsLoading(false);
-    }, 500),
-    [companies]
+      try {
+        const response = await fetch(
+          `${BASE_URL}/public/companies/search?search_term=${encodeURIComponent(
+            query.trim()
+          )}&per_page=5`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setFilteredCompanies(data.data || []);
+      } catch (error) {
+        console.error("Search error:", error);
+        showToast("Search failed", "error");
+        setFilteredCompanies([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 800),
+    [showToast]
   );
 
   // Handle search query changes
@@ -281,7 +298,8 @@ const Hero: React.FC = () => {
     // Keep focus on input after selection
     inputRef.current?.focus();
 
-    // Run the search
+    // Trigger the search
+    setIsLoading(true);
     debouncedSearch(item);
   };
 
@@ -332,8 +350,8 @@ const Hero: React.FC = () => {
   return (
     <section
       className={cn(
-        "relative min-h-[80vh] lg:min-h-screen flex items-center overflow-hidden",
-        "pt-[70px] lg:pt-10 md:pb-[80px] md:max-h-[1500px]"
+        "relative min-h-[80vh] lg:min-h-screen flex items-center",
+        "pt-[100px] lg:pt-10 md:pb-[80px] md:max-h-[1500px]"
       )}
       onMouseMove={(e) => setMousePosition({ x: e.clientX, y: e.clientY })}
     >
@@ -482,7 +500,7 @@ const Hero: React.FC = () => {
                   <input
                     ref={inputRef}
                     type="text"
-                    placeholder="Search by company name, country, or category..."
+                    placeholder="Search by company name, services, location..."
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -549,7 +567,8 @@ const Hero: React.FC = () => {
                         "bg-white dark:bg-gray-800",
                         "border border-gray-300 dark:border-gray-700",
                         "shadow-lg shadow-gray-200/20 dark:shadow-gray-900/30",
-                        "z-50 overflow-hidden"
+                        "z-50 overflow-hidden",
+                        "pt-2"
                       )}
                     >
                       {isLoading ? (
@@ -558,21 +577,37 @@ const Hero: React.FC = () => {
                           <p className="mt-2">Searching...</p>
                         </div>
                       ) : filteredCompanies.length > 0 ? (
-                        <div
-                          className="max-h-96 overflow-y-auto"
-                          role="listbox"
-                          ref={
-                            suggestionsRef as unknown as React.RefObject<HTMLDivElement>
-                          }
-                        >
-                          {filteredCompanies.map((company, index) => (
-                            <CompanyCard
-                              key={company.id}
-                              company={company}
-                              isSearchResult={true}
-                            />
-                          ))}
-                        </div>
+                        <Virtuoso
+                          data={filteredCompanies}
+                          totalCount={filteredCompanies.length}
+                          itemContent={(index, company) => (
+                            <div key={company.id} className="px-2">
+                              <CompanyCard
+                                company={company}
+                                isSearchResult={true}
+                              />
+                            </div>
+                          )}
+                          style={{ height: "300px" }} // Matches max-h-96
+                          components={{
+                            List: React.forwardRef<
+                              HTMLDivElement,
+                              {
+                                style?: React.CSSProperties;
+                                children?: React.ReactNode;
+                              }
+                            >(({ style, children }, ref) => (
+                              <div
+                                ref={ref}
+                                style={style}
+                                className="space-y-2"
+                                role="listbox"
+                              >
+                                {children}
+                              </div>
+                            )),
+                          }}
+                        />
                       ) : searchHistory.length > 0 && !searchQuery.trim() ? (
                         <div>
                           <div className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 flex items-center">
@@ -616,7 +651,8 @@ const Hero: React.FC = () => {
                         </div>
                       ) : searchQuery.trim() !== "" && !isLoading ? (
                         <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                          No results found for "{searchQuery}"
+                          No matching companies found. Try different keywords or
+                          a broader search term.
                         </div>
                       ) : null}
                     </motion.div>

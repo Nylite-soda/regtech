@@ -19,6 +19,8 @@ import {
   Newspaper,
   Building,
   Search,
+  Linkedin,
+  Instagram,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +42,7 @@ import {
 } from "@/lib/utils";
 import { BackButton } from "@/components/ui/back-button";
 import { useRouter } from "next/navigation";
+import Twitter from "@/components/ui/Twitter";
 
 interface CompanyProfile {
   id: number;
@@ -707,28 +710,148 @@ export default function CompanyProfilePage({
         )}
 
         {activeTab === "team" && (
-          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-4 md:mb-6">
-            <h2 className="text-xl font-semibold mb-6">Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {company.founders && company.founders.length > 0 ? (
-                company.founders.map((founder, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-6"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-                      {founder.avatar || (
-                        <Users2 className="w-8 h-8 text-gray-400" />
-                      )}
-                    </div>
-                    <h3 className="text-lg font-medium">{founder.name}</h3>
-                    <p className="text-[#AD0000] mb-2">{founder.role || ""}</p>
-                    <p className="text-gray-600">{founder.bio || ""}</p>
+          <div className="bg-white rounded-lg mb-6 overflow-hidden">
+            <div className="relative">
+              {/* Subtle top design element */}
+              {/* <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#AD0000]/10 via-[#AD0000] to-[#AD0000]/10"></div> */}
+
+              {/* Header area with refined styling */}
+              <div className="px-6 md:px-10 pt-10 pb-8">
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="h-px w-8 bg-[#AD0000]"></div>
+                  <h3 className="text-sm font-medium uppercase tracking-wider text-[#AD0000]">
+                    Leadership
+                  </h3>
+                </div>
+                <h2 className="text-3xl font-semibold text-gray-800 tracking-tight">
+                  Our Team
+                </h2>
+                <p className="mt-3 text-gray-500 max-w-2xl">
+                  The talented individuals who drive our vision forward and
+                  shape our company's future.
+                </p>
+              </div>
+
+              {/* Team members grid with refined cards */}
+              <div className="px-6 md:px-10 pb-10">
+                {company.founders && company.founders.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {company.founders.map((founder, index) => (
+                      <div
+                        key={index}
+                        className="group relative bg-white rounded-lg overflow-hidden transition-all duration-300"
+                      >
+                        {/* Card with hover animation */}
+                        <div className="flex flex-col h-full transform-gpu transition-all duration-300 group-hover:translate-y-0">
+                          {/* Image with refined handling */}
+                          <div className="relative">
+                            <div className="aspect-[3/3.2] overflow-hidden bg-gray-50">
+                              {founder.avatar ? (
+                                <div className="w-full h-full">
+                                  <img
+                                    src={founder.avatar}
+                                    alt={founder.name}
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                    onError={(e) => {
+                                      const target =
+                                        e.target as HTMLImageElement;
+                                      target.onerror = null;
+                                      target.src = "/api/placeholder/300/375";
+                                      target.classList.add(
+                                        "filter",
+                                        "grayscale"
+                                      );
+                                    }}
+                                  />
+                                  {/* Subtle overlay effect */}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                                </div>
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                  <Users2 className="w-12 h-12 text-gray-300" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Content area with refined spacing */}
+                          <div className="p-6 flex-grow flex flex-col justify-between bg-white border-t border-gray-100">
+                            <div>
+                              <h3 className="text-lg font-medium text-gray-900 group-hover:text-[#AD0000] transition-colors duration-300">
+                                {founder.name}
+                              </h3>
+                              <p className="mt-1 text-sm font-medium text-[#AD0000]">
+                                {founder.role || "Team Member"}
+                              </p>
+
+                              {founder.bio && (
+                                <p className="mt-3 text-sm text-gray-600 line-clamp-3">
+                                  {founder.bio}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Social links with refined styling */}
+                            {founder.social && (
+                              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                                {founder.social.linkedin && (
+                                  <a
+                                    href={founder.social.linkedin}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1.5 rounded-full text-gray-400 hover:text-[#AD0000] hover:bg-[#AD0000]/5 transition-all duration-300"
+                                    aria-label="LinkedIn profile"
+                                  >
+                                    <Linkedin size={16} />
+                                  </a>
+                                )}
+                                {founder.social.twitter && (
+                                  <a
+                                    href={founder.social.twitter}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1.5 rounded-full text-gray-400 hover:text-[#AD0000] hover:bg-[#AD0000]/5 transition-all duration-300"
+                                    aria-label="Twitter profile"
+                                  >
+                                    <Twitter className="h-4 w-4" />
+                                  </a>
+                                )}
+                                {founder.social.website && (
+                                  <a
+                                    href={founder.social.website}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1.5 rounded-full text-gray-400 hover:text-[#AD0000] hover:bg-[#AD0000]/5 transition-all duration-300"
+                                    aria-label="Personal website"
+                                  >
+                                    <Globe size={16} />
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Subtle border effect */}
+                        <div className="absolute inset-0 border border-gray-200 group-hover:border-[#AD0000]/30 rounded-lg pointer-events-none transition-colors duration-300"></div>
+                      </div>
+                    ))}
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No data available yet.</p>
-              )}
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-20 rounded-lg bg-gray-50">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                      <Users2 className="w-10 h-10 text-gray-300" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                      No Team Members Yet
+                    </h3>
+                    <p className="text-gray-500 text-center max-w-md">
+                      Team information for this company will appear here once it
+                      becomes available.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -816,3 +939,14 @@ export default function CompanyProfilePage({
     </div>
   );
 }
+
+const getSocialIcon = (platform: string) => {
+  switch (platform) {
+    case "twitter":
+      return <Twitter className="h-4 w-4" />;
+    case "linkedin":
+      return <Linkedin className="h-4 w-4" />;
+    case "instagram":
+      return <Instagram className="h-4 w-4" />;
+  }
+};

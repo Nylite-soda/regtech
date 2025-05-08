@@ -34,9 +34,7 @@ export default function ComingSoon() {
         </p>
 
         <Link href="/">
-          <button
-            className="mt-4 px-6 py-2 text-white bg-black hover:bg-[#AD0000] rounded-md transition-all duration-300 ease-in-out"
-          >
+          <button className="mt-4 px-6 py-2 text-white bg-black hover:bg-[#AD0000] rounded-md transition-all duration-300 ease-in-out">
             Go Back Home
           </button>
         </Link>
