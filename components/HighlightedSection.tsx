@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { BASE_URL, cn } from "@/lib/utils";
+import { LoadingScreen } from "./ui/loading-screen";
 
 interface Company {
   id: string;
@@ -13,19 +14,32 @@ interface Company {
   niche: string;
   description: string;
   location: string;
-  foundedYear: number;
+  year_founded: number;
   logo: string;
 }
 
 export const companies: Company[] = [
   {
-    id: "1",
-    name: "PaySwift",
-    niche: "KYC",
-    description:
-      "PaySwift is a seamless payment processing platform that enables businesses to accept online and offline transactions with secure, instant settlements.",
-    location: "Nairobi, Kenya",
-    foundedYear: 2018,
+    id: "0681a221-dee8-7c26-8000-b65616efa06f",
+    name: "Regfyl",
+    niche: "AML",
+    description: `Regfyl is a pioneering AI-powered SaaS company focused on transforming anti-money 
+laundering (AML) and fraud detection processes across Africa. Founded in 2023, Regfyl offers a 
+suite of automated solutions designed to assist financial institutions in adhering to compliance 
+regulations while enhancing fraud prevention capabilities. 
+Regfyl's journey began with the vision of providing AI-driven tools tailored specifically for the 
+African financial sector. The company’s flagship product is designed to address key pain points in 
+AML compliance, including transaction monitoring, risk assessment, and regulatory reporting. 
+Regfyl raised $1.2 million in pre-seed funding from prominent fintech venture capitalists and 
+continues to grow its customer base across Nigerian banks, fintechs, and microfinance 
+institutions. 
+Key milestones include: 
+● Winner JP Morgan prize Oxbridge AI Challenge - December 2023 
+● Participated in Techstars Oakland powered by JP Morgan - March-May 2024 
+● Secured $1.1 million in pre-seed funding - August 2024 
+● Onboarded 50+ financial institutions in Nigeria - January 2025`,
+    location: "Lagos, Nigeria",
+    year_founded: 2023,
     logo: "https://images.pexels.com/photos/38568/apple-imac-ipad-workplace-38568.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
@@ -35,7 +49,7 @@ export const companies: Company[] = [
     description:
       "MediLink connects patients with top healthcare providers, offering telemedicine, electronic health records, and AI-powered diagnostics for improved healthcare access.",
     location: "Cape Town, South Africa",
-    foundedYear: 2020,
+    year_founded: 2020,
     logo: "https://images.pexels.com/photos/5327921/pexels-photo-5327921.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
@@ -45,7 +59,7 @@ export const companies: Company[] = [
     description:
       "AgriTech Solutions leverages AI and IoT to optimize farming efficiency, reduce waste, and provide real-time insights for better crop management.",
     location: "Accra, Ghana",
-    foundedYear: 2015,
+    year_founded: 2015,
     logo: "https://images.pexels.com/photos/8117242/pexels-photo-8117242.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
@@ -55,7 +69,7 @@ export const companies: Company[] = [
     description:
       "EduPro is a personalized e-learning platform that provides interactive courses, AI tutors, and skill-based training programs for students and professionals.",
     location: "Abuja, Nigeria",
-    foundedYear: 2019,
+    year_founded: 2019,
     logo: "https://images.pexels.com/photos/5676744/pexels-photo-5676744.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
   {
@@ -65,7 +79,7 @@ export const companies: Company[] = [
     description:
       "EcoCharge provides affordable solar and renewable energy solutions, helping households and businesses reduce carbon footprints and achieve energy independence.",
     location: "Kigali, Rwanda",
-    foundedYear: 2016,
+    year_founded: 2016,
     logo: "https://images.pexels.com/photos/9875441/pexels-photo-9875441.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
   },
 ];
@@ -78,6 +92,9 @@ const HighlightedSection = () => {
   const [isScrolledToStart, setIsScrolledToStart] = useState(true);
   const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewportSize, setViewportSize] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
@@ -138,6 +155,41 @@ const HighlightedSection = () => {
       }
       window.removeEventListener("resize", checkViewportSize);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/v1/company/all?per_page=7`
+        );
+        const result = await response.json();
+
+        if (result.status === "success") {
+          // Map backend data to our component format if needed
+          const formattedCompanies = result.data.map((company: any) => ({
+            id: company.id,
+            name: company.name,
+            niche: company.niche,
+            description: company.description,
+            location: company.headquarters,
+            year_founded: company.year_founded,
+            logo: company.logo || "/placeholder-logo.png", // Fallback logo
+          }));
+          setCompanies(formattedCompanies);
+        } else {
+          setError("Failed to load companies");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching companies");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanies();
   }, []);
 
   const handleScroll = (direction: "left" | "right") => {
@@ -290,6 +342,25 @@ const HighlightedSection = () => {
           </div>
         </div>
 
+        {/* Loading state */}
+        {loading && <LoadingScreen />}
+
+        {/* Error state */}
+        {error && (
+          <div className="w-full flex items-center justify-center py-10">
+            <div className="text-center space-y-4">
+              <p className="text-red-500 dark:text-red-400">{error}</p>
+              <Button
+                variant="outline"
+                onClick={() => window.location.reload()}
+                className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
+              >
+                Try Again
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Companies List */}
         <div
           ref={containerRef}
@@ -307,7 +378,7 @@ const HighlightedSection = () => {
           aria-label="Companies carousel"
           tabIndex={0}
         >
-          {filteredCompanies.length > 0 ? (
+          {!loading && !error && filteredCompanies.length > 0 ? (
             filteredCompanies.map((company, index) => (
               <Card
                 key={company.id}
@@ -397,7 +468,7 @@ const HighlightedSection = () => {
                           <span className="line-clamp-3">
                             {company.description}
                           </span>
-                          <span className="absolute bottom-0 right-0 bg-gradient-to-l from-white dark:from-gray-900 to-transparent w-16 h-full pointer-events-none"></span>
+                          <span className="absolute bottom-0 right-0 bg-gradient-to-l from-white dark:from-[#121212] to-transparent w-16 h-full pointer-events-none"></span>
                         </>
                       ) : (
                         company.description
@@ -407,12 +478,12 @@ const HighlightedSection = () => {
 
                   {/* Company Details - Location and Founded */}
                   <div className="flex items-center gap-4 sm:gap-6 mt-auto">
-                    <div className="space-y-1">
+                    <div className="space-y-1 max-w-[50%]">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         Location
                       </span>
                       <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
-                        {company.location}
+                        {company.location || "N/A"}
                       </p>
                     </div>
                     <div className="space-y-1">
@@ -420,7 +491,7 @@ const HighlightedSection = () => {
                         Founded
                       </span>
                       <p className="text-gray-900 dark:text-white font-medium text-xs sm:text-sm">
-                        {company.foundedYear}
+                        {company.year_founded || "N/A"}
                       </p>
                     </div>
                   </div>

@@ -139,7 +139,6 @@ export default function CompanyProfilePage({
         }
 
         const data = (await response.json()).data;
-        console.log(data);
         setCompany({
           id: data.id,
           name: data.name || data.company_name,
@@ -318,7 +317,7 @@ export default function CompanyProfilePage({
               </div>
             </div>
             <div className="flex items-center gap-2 md:gap-4 ml-auto mt-4 md:mt-0">
-              <Button
+              {/* <Button
                 className="px-3 py-1.5 md:px-4 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg flex items-center gap-1 md:gap-2 text-sm"
                 suppressHydrationWarning
               >
@@ -330,7 +329,16 @@ export default function CompanyProfilePage({
                 suppressHydrationWarning
               >
                 Compare
-              </Button>
+              </Button> */}
+              <Link href="/search">
+                <Button
+                  className="px-3 py-1.5 md:px-4 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg flex items-center gap-1 md:gap-2 text-sm"
+                  suppressHydrationWarning
+                >
+                  <Search className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="hidden sm:inline">Search Companies</span>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -723,7 +731,7 @@ export default function CompanyProfilePage({
                     Leadership
                   </h3>
                 </div>
-                <h2 className="text-3xl font-semibold text-gray-800 tracking-tight">
+                <h2 className="text-3xl font-semibold text-gray-800 dark:text-white tracking-tight">
                   Our Team
                 </h2>
                 <p className="mt-3 text-gray-500 max-w-2xl">

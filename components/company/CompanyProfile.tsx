@@ -564,13 +564,6 @@ export default function CompanyProfile() {
       return;
     }
 
-    console.log("Update payload:", {
-      company_name: formData.company_name,
-      last_funding: formData.last_funding,
-      // Add other fields you're having trouble with
-      fullPayload: mapFormDataToApiData(formData),
-    });
-
     try {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {

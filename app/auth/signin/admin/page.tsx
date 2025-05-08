@@ -121,7 +121,7 @@ export default function AdminLoginPage() {
 
       // Redirect to dashboard after successful login
       setTimeout(() => {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/dashboard/admin";
       }, 1500);
     } catch (error: any) {
       setMessage({
@@ -297,7 +297,7 @@ export default function AdminLoginPage() {
             </div>
             <div className="text-sm">
               <a
-                href="/admin/forgot-password"
+                href="/forgot-password"
                 className="font-medium text-red-600 hover:text-red-700"
               >
                 Forgot your password?
@@ -349,7 +349,7 @@ export default function AdminLoginPage() {
             <p>
               Don't have an account?{" "}
               <a
-                href="/admin/register"
+                href="/register/admin"
                 className="text-red-600 hover:text-red-700"
               >
                 Create an admin account
