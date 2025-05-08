@@ -1103,11 +1103,11 @@ export default function DashboardPage() {
       label: "Profile",
       icon: userData.avatar || <User className="w-5 h-5" />,
     },
-    {
-      id: "subscription",
-      label: "Subscription",
-      icon: <CreditCard className="w-5 h-5" />,
-    },
+    // {
+    //   id: "subscription",
+    //   label: "Subscription",
+    //   icon: <CreditCard className="w-5 h-5" />,
+    // },
     {
       id: "settings",
       label: "Settings",

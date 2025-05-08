@@ -21,10 +21,10 @@ const footerData = {
   categories: ["AML", "SupTech", "Compliance", "Regulatory"],
 
   resourceLinks: [
-    {
-      text: "Pricing",
-      href: "/checkout",
-    },
+    // {
+    //   text: "Pricing",
+    //   href: "/checkout",
+    // },
     {
       text: "Privacy Policy",
       href: "/privacy",

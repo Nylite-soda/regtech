@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Shield, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
-import { UserData } from "@/types";
+import { Company, UserData } from "@/types";
 import { BASE_URL } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 import { validatePassword } from "@/lib/validation";
 
 interface SecuritySettingsProps {
-  user: UserData;
+  user?: UserData;
+  company?: Company;
 }
 
 interface PasswordFormData {
@@ -18,7 +19,10 @@ interface PasswordFormData {
   confirm_new_password: string;
 }
 
-export default function SecuritySettings({ user }: SecuritySettingsProps) {
+export default function SecuritySettings({
+  user,
+  company,
+}: SecuritySettingsProps) {
   const [showPassword, setShowPassword] = useState(false);
   const { showToast } = useToast();
   const [error, setError] = useState("");
@@ -35,6 +39,11 @@ export default function SecuritySettings({ user }: SecuritySettingsProps) {
       confirm_new_password: "",
     },
   });
+
+  // Determine if we're working with a user or company account
+  const accountType = user ? "user" : "company";
+  const accountId = user ? user.id : company?.id;
+  const accountName = user ? user.first_name || user.email : company?.name;
 
   const onSubmit = async (data: PasswordFormData) => {
     setError("");
@@ -61,7 +70,12 @@ export default function SecuritySettings({ user }: SecuritySettingsProps) {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/users/change-password`, {
+      // Use different endpoints based on account type
+      const endpoint = user
+        ? `${BASE_URL}/api/v1/users/change-password`
+        : `${BASE_URL}/api/v1/companies/change-password`;
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,13 +97,30 @@ export default function SecuritySettings({ user }: SecuritySettingsProps) {
     }
   };
 
+  // If neither user nor company is provided, show a message
+  if (!user && !company) {
+    return (
+      <SectionWrapper
+        icon={<Shield className="w-5 h-5" />}
+        title="Security Settings"
+      >
+        <div className="p-4 text-amber-700 bg-amber-50 rounded-md">
+          No account information available.
+        </div>
+      </SectionWrapper>
+    );
+  }
+
   return (
     <SectionWrapper
       icon={<Shield className="w-5 h-5" />}
       title="Security Settings"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-        <h3 className="font-medium">Change Password</h3>
+        <h3 className="font-medium">
+          Change Password for {accountType === "user" ? "User" : "Company"}:{" "}
+          {accountName}
+        </h3>
         <div className="space-y-4">
           <div className="relative">
             <input
