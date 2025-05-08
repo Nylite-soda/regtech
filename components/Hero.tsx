@@ -264,7 +264,7 @@ const Hero: React.FC = () => {
       localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
 
       router.push(
-        `/companies?search=${encodeURIComponent(searchQuery.trim())}`
+        `/companies?search_term=${encodeURIComponent(searchQuery.trim())}`
       );
     }
   };
@@ -281,7 +281,7 @@ const Hero: React.FC = () => {
     setSearchHistory(updatedHistory);
     localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
 
-    router.push(`/companies?search=${encodeURIComponent(companyName)}`);
+    router.push(`/companies?search_term=${encodeURIComponent(companyName)}`);
   };
 
   const handleHistoryItemClick = (item: string) => {
@@ -341,6 +341,35 @@ const Hero: React.FC = () => {
     } else if (e.key === "Escape") {
       setShowSuggestions(false);
     }
+  };
+
+  // Helper function to determine if we should show the suggestions dropdown
+  const shouldShowSuggestions = () => {
+    return (
+      showSuggestions &&
+      (isLoading ||
+        filteredCompanies.length > 0 ||
+        (searchHistory.length > 0 && !searchQuery.trim()) ||
+        (searchQuery.trim() !== "" &&
+          !isLoading &&
+          filteredCompanies.length === 0))
+    );
+  };
+
+  // Calculate dynamic height for Virtuoso component based on number of items
+  const calculateVirtuosoHeight = () => {
+    // Set base height per item (approx. CompanyCard height)
+    const baseItemHeight = 170; // Average height of a company card in pixels
+    const maxHeight = 300; // Maximum height in pixels
+
+    // Calculate height based on number of items (minimum of 1 item height)
+    const calculatedHeight = Math.min(
+      filteredCompanies.length * baseItemHeight,
+      maxHeight
+    );
+
+    // Return at least enough height for one item, or calculated height
+    return Math.max(baseItemHeight, calculatedHeight);
   };
 
   if (!mounted) {
@@ -554,9 +583,9 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Search Suggestions with CompanyCards */}
+                {/* Search Suggestions with CompanyCards - Only show when there's content */}
                 <AnimatePresence>
-                  {showSuggestions && (
+                  {shouldShowSuggestions() && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -588,7 +617,7 @@ const Hero: React.FC = () => {
                               />
                             </div>
                           )}
-                          style={{ height: "300px" }} // Matches max-h-96
+                          style={{ height: `${calculateVirtuosoHeight()}px` }}
                           components={{
                             List: React.forwardRef<
                               HTMLDivElement,
