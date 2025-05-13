@@ -165,7 +165,6 @@ export default function CompanyProfilePage({
         }
 
         const data = (await response.json()).data;
-        console.log(data);
         setCompany({
           id: data.id,
           name: data.name || data.company_name,
