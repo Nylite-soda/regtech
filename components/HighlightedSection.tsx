@@ -292,7 +292,7 @@ const HighlightedSection = () => {
         {/* Loading state */}
         {loading && <LoadingScreen />}
 
-        {/* Error state */}
+        {/* Error state
         {error && (
           <div className="w-full flex items-center justify-center py-10">
             <div className="text-center space-y-4">
@@ -306,7 +306,7 @@ const HighlightedSection = () => {
               </Button>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Companies List */}
         <div

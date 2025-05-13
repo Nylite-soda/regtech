@@ -38,11 +38,16 @@ import {
   BASE_URL,
   getItem,
   isUserSignedIn,
+  logout,
   storeRedirectUrl,
 } from "@/lib/utils";
 import { BackButton } from "@/components/ui/back-button";
 import { useRouter } from "next/navigation";
 import Twitter from "@/components/ui/Twitter";
+import MarkdownIt from "markdown-it";
+import { useToast } from "@/components/ui/toast-context";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
 
 interface CompanyProfile {
   id: number;
@@ -97,6 +102,18 @@ interface CompanyProfile {
   }>;
 }
 
+const md = new MarkdownIt({
+  breaks: true,
+  highlight: (str, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(str, { language: lang }).value;
+      } catch (__) {}
+    }
+    return "";
+  },
+});
+
 export default function CompanyProfilePage({
   params,
 }: {
@@ -109,6 +126,7 @@ export default function CompanyProfilePage({
   const [error, setError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -135,6 +153,14 @@ export default function CompanyProfilePage({
         });
 
         if (!response.ok) {
+          const res = await response.json();
+          if (res.detail && res.detail === "Could not validate credentials!") {
+            showToast("Token has expired! Please sign in!", "info");
+            logout();
+            setCompany(null);
+            router.push("/auth/signin");
+            return;
+          }
           throw new Error(`Failed to fetch company data: ${response.status}`);
         }
 
@@ -487,9 +513,14 @@ export default function CompanyProfilePage({
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-4 md:mb-6">
                 <h2 className="text-xl font-semibold mb-4">About</h2>
-                <p className="text-gray-600 mb-6">
-                  {company.description || "No Description Yet"}
-                </p>
+                <div
+                  className="mb-6 prose prose-sm"
+                  dangerouslySetInnerHTML={{
+                    __html: md.render(
+                      company.description || "No Description Yet"
+                    ),
+                  }}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                   <div className="flex items-center gap-3">
@@ -700,7 +731,12 @@ export default function CompanyProfilePage({
                     className="border border-gray-200 rounded-lg p-6"
                   >
                     <h3 className="text-lg font-medium mb-2">{service.name}</h3>
-                    <p className="text-gray-600">{service.description}</p>
+                    <div
+                      className="mb-6 prose prose-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: md.render(service.description || ""),
+                      }}
+                    />
                   </div>
                 ))
               ) : (

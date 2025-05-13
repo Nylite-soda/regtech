@@ -329,3 +329,25 @@ body {
 .tabContent {
   @apply transition-opacity duration-300 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8;
 }
+
+/* Add to your CSS */
+.preview-pane {
+  overflow-y: auto;
+  max-height: calc(100% - 40px);
+}
+
+.prose {
+  max-width: 100%;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose pre {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+}

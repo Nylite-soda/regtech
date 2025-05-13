@@ -41,10 +41,10 @@ export default function ForgotPassword() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email,
           // Include expiration time for the reset token (24 hours)
-          expirationHours: 24
+          expirationHours: 24,
         }),
       });
 
@@ -54,11 +54,15 @@ export default function ForgotPassword() {
         throw new Error(data.error || "Failed to send reset email");
       }
 
-      setSuccess("If an account exists with this email, you will receive password reset instructions.");
+      setSuccess(
+        "If an account exists with this email, you will receive password reset instructions."
+      );
       setEmailSent(true);
-      showToast("Reset instructions sent to your email", "success");
+      showToast("Reset instructions sent to your email", "info");
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Failed to send reset email");
+      setError(
+        error instanceof Error ? error.message : "Failed to send reset email"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,12 +74,15 @@ export default function ForgotPassword() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
           <p className="text-sm text-gray-600">
-            Enter your email address and we'll send you instructions to reset your password.
+            Enter your email address and we'll send you instructions to reset
+            your password.
           </p>
         </CardHeader>
         <CardContent>
           {error && (
-            <p className="p-3 bg-red-100 text-red-600 rounded-md text-sm mb-4">{error}</p>
+            <p className="p-3 bg-red-100 text-red-600 rounded-md text-sm mb-4">
+              {error}
+            </p>
           )}
           {success && (
             <div className="p-3 bg-green-100 text-green-600 rounded-md text-sm mb-4">
@@ -107,7 +114,10 @@ export default function ForgotPassword() {
 
           <div className="text-center text-sm mt-4">
             Remember your password?{" "}
-            <Link href="/auth/signin" className="text-blue-600 hover:text-blue-800">
+            <Link
+              href="/auth/signin"
+              className="text-blue-600 hover:text-blue-800"
+            >
               Sign in here
             </Link>
           </div>
@@ -115,4 +125,4 @@ export default function ForgotPassword() {
       </Card>
     </div>
   );
-} 
+}

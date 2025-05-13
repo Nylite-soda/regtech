@@ -99,7 +99,7 @@ export function Overview({ className }: { className?: string }) {
       const result = await response.json();
 
       if (result.detail === "Could not validate credentials!") {
-        showToast("Expired! Kindly sign in", "error");
+        showToast("Expired! Kindly sign in", "info");
         logout();
         setData(undefined);
         router.push("/auth/signin");

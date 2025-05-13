@@ -48,6 +48,9 @@ import Twitter from "@/components/ui/Twitter";
 import ProfileProgressBar from "@/components/company/ProfileProgressBar";
 import { CompanyFounder, CompanyService } from "@/types";
 import Router from "next/router";
+import MarkdownIt from "markdown-it";
+import MDEditor from "@uiw/react-markdown-editor";
+import MarkdownEditor from "../MarkdownEditor";
 
 interface CompanyProfile {
   id: string;
@@ -74,6 +77,13 @@ interface Social {
   linkedin?: string;
   instagram?: string;
 }
+
+const md = new MarkdownIt({
+  html: true,
+  breaks: true,
+  linkify: true,
+  // typographer: true
+});
 
 // Mapping between our form structure and the backend schema
 const mapFormDataToApiData = (formData: CompanyProfile) => {
@@ -143,6 +153,11 @@ export default function CompanyProfile() {
     logo: "",
     social_media: [] as { platform: string; url: string }[],
     profile_completion: 0,
+  });
+
+  const [previewMode, setPreviewMode] = useState({
+    description: false,
+    services: Array(formData.services.length).fill(false),
   });
 
   useEffect(() => {
@@ -277,6 +292,16 @@ export default function CompanyProfile() {
     );
 
     setNextActions(actions);
+  };
+
+  const handleMarkdownChange = (field: string, value: string, index = null) => {
+    if (index !== null) {
+      // Handle service description
+      updateServiceField(index, field, value);
+    } else {
+      // Handle main description
+      handleChange({ target: { name: field, value } });
+    }
   };
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
@@ -432,6 +457,15 @@ export default function CompanyProfile() {
     }
 
     // Services validation
+    formData.services.forEach((service, index) => {
+      if (!service.name.trim()) {
+        errors[`services_${index}_name`] = "Service name is required";
+      }
+    });
+
+    if (formData.services.length === 0) {
+      errors.services = "At least one service is required";
+    }
     if (
       !formData.services.length ||
       formData.services.some((s) => !s.name.trim())
@@ -728,28 +762,17 @@ export default function CompanyProfile() {
               )}
             </div>
 
-            {/* Description */}
-            <div>
-              <Label htmlFor="description" className="mb-2 mt-2">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                name="description"
-                required
-                value={formData.description}
-                onChange={(e) => handleChange(e)}
-                className={`mt-1 ${
-                  formErrors.description ? "border-red-500" : ""
-                }`}
-                placeholder="Briefly describe your company..."
-              />
-              {formErrors.description && (
-                <p className="mt-1 text-sm text-red-600">
-                  {formErrors.description}
-                </p>
-              )}
-            </div>
+            {/* Description with Markdown */}
+            <MarkdownEditor
+              value={formData.description}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, description: value }))
+              }
+              label="Description"
+              placeholder="Briefly describe your company... (Markdown supported)"
+              error={formErrors.description}
+              rows={8}
+            />
 
             {/* Website */}
             <div>
@@ -1249,49 +1272,78 @@ export default function CompanyProfile() {
               )}
             </div>
 
-            {/* Services */}
+            {/* Services with Markdown */}
+            {/* Services Section */}
             <div>
               <Label htmlFor="services" className="mb-2 mt-2">
                 Services Offered
               </Label>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {formData.services.map((service, index) => (
-                  <div key={index} className="flex gap-2 items-center">
-                    <Input
-                      placeholder="Service Name"
-                      value={service.name}
-                      onChange={(e) =>
-                        updateServiceField(index, "name", e.target.value)
-                      }
-                    />
-                    <Input
-                      placeholder="Description"
+                  <div
+                    key={index}
+                    className="border rounded-lg p-4 bg-white shadow-sm"
+                  >
+                    <div className="flex gap-2 items-center mb-4">
+                      <Input
+                        placeholder="Service Name *"
+                        value={service.name}
+                        onChange={(e) => {
+                          updateServiceField(index, "name", e.target.value);
+                          if (formErrors[`services_${index}_name`]) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              [`services_${index}_name`]: "",
+                            }));
+                          }
+                        }}
+                        className={`font-medium ${
+                          formErrors[`services_${index}_name`]
+                            ? "border-red-500"
+                            : ""
+                        }`}
+                        autoFocus={service.name === ""}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const newServices = [...formData.services];
+                          newServices.splice(index, 1);
+                          setFormData((prev) => ({
+                            ...prev,
+                            services: newServices,
+                          }));
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {formErrors[`services_${index}_name`] && (
+                      <p className="text-red-500 text-sm mt-1 mb-2">
+                        {formErrors[`services_${index}_name`]}
+                      </p>
+                    )}
+
+                    <MarkdownEditor
                       value={service.description || ""}
-                      onChange={(e) =>
-                        updateServiceField(index, "description", e.target.value)
+                      onChange={(value) =>
+                        updateServiceField(index, "description", value)
                       }
+                      label="Service Description"
+                      placeholder="Describe this service... (Markdown supported)"
+                      rows={6}
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        const newServices = [...formData.services];
-                        newServices.splice(index, 1);
-                        setFormData((prev) => ({
-                          ...prev,
-                          services: newServices,
-                        }));
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
                   </div>
                 ))}
+
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
+                  className="w-full"
                   onClick={() =>
                     setFormData((prev) => ({
                       ...prev,
@@ -1546,3 +1598,29 @@ export default function CompanyProfile() {
     </div>
   );
 }
+
+// const MarkdownGuide = () => (
+//   <div className="text-xs text-gray-500 mt-2 p-2 border rounded bg-gray-50">
+//     <h4 className="font-medium mb-1">Markdown Guide:</h4>
+//     <ul className="space-y-1">
+//       <li>
+//         <code>**bold**</code> - <strong>bold</strong>
+//       </li>
+//       <li>
+//         <code>*italic*</code> - <em>italic</em>
+//       </li>
+//       <li>
+//         <code>[Link](https://example.com)</code> - <a href="#">Link</a>
+//       </li>
+//       <li>
+//         <code># Heading 1</code> - Heading
+//       </li>
+//       <li>
+//         <code>- List item</code> - Bullet list
+//       </li>
+//       <li>
+//         <code>1. Numbered item</code> - Numbered list
+//       </li>
+//     </ul>
+//   </div>
+// );

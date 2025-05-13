@@ -14,6 +14,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import MarkdownIt from "markdown-it";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
 
 // Define the Company type based on your backend model
 interface Company {
@@ -37,6 +40,18 @@ interface Company {
   founders: any[];
   company_type: string;
 }
+
+const md = new MarkdownIt({
+  breaks: true,
+  highlight: (str, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(str, { language: lang }).value;
+      } catch (__) {}
+    }
+    return "";
+  },
+});
 
 // Define recent activity type
 interface Activity {
@@ -194,9 +209,12 @@ const CompanyOverview: React.FC = () => {
       {/* Company Overview */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-xl font-semibold mb-4">Company Overview</h2>
-        <div className="prose max-w-none">
-          <p>{company.description || "No company description available."}</p>
-        </div>
+        <div
+          className="mb-6 prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{
+            __html: md.render(company.description || "No Description Yet"),
+          }}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <div className="flex items-center gap-3">
             <Building2 className="w-5 h-5 text-gray-400" />
