@@ -291,7 +291,7 @@ const HighlightedSection = () => {
         </div>
 
         {/* Loading state */}
-        {loading && <Spinner label="Loading companies..." size="md" />}
+        {loading && <Spinner label="Loading companies..." size="lg" />}
 
         {/* Companies List */}
         <div

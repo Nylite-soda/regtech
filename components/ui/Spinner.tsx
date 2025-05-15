@@ -84,7 +84,7 @@ export function Spinner({
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col pt-5 py-2 items-center justify-center">
       <div
         className={`relative ${classes.container} flex items-center justify-center`}
       >

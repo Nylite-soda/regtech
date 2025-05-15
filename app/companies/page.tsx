@@ -306,7 +306,7 @@ export default function CompaniesPage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && <Spinner size="md" label="Loading companies..." />}
+        {isLoading && <Spinner size="lg" label="Loading companies..." />}
 
         {/* Error State */}
         {error && !isLoading && (

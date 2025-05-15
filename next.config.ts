@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'standalone',
+  // output: 'standalone',
   // Add this to exclude the not-found page from static generation
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true
