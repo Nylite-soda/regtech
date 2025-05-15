@@ -1,28 +1,32 @@
-import React from 'react';
-import { ArrowRight, Shield, LineChart, Bell, Zap } from 'lucide-react';
-import { Button } from './ui/button';
+import React from "react";
+import { ArrowRight, Shield, LineChart, Bell, Zap } from "lucide-react";
+import { Button } from "./ui/button";
 
 const features = [
   {
     icon: Shield,
     title: "Advanced Compliance Tools",
-    description: "Real-time monitoring and automated compliance checks across multiple jurisdictions"
+    description:
+      "Real-time monitoring and automated compliance checks across multiple jurisdictions",
   },
   {
     icon: LineChart,
     title: "Market Intelligence",
-    description: "Deep insights into regulatory trends with predictive analytics and market analysis"
+    description:
+      "Deep insights into regulatory trends with predictive analytics and market analysis",
   },
   {
     icon: Bell,
     title: "Instant Alerts",
-    description: "Stay informed with real-time notifications on regulatory changes and updates"
+    description:
+      "Stay informed with real-time notifications on regulatory changes and updates",
   },
   {
     icon: Zap,
     title: "Smart Automation",
-    description: "Streamline your compliance workflow with AI-powered automation tools"
-  }
+    description:
+      "Streamline your compliance workflow with AI-powered automation tools",
+  },
 ];
 
 const PremiumFeatures = () => {
@@ -35,14 +39,18 @@ const PremiumFeatures = () => {
               <div className="inline-block">
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full">
                   <span className="inline-block w-2 h-2 bg-[#AD0000] rounded-full animate-pulse"></span>
-                  <span className="text-white/90 text-sm font-medium">Premium Access</span>
+                  <span className="text-white/90 text-sm font-medium">
+                    Premium Access
+                  </span>
                 </div>
               </div>
               <h2 className="text-4xl font-bold text-white leading-tight">
                 Transform Your Regulatory Compliance with Premium Features
               </h2>
               <p className="text-gray-300 text-lg">
-                Get exclusive access to advanced tools, real-time insights, and expert analysis to stay ahead in the evolving regulatory landscape.
+                Get exclusive access to advanced tools, real-time insights, and
+                expert analysis to stay ahead in the evolving regulatory
+                landscape.
               </p>
             </div>
 
@@ -57,7 +65,9 @@ const PremiumFeatures = () => {
                     <div className="w-12 h-12 rounded-lg bg-[#AD0000]/10 flex items-center justify-center mb-4 group-hover:bg-[#AD0000]/20 transition-colors duration-300">
                       <Icon className="w-6 h-6 text-[#AD0000]" />
                     </div>
-                    <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
+                    <h3 className="text-white font-semibold mb-2">
+                      {feature.title}
+                    </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
                       {feature.description}
                     </p>
@@ -65,13 +75,13 @@ const PremiumFeatures = () => {
                 );
               })}
             </div>
-
+            {/* 
             <Button 
               className="bg-[#AD0000] text-white px-8 py-3 rounded-lg hover:bg-[#AD0000]/90 transition-colors duration-300 flex items-center gap-2 group"
             >
               Get Premium Access
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
+            </Button> */}
           </div>
 
           <div className="relative lg:h-[600px] h-[400px] rounded-2xl overflow-hidden">

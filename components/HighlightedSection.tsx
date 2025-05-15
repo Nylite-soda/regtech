@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { BASE_URL, cn } from "@/lib/utils";
 import { LoadingScreen } from "./ui/loading-screen";
+import { Spinner } from "./ui/Spinner";
 
 interface Company {
   id: string;
@@ -181,7 +182,7 @@ const HighlightedSection = () => {
               "rounded-tr-2xl rounded-bl-2xl",
               "shadow-lg",
               "w-fit",
-              "transform transition-all duration-500 hover:scale-105",
+              "transform transition-all duration-500 hover:scale-103",
               "group"
             )}
           >
@@ -261,7 +262,7 @@ const HighlightedSection = () => {
                   "border-none text-white",
                   "hover:bg-red-600 dark:hover:bg-red-500",
                   "transition-all duration-300",
-                  "hover:scale-110 active:scale-95",
+                  "hover:scale-105 active:scale-95",
                   "disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-gray-900 dark:disabled:hover:bg-gray-800"
                 )}
                 aria-label="Scroll left"
@@ -278,7 +279,7 @@ const HighlightedSection = () => {
                   "border-none text-white",
                   "hover:bg-red-600 dark:hover:bg-red-500",
                   "transition-all duration-300",
-                  "hover:scale-110 active:scale-95",
+                  "hover:scale-105 active:scale-95",
                   "disabled:opacity-40 disabled:hover:scale-100 disabled:hover:bg-gray-900 dark:disabled:hover:bg-gray-800"
                 )}
                 aria-label="Scroll right"
@@ -290,33 +291,17 @@ const HighlightedSection = () => {
         </div>
 
         {/* Loading state */}
-        {loading && <LoadingScreen />}
-
-        {/* Error state
-        {error && (
-          <div className="w-full flex items-center justify-center py-10">
-            <div className="text-center space-y-4">
-              <p className="text-red-500 dark:text-red-400">{error}</p>
-              <Button
-                variant="outline"
-                onClick={() => window.location.reload()}
-                className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
-              >
-                Try Again
-              </Button>
-            </div>
-          </div>
-        )} */}
+        {loading && <Spinner label="Loading companies..." size="md" />}
 
         {/* Companies List */}
         <div
           ref={containerRef}
           className={cn(
-            "flex gap-4 sm:gap-6 overflow-x-auto pb-8",
+            "flex gap-4 sm:gap-4 overflow-x-auto",
             "scroll-smooth",
             "snap-x snap-mandatory",
             "no-scrollbar",
-            "-mx-4 px-4"
+            "-mx-4 px-4 py-2 md:pb-14"
           )}
           style={{
             scrollbarWidth: "none" /* Firefox */,
@@ -339,7 +324,7 @@ const HighlightedSection = () => {
                     "bg-white dark:bg-gray-900",
                     "shadow-lg hover:shadow-xl",
                     "transition-all duration-300 transform",
-                    "hover:scale-[1.02]",
+                    "hover:scale-[1.01]",
                     isVisible
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-4",
@@ -359,7 +344,7 @@ const HighlightedSection = () => {
                           "border border-gray-200 dark:border-gray-700",
                           "bg-gray-100 dark:bg-gray-800",
                           "transition-transform duration-500",
-                          "hover:rotate-3 hover:scale-105",
+                          "hover:rotate-4 hover:scale-102",
                           "group-hover:rotate-3 group-hover:scale-105"
                         )}
                       >
@@ -406,7 +391,7 @@ const HighlightedSection = () => {
                                 "hover:bg-red-600 dark:hover:bg-red-500",
                                 "hover:text-white dark:hover:text-white",
                                 "transition-all duration-300",
-                                "hover:scale-105",
+                                "hover:scale-102",
                                 "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
                               )}
                             >
@@ -470,7 +455,7 @@ const HighlightedSection = () => {
                               "hover:bg-red-600 dark:hover:bg-red-500",
                               "hover:text-white dark:hover:text-white",
                               "transition-all duration-300",
-                              "hover:scale-105",
+                              "hover:scale-102",
                               "w-full",
                               "focus:ring-2 focus:ring-red-600 dark:focus:ring-red-500 focus:ring-offset-2"
                             )}
@@ -495,7 +480,7 @@ const HighlightedSection = () => {
                       variant="outline"
                       onClick={() => {
                         setActiveNiche(null);
-                        !error && window.location.reload();
+                        window.location.reload();
                       }}
                       className="border-red-600 text-red-600 hover:bg-red-50 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-950/20"
                     >

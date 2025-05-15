@@ -133,6 +133,7 @@ export default function CompanyProfilePage({
       if (!isUserSignedIn()) {
         setIsRedirecting(true);
         storeRedirectUrl();
+        showToast("Please sign in to continue", "info");
         router.push("/auth/signin");
       }
     };

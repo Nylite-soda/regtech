@@ -14,7 +14,7 @@ import {
 import CompanyCard from "@/components/CompanyCard";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, isUserSignedIn, storeRedirectUrl } from "@/lib/utils";
 import Pagination from "@/components/Pagination";
 import { useToast } from "@/components/ui/toast-context";
 import { LoadingScreen } from "@/components/ui/loading-screen";
@@ -28,6 +28,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
 import { CompanyService } from "@/types";
+import { useRouter } from "next/navigation";
 
 interface Company {
   id: string;
@@ -89,6 +90,22 @@ export default function AdvancedSearchPage() {
   const [maxYearDate, setMaxYearDate] = useState<dayjs.Dayjs | null>(null);
   const [minYearPopoverOpen, setMinYearPopoverOpen] = useState(false);
   const [maxYearPopoverOpen, setMaxYearPopoverOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!isUserSignedIn()) {
+        setIsRedirecting(true);
+        storeRedirectUrl();
+        showToast("Please sign in to continue", "info");
+        router.push("/auth/signin");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   // Filter options
   const locations = ["South Africa", "Kenya", "Nigeria", "Egypt", "Morocco"];

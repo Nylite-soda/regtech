@@ -49,7 +49,7 @@ export function storeRedirectUrl() {
 export function getAndClearRedirectUrl(): string {
   if (typeof window === 'undefined') return '/dashboard';
   
-  const redirectUrl = localStorage.getItem("redirectUrl") || "/dashboard";
+  const redirectUrl = localStorage.getItem("redirectUrl") || "/";
   localStorage.removeItem("redirectUrl");
   return redirectUrl;
 }

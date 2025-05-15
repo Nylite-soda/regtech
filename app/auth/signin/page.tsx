@@ -143,8 +143,8 @@ export default function SignIn() {
 
         // Use the utility function to get and clear the redirect URL
         const redirectUrl = getAndClearRedirectUrl();
-        router.back();
-        // router.push(redirectUrl);
+        // router.back();
+        router.push(redirectUrl);
       } else {
         setError("An unexpected error occurred. Please try again.");
       }

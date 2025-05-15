@@ -299,7 +299,7 @@ body {
 }
 
 .animate-spin-slow {
-  animation: spin-slow 2s linear infinite;
+  animation: spin-slow 2.5s linear infinite;
 }
 
 .animate-spin-reverse {

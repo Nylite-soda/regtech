@@ -14,6 +14,7 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 import { useToast } from "@/components/ui/toast-context";
 import { Button } from "@/components/ui/button";
 import { Company } from "@/types";
+import { Spinner } from "@/components/ui/Spinner";
 
 interface Pagination {
   page: number;
@@ -305,12 +306,7 @@ export default function CompaniesPage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && (
-          <div className="text-center py-12 col-span-full">
-            <LoadingScreen />
-            <p className="text-xl text-gray-600">Loading companies...</p>
-          </div>
-        )}
+        {isLoading && <Spinner size="md" label="Loading companies..." />}
 
         {/* Error State */}
         {error && !isLoading && (

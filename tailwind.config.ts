@@ -9,8 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       animation: {
-        'spin-slow': 'spin 3s linear infinite',
-        'spin-reverse': 'spin 1s linear infinite reverse',
+        'spin-slow-reverse': 'spin 3s linear infinite reverse',
+        'spin-reverse': 'spin 1.5s linear infinite reverse',
+      },
+      keyframes: {
+        loadingProgress: {
+          '0%': { width: '0%' },
+          '50%': { width: '70%' },
+          '100%': { width: '100%' }
+        }
+      },
+      borderWidth: {
+        '6': '6px',
       },
     },
   },

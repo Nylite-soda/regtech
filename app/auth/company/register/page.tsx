@@ -168,6 +168,7 @@ export default function CompanyRegister() {
       if (!isUserSignedIn()) {
         setIsRedirecting(true);
         storeRedirectUrl();
+        showToast("Please sign in to continue", "info");
         router.push("/auth/signin");
       }
     };

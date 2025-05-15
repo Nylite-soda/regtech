@@ -55,7 +55,8 @@ const FeaturedNews = () => {
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-700 hover:text-[#AD0000] transition-colors duration-300 group"
             >
-              <span className="font-medium">See all news</span>
+              <span className="font-medium hidden sm:flex">See all news</span>
+              <span className="font-medium sm:hidden flex">See all </span>
               <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 group-hover:bg-[#AD0000] transition-colors duration-300">
                 <ArrowRight
                   size={16}

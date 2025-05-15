@@ -23,8 +23,10 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import { useToast } from "@/components/ui/toast-context";
 
 export default function DashboardPage() {
+  const { showToast } = useToast();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [userData, setUserData] = useState<UserData | null>(getItem("user"));
@@ -33,6 +35,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isUserSignedIn()) {
       storeRedirectUrl();
+      showToast("Please sign in to continue", "info");
       router.push("/auth/signin");
       return;
     }
