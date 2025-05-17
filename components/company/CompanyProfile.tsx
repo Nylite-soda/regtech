@@ -56,7 +56,7 @@ interface CompanyProfile {
   id: string;
   company_name: string;
   company_email: string;
-  company_phone: string;
+  company_phone?: string;
   company_website: string;
   description: string;
   company_type: string;
@@ -406,7 +406,6 @@ export default function CompanyProfile() {
     const requiredFields = [
       "company_name",
       "company_email",
-      "company_phone",
       "company_website",
       "description",
       "company_type",

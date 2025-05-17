@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { validateEmail } from "@/lib/validation";
 import { useToast } from "@/components/ui/toast-context";
+import { BASE_URL } from "@/lib/utils";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function ForgotPassword() {
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
+    const [message, setMessage] = useState("");
 
     // Validate email
     const emailError = validateEmail(email);
@@ -36,7 +38,7 @@ export default function ForgotPassword() {
     }
 
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,6 +51,7 @@ export default function ForgotPassword() {
       });
 
       const data = await response.json();
+      setMessage(data.message);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to send reset email");
@@ -107,7 +110,7 @@ export default function ForgotPassword() {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Sending..." : "Send Reset Instructions"}
+                {loading ? "Sending..." : "Send reset link"}
               </Button>
             </form>
           )}

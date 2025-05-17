@@ -597,24 +597,28 @@ export default function CompanyProfilePage({
               <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-4 md:mb-6">
                 <h2 className="text-xl font-semibold mb-4">Contact</h2>
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-gray-400" />
-                    <a
-                      href={`mailto:${company.contact.email}`}
-                      className="text-[#AD0000] hover:underline"
-                    >
-                      {company.contact.email}
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-gray-400" />
-                    <a
-                      href={`tel:${company.contact.phone}`}
-                      className="text-gray-600 hover:text-[#AD0000]"
-                    >
-                      {company.contact.phone}
-                    </a>
-                  </div>
+                  {company.contact.email && (
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-5 h-5 text-gray-400" />
+                      <a
+                        href={`mailto:${company.contact.email}`}
+                        className="text-[#AD0000] hover:underline"
+                      >
+                        {company.contact.email}
+                      </a>
+                    </div>
+                  )}
+                  {company.contact.phone && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-gray-400" />
+                      <a
+                        href={`tel:${company.contact.phone}`}
+                        className="text-gray-600 hover:text-[#AD0000]"
+                      >
+                        {company.contact.phone}
+                      </a>
+                    </div>
+                  )}
                   <div className="flex items-center gap-3">
                     <Globe className="w-5 h-5 text-gray-400" />
                     <a

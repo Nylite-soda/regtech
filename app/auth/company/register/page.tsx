@@ -49,7 +49,7 @@ interface Country {
 interface FormData {
   companyName: string;
   email: string;
-  phone: string;
+  phone?: string;
   password: string;
   confirmPassword: string;
   type: string;
@@ -274,9 +274,11 @@ export default function CompanyRegister() {
     }
 
     // Phone validation
-    const phoneError = validatePhone(formData.phone);
-    if (phoneError) {
-      errors.phone = phoneError.message;
+    if (formData.phone) {
+      const phoneError = validatePhone(formData.phone);
+      if (phoneError) {
+        errors.phone = phoneError.message;
+      }
     }
 
     // Company name validation
@@ -467,7 +469,7 @@ export default function CompanyRegister() {
               name="phone"
               type="tel"
               placeholder="+1 (555) 123-4567"
-              value={formData.phone}
+              value={formData.phone || ""}
               onChange={handleChange}
               error={formErrors.phone}
               touched={touchedFields.phone}
