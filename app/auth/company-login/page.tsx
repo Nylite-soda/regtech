@@ -9,7 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { BASE_URL, getAndClearRedirectUrl } from "@/lib/utils";
+import {
+  BASE_URL,
+  getAndClearRedirectUrl,
+  logout,
+  storeRedirectUrl,
+} from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 
 export default function CompanyLogin() {
@@ -26,26 +31,28 @@ export default function CompanyLogin() {
     password: "",
   });
 
-
   useEffect(() => {
     // Check if there's a success message in th e URL (e.g., after registration)
-    const storedData = localStorage.getItem("user")
+    const storedData = localStorage.getItem("user");
     if (!storedData) {
-      showToast("User not signed up", "error");
-      router.push("/auth/register");
+      showToast("User not signed in", "error");
+      storeRedirectUrl();
+      router.push("/auth/signin");
       return;
     }
     const urlParams = new URLSearchParams(window.location.search);
     const registered = urlParams.get("registered");
     if (registered === "true") {
-      setSuccess("Registration successful! Please log in with your credentials.");
+      setSuccess(
+        "Registration successful! Please log in with your credentials."
+      );
     }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     // Clear error for this field when user starts typing
     if (formErrors[name]) {
       setFormErrors((prev) => ({ ...prev, [name]: "" }));
@@ -54,35 +61,34 @@ export default function CompanyLogin() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!formData.email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "Please enter a valid email address";
     }
-    
+
     if (!formData.password) {
       errors.password = "Password is required";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
-    
+
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-    
+
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         showToast("User not signed up", "error");
         return;
@@ -91,14 +97,24 @@ export default function CompanyLogin() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Remove user token from headers
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
-      })
-      
+      });
+
       const result = await response.json();
-      
+
       if (result.status !== "success") {
+        if (
+          result.detail &&
+          result.detail === "Could not validate credentials!"
+        ) {
+          showToast("Token has expired! Please sign in!", "info");
+          logout();
+          storeRedirectUrl();
+          router.push("/auth/signin");
+          return;
+        }
         if (response.status === 401) {
           setError("Invalid company credentials");
         } else if (response.status === 404) {
@@ -106,10 +122,10 @@ export default function CompanyLogin() {
         }
       } else if (result.status === "success") {
         localStorage.setItem("company", JSON.stringify(result.data));
-        localStorage.setItem("access_token", result.access_token);  
         showToast(`Welcome back!`, "success");
         const redirectUrl = getAndClearRedirectUrl();
-        router.push(`/dashboard/company/$`);
+        localStorage.setItem("company_id", result.data.id);
+        router.push(`/dashboard/company/${result.data.id}`);
       }
     } catch (err) {
       setError("An error occurred. Please try again later.");
@@ -183,7 +199,9 @@ export default function CompanyLogin() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`mt-1 pr-10 ${formErrors.password ? "border-red-500" : ""}`}
+                  className={`mt-1 pr-10 ${
+                    formErrors.password ? "border-red-500" : ""
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -199,7 +217,9 @@ export default function CompanyLogin() {
                 </button>
               </div>
               {formErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {formErrors.password}
+                </p>
               )}
             </div>
           </div>
@@ -252,4 +272,4 @@ export default function CompanyLogin() {
       </div>
     </div>
   );
-} 
+}

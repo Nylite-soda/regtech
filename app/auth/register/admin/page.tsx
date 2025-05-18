@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, logout, storeRedirectUrl } from "@/lib/utils";
 import { validateName, validatePassword } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/toast-context";
 
 export default function AdminRegistrationPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function AdminRegistrationPage() {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [formComplete, setFormComplete] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const { showToast } = useToast();
 
   // Check if all required fields are filled and valid
   useEffect(() => {
@@ -163,6 +165,13 @@ export default function AdminRegistrationPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.detail && data.detail === "Could not validate credentials!") {
+          showToast("Token has expired! Please sign in as admin!", "info");
+          logout();
+          storeRedirectUrl();
+          router.push("/auth/signin/admin");
+          return;
+        }
         throw new Error(
           data.message ||
             data.detail ||

@@ -28,7 +28,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "@mui/x-date-pickers/icons";
-import { BASE_URL, isUserSignedIn, storeRedirectUrl } from "@/lib/utils";
+import {
+  BASE_URL,
+  isUserSignedIn,
+  logout,
+  storeRedirectUrl,
+} from "@/lib/utils";
 import CountrySelect from "react-select-country-list";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 import {
@@ -72,7 +77,6 @@ interface FormFieldProps {
   error?: string;
   touched: boolean;
   required: boolean;
-  pattern?: string;
 }
 
 // Preload country data
@@ -240,7 +244,7 @@ export default function CompanyRegister() {
 
     // Required fields validation
     Object.entries(formData).forEach(([key, value]) => {
-      if (!value) {
+      if (!value && key !== "phone") {
         errors[key] = `${
           key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")
         } is required`;
@@ -367,12 +371,23 @@ export default function CompanyRegister() {
           country: formData.country,
           niche: formData.niche,
           company_password: formData.password,
+          status: "pending",
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
+        if (
+          result.detail &&
+          result.detail === "Could not validate credentials!"
+        ) {
+          showToast("Token has expired! Please sign in!", "info");
+          logout();
+          storeRedirectUrl();
+          router.push("/auth/signin");
+          return;
+        }
         const errorMessage =
           result.detail ===
           "Failed to create company: 400: Company with this email already exists"
@@ -641,7 +656,6 @@ export default function CompanyRegister() {
               type="text"
               placeholder="https://www.yourcompany.com"
               value={formData.website}
-              pattern="^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:?#[\]@!$&'()*+,;=]*)?$"
               onChange={handleChange}
               error={formErrors.website}
               touched={touchedFields.website}
@@ -797,7 +811,7 @@ export default function CompanyRegister() {
                 <SelectContent className="max-h-[300px] overflow-y-auto">
                   <SelectGroup>
                     {countryOptions.map((country) => (
-                      <SelectItem key={country.value} value={country.value}>
+                      <SelectItem key={country.value} value={country.label}>
                         {country.label}
                       </SelectItem>
                     ))}
@@ -883,7 +897,6 @@ function FormField({
   error,
   touched,
   required,
-  pattern,
 }: FormFieldProps) {
   return (
     <div>
@@ -896,7 +909,6 @@ function FormField({
         onChange={onChange}
         className={`mt-1 ${error && touched ? "border-red-500" : ""}`}
         placeholder={placeholder}
-        pattern={pattern}
         required={required}
       />
       {error && touched && <p className="mt-1 text-sm text-red-600">{error}</p>}

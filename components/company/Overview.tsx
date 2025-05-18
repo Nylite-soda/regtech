@@ -12,11 +12,12 @@ import {
   PhoneCall,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, logout, storeRedirectUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
+import { useToast } from "../ui/toast-context";
 
 // Define the Company type based on your backend model
 interface Company {
@@ -71,6 +72,7 @@ const CompanyOverview: React.FC = () => {
     savedByUsers: 0,
     contactRequests: 0,
   });
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -98,11 +100,42 @@ const CompanyOverview: React.FC = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
+          if (
+            errorData.detail &&
+            errorData.detail === "Could not validate credentials!"
+          ) {
+            showToast("Token has expired! Please sign in!", "info");
+            setCompany(null);
+            storeRedirectUrl();
+            router.push("/auth/signin");
+            return;
+          }
           throw new Error(errorData.detail || "Failed to fetch company data");
         }
 
         const companyData = (await response.json()).data;
         setCompany(companyData);
+        setCompany({
+          id: companyData.id,
+          company_name: companyData.name,
+          company_email: companyData.email,
+          company_phone: companyData.phone,
+          company_website: companyData.website,
+          company_size: companyData.company_size,
+          year_founded: companyData.year_founded,
+          headquarters: companyData.headquarters,
+          country: companyData.country,
+          description: companyData.description,
+          social_media_linkedIn: companyData.social_media_linkedIn,
+          social_media_ig: companyData.social_media_ig,
+          social_media_X: companyData.social_media_X,
+          niche: companyData.niche,
+          last_funding_date: companyData.last_funding_date,
+          logo: companyData.logo,
+          services: companyData.services,
+          founders: companyData.founders,
+          company_type: companyData.company_type,
+        });
 
         // Fetch recent activity (you can customize this endpoint based on your API)
         const activityResponse = await fetch(
@@ -208,7 +241,10 @@ const CompanyOverview: React.FC = () => {
     <div className="space-y-6">
       {/* Company Overview */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold mb-4">Company Overview</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          <span className="text-[#AD0000]">{company.company_name}</span>{" "}
+          Overview
+        </h2>
         <div
           className="mb-6 prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{
@@ -302,7 +338,7 @@ const CompanyOverview: React.FC = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      {/* <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
         <div className="space-y-4">
           {displayActivity.map((activity) => (
@@ -318,10 +354,10 @@ const CompanyOverview: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-[#AD0000]/10 rounded-lg">
@@ -361,7 +397,7 @@ const CompanyOverview: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

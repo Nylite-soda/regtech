@@ -102,6 +102,7 @@ export function Overview({ className }: { className?: string }) {
         showToast("Expired! Kindly sign in", "info");
         logout();
         setData(undefined);
+        storeRedirectUrl();
         router.push("/auth/signin");
         return;
       }

@@ -17,7 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BASE_URL } from "@/lib/utils";
+import {
+  BASE_URL,
+  isUserSignedIn,
+  logout,
+  storeRedirectUrl,
+} from "@/lib/utils";
 import {
   Calendar,
   MapPin,
@@ -180,6 +185,31 @@ export default function CompanyProfile() {
             },
           }
         );
+
+        if (!response.ok) {
+          const result = await response.json();
+          if (
+            isUserSignedIn() &&
+            result.detail &&
+            result.detail === "Could not validate credentials!"
+          ) {
+            showToast("Token has expired! Please sign in!", "info");
+            storeRedirectUrl();
+            router.push("/auth/company-login");
+            return;
+          } else if (!isUserSignedIn()) {
+            showToast("Token has expired! Please sign in!", "info");
+            storeRedirectUrl();
+            router.push("/auth/signin");
+            return;
+          }
+          const errorMessage =
+            result.detail ===
+            "Failed to create company: 400: Company with this email already exists"
+              ? "Company with this email already exists"
+              : result.error || result.message || "Registration failed";
+          throw new Error(errorMessage);
+        }
 
         if (response.ok) {
           const predata = await response.json();
@@ -601,6 +631,7 @@ export default function CompanyProfile() {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         showToast("Please log in to update your profile", "error");
+        storeRedirectUrl();
         router.push("/auth/signin");
         return;
       }

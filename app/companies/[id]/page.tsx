@@ -158,6 +158,7 @@ export default function CompanyProfilePage({
           if (res.detail && res.detail === "Could not validate credentials!") {
             showToast("Token has expired! Please sign in!", "info");
             logout();
+            storeRedirectUrl();
             setCompany(null);
             router.push("/auth/signin");
             return;
