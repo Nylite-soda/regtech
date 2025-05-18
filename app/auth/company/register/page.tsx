@@ -71,6 +71,8 @@ interface FormFieldProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   touched: boolean;
+  required: boolean;
+  pattern?: string;
 }
 
 // Preload country data
@@ -129,13 +131,6 @@ const PASSWORD_CRITERIA = [
     check: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
     label: "One special character",
   },
-];
-
-const PASSWORD_STRENGTH_MESSAGES = [
-  { score: 0, message: "Very Weak", color: "text-red-500" },
-  { score: 1, message: "Weak", color: "text-orange-500" },
-  { score: 2, message: "Medium", color: "text-yellow-500" },
-  { score: 3, message: "Strong", color: "text-green-500" },
 ];
 
 export default function CompanyRegister() {
@@ -449,6 +444,7 @@ export default function CompanyRegister() {
               onChange={handleChange}
               error={formErrors.companyName}
               touched={touchedFields.companyName}
+              required={true}
             />
 
             {/* Email Address */}
@@ -461,6 +457,7 @@ export default function CompanyRegister() {
               onChange={handleChange}
               error={formErrors.email}
               touched={touchedFields.email}
+              required={true}
             />
 
             {/* Phone Number */}
@@ -473,6 +470,7 @@ export default function CompanyRegister() {
               onChange={handleChange}
               error={formErrors.phone}
               touched={touchedFields.phone}
+              required={false}
             />
 
             {/* Password */}
@@ -640,12 +638,14 @@ export default function CompanyRegister() {
             <FormField
               label="Website"
               name="website"
-              type="url"
+              type="text"
               placeholder="https://www.yourcompany.com"
               value={formData.website}
+              pattern="^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:?#[\]@!$&'()*+,;=]*)?$"
               onChange={handleChange}
               error={formErrors.website}
               touched={touchedFields.website}
+              required={true}
             />
 
             {/* Company Size */}
@@ -773,6 +773,7 @@ export default function CompanyRegister() {
               onChange={handleChange}
               error={formErrors.headquarters}
               touched={touchedFields.headquarters}
+              required={true}
             />
 
             {/* Country */}
@@ -881,6 +882,8 @@ function FormField({
   onChange,
   error,
   touched,
+  required,
+  pattern,
 }: FormFieldProps) {
   return (
     <div>
@@ -889,11 +892,12 @@ function FormField({
         id={name}
         name={name}
         type={type}
-        required
         value={value}
         onChange={onChange}
         className={`mt-1 ${error && touched ? "border-red-500" : ""}`}
         placeholder={placeholder}
+        pattern={pattern}
+        required={required}
       />
       {error && touched && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
