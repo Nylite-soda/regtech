@@ -209,11 +209,60 @@ export function Overview({ className }: { className?: string }) {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="companies">My Companies</TabsTrigger>
-          <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        {/* Mobile view - compact grid layout */}
+        <TabsList className="grid grid-cols-2 gap-2 w-full md:hidden mb-6 bg-transparent p-0">
+          <TabsTrigger
+            value="overview"
+            className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="companies"
+            className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+          >
+            My Companies
+          </TabsTrigger>
+          <TabsTrigger
+            value="activity"
+            className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+          >
+            Recent Activity
+          </TabsTrigger>
+          <TabsTrigger
+            value="notifications"
+            className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+          >
+            Notifications
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Tablet/Desktop view - traditional tabs */}
+        <TabsList className="hidden md:flex w-full border-b border-gray-200 bg-transparent p-0 h-auto rounded-none flex-wrap">
+          <TabsTrigger
+            value="overview"
+            className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="companies"
+            className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+          >
+            My Companies
+          </TabsTrigger>
+          <TabsTrigger
+            value="activity"
+            className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+          >
+            Recent Activity
+          </TabsTrigger>
+          <TabsTrigger
+            value="notifications"
+            className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+          >
+            Notifications
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">

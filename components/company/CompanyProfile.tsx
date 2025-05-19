@@ -55,6 +55,7 @@ import { CompanyFounder, CompanyService } from "@/types";
 import Router from "next/router";
 import MarkdownIt from "markdown-it";
 import MDEditor from "@uiw/react-md-editor";
+import TabNavigation from "../ui/TabNavigation";
 
 interface CompanyProfile {
   id: string;
@@ -725,10 +726,48 @@ export default function CompanyProfile() {
 
       <form className="space-y-8" onSubmit={handleSubmit}>
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic">Basic Information</TabsTrigger>
-            <TabsTrigger value="details">Company Details</TabsTrigger>
-            <TabsTrigger value="social">Social Media</TabsTrigger>
+          {/* Mobile view - compact grid layout */}
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full md:hidden mb-6 bg-transparent p-0">
+            <TabsTrigger
+              value="basic"
+              className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+            >
+              Basic Information
+            </TabsTrigger>
+            <TabsTrigger
+              value="details"
+              className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+            >
+              Company Details
+            </TabsTrigger>
+            <TabsTrigger
+              value="social"
+              className={`tabButton h-10 data-[state=active]:bg-[#AD0000] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 border-none`}
+            >
+              Social Media
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tablet/Desktop view - traditional tabs */}
+          <TabsList className="hidden md:flex w-full border-b border-gray-200 bg-transparent p-0 h-auto rounded-none flex-wrap">
+            <TabsTrigger
+              value="basic"
+              className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+            >
+              Basic Information
+            </TabsTrigger>
+            <TabsTrigger
+              value="details"
+              className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+            >
+              Company Details
+            </TabsTrigger>
+            <TabsTrigger
+              value="social"
+              className={`pb-4 px-4 border-b-2 rounded-none font-medium text-sm h-auto data-[state=active]:border-[#AD0000] data-[state=active]:text-[#AD0000] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-500 data-[state=inactive]:hover:text-gray-700 data-[state=inactive]:hover:border-gray-300`}
+            >
+              Social Media
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="space-y-4 mt-4">
