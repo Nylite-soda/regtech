@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@/styles/md-editor.css";
 import { PageWrapper } from "@/components/layout/page-wrapper";
 import { NavigationProvider } from "@/components/navigation/navigation-context";
 import { ToastProvider } from "@/components/ui/toast-context";
@@ -12,9 +13,7 @@ export const metadata: Metadata = {
   title: "RegTech",
   description: "Regulatory Technology Platform",
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-    ],
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
   },
 };
 

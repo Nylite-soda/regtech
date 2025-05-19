@@ -48,6 +48,7 @@ import MarkdownIt from "markdown-it";
 import { useToast } from "@/components/ui/toast-context";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface CompanyProfile {
   id: number;
@@ -514,13 +515,8 @@ export default function CompanyProfilePage({
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-4 md:mb-6">
                 <h2 className="text-xl font-semibold mb-4">About</h2>
-                <div
-                  className="mb-6 prose prose-sm"
-                  dangerouslySetInnerHTML={{
-                    __html: md.render(
-                      company.description || "No Description Yet"
-                    ),
-                  }}
+                <MarkdownRenderer
+                  content={company.description || "No Description Yet"}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
@@ -736,12 +732,7 @@ export default function CompanyProfilePage({
                     className="border border-gray-200 rounded-lg p-6"
                   >
                     <h3 className="text-lg font-medium mb-2">{service.name}</h3>
-                    <div
-                      className="mb-6 prose prose-sm"
-                      dangerouslySetInnerHTML={{
-                        __html: md.render(service.description || ""),
-                      }}
-                    />
+                    <MarkdownRenderer content={service.description || ""} />
                   </div>
                 ))
               ) : (

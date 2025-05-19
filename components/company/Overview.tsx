@@ -16,8 +16,11 @@ import { BASE_URL, logout, storeRedirectUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 import "highlight.js/styles/github.css";
 import { useToast } from "../ui/toast-context";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
 
 // Define the Company type based on your backend model
 interface Company {
@@ -241,15 +244,13 @@ const CompanyOverview: React.FC = () => {
     <div className="space-y-6">
       {/* Company Overview */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-xl md:text-2xl font-bold mb-4">
           <span className="text-[#AD0000]">{company.company_name}</span>{" "}
           Overview
         </h2>
-        <div
-          className="mb-6 prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{
-            __html: md.render(company.description || "No Description Yet"),
-          }}
+
+        <MarkdownRenderer
+          content={company.description || "No Description Yet"}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <div className="flex items-center gap-3">

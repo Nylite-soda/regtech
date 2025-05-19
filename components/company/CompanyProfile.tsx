@@ -54,8 +54,7 @@ import ProfileProgressBar from "@/components/company/ProfileProgressBar";
 import { CompanyFounder, CompanyService } from "@/types";
 import Router from "next/router";
 import MarkdownIt from "markdown-it";
-import MDEditor from "@uiw/react-markdown-editor";
-import MarkdownEditor from "../MarkdownEditor";
+import MDEditor from "@uiw/react-md-editor";
 
 interface CompanyProfile {
   id: string;
@@ -164,6 +163,10 @@ export default function CompanyProfile() {
     description: false,
     services: Array(formData.services.length).fill(false),
   });
+
+  const theme = document.documentElement.classList.contains("dark")
+    ? "dark"
+    : "light";
 
   useEffect(() => {
     const fetchCompanyProfile = async () => {
@@ -573,7 +576,11 @@ export default function CompanyProfile() {
 
   const updateServiceField = (index: number, field: string, value: string) => {
     const updatedServices = [...formData.services];
-    updatedServices[index] = { ...updatedServices[index], [field]: value };
+    if (!updatedServices[index]) return; // Prevent crashing
+    updatedServices[index] = {
+      ...updatedServices[index],
+      [field]: value,
+    };
     setFormData((prev) => ({ ...prev, services: updatedServices }));
   };
 
@@ -793,16 +800,33 @@ export default function CompanyProfile() {
             </div>
 
             {/* Description with Markdown */}
-            <MarkdownEditor
-              value={formData.description}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, description: value }))
-              }
-              label="Description"
-              placeholder="Briefly describe your company... (Markdown supported)"
-              error={formErrors.description}
-              rows={8}
-            />
+
+            <label htmlFor="description" className="pb-4">
+              Description
+            </label>
+
+            <div
+              className="rounded-md border border-gray-300 dark:border-gray-600"
+              data-color-mode={theme} // theme = "light" or "dark"
+            >
+              <MDEditor
+                value={formData.description}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, description: value || "" }))
+                }
+                height={300}
+                preview="edit"
+                textareaProps={{
+                  placeholder: "Briefly describe your company...",
+                }}
+              />
+            </div>
+
+            {formErrors.description && (
+              <p className="text-xs text-red-600" id="markdown-error">
+                {formErrors.description}
+              </p>
+            )}
 
             {/* Website */}
             <div>
@@ -1357,15 +1381,30 @@ export default function CompanyProfile() {
                       </p>
                     )}
 
-                    <MarkdownEditor
-                      value={service.description || ""}
-                      onChange={(value) =>
-                        updateServiceField(index, "description", value)
-                      }
-                      label="Service Description"
-                      placeholder="Describe this service... (Markdown supported)"
-                      rows={6}
-                    />
+                    <label
+                      htmlFor="service-description"
+                      className=" text-base mt-1"
+                    >
+                      Service Description
+                    </label>
+                    <div
+                      className="rounded-md border border-gray-300 dark:border-gray-600"
+                      data-color-mode={theme} // theme = "light" or "dark"
+                    >
+                      <MDEditor
+                        className="p-2"
+                        value={service.description || ""}
+                        onChange={(value) =>
+                          updateServiceField(index, "description", value || "")
+                        }
+                        preview="edit"
+                        height={200}
+                        textareaProps={{
+                          placeholder:
+                            "Briefly describe your service or product and what problem it solves",
+                        }}
+                      />
+                    </div>
                   </div>
                 ))}
 
