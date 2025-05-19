@@ -56,6 +56,7 @@ import Router from "next/router";
 import MarkdownIt from "markdown-it";
 import MDEditor from "@uiw/react-md-editor";
 import TabNavigation from "../ui/TabNavigation";
+import CompanyStatusToggle from "./CompanyStatusToggle";
 
 interface CompanyProfile {
   id: string;
@@ -75,6 +76,7 @@ interface CompanyProfile {
   logo: string;
   social_media: { platform: string; url: string }[];
   profile_completion: number;
+  status: "active" | "inactive" | "pending";
 }
 
 interface Social {
@@ -158,6 +160,7 @@ export default function CompanyProfile() {
     logo: "",
     social_media: [] as { platform: string; url: string }[],
     profile_completion: 0,
+    status: "pending",
   });
 
   const [previewMode, setPreviewMode] = useState({
@@ -239,6 +242,7 @@ export default function CompanyProfile() {
             logo: data.logo || "",
             social_media: [] as { platform: string; url: string }[],
             profile_completion: data.profile_completion || 0,
+            status: data.status || "inactive",
           };
 
           // Add social media
@@ -717,6 +721,10 @@ export default function CompanyProfile() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6">Company Profile</h1>
+      <CompanyStatusToggle
+        companyId={formData.id}
+        initialStatus={formData.status}
+      />
       {/* Profile Progress Bar */}
       <ProfileProgressBar formData={formData} className="mb-8" />
       <ProfileCompletionModal
