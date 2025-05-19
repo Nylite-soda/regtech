@@ -293,8 +293,8 @@ export default function CompanyProfile() {
       actions.push({ text: "Add company name", priority: "high" });
     if (!data.company_email)
       actions.push({ text: "Add company email", priority: "high" });
-    if (!data.company_phone)
-      actions.push({ text: "Add phone number", priority: "medium" });
+    // if (!data.company_phone)
+    //   actions.push({ text: "Add phone number", priority: "medium" });
     if (!data.company_website)
       actions.push({ text: "Add website", priority: "medium" });
     if (!data.description)
@@ -831,7 +831,6 @@ export default function CompanyProfile() {
                 id="company_phone"
                 name="company_phone"
                 type="tel"
-                required
                 value={formData.company_phone}
                 onChange={(e) => handleChange(e)}
                 className={`mt-1 ${
