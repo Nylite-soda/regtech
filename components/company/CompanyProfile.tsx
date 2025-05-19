@@ -875,7 +875,7 @@ export default function CompanyProfile() {
               <Input
                 id="company_website"
                 name="company_website"
-                type="url"
+                type="text"
                 required
                 value={formData.company_website}
                 onChange={(e) => handleChange(e)}
@@ -1656,7 +1656,7 @@ export default function CompanyProfile() {
                           <span className="text-sm">{social.platform}:</span>
                         </div>
                         <Input
-                          type="url"
+                          type="text"
                           value={social.url}
                           onChange={(e) =>
                             updateSocialMediaUrl(index, e.target.value)
