@@ -238,7 +238,7 @@ export default function CompanyProfile() {
             founder: data.founders || [],
             services: data.services || [],
             niche: data.niche || "",
-            last_funding: data.last_funding_date || "",
+            last_funding: data.last_funding_date || null,
             logo: data.logo || "",
             social_media: [] as { platform: string; url: string }[],
             profile_completion: data.profile_completion || 0,
