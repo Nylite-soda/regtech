@@ -826,7 +826,7 @@ export default function CompanyProfilePage({
                               </p>
 
                               {founder.bio && (
-                                <p className="mt-3 text-sm text-gray-600 line-clamp-3">
+                                <p className="mt-3 text-sm text-gray-600 line-clamp-10">
                                   {founder.bio}
                                 </p>
                               )}
