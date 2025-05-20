@@ -450,7 +450,7 @@ export default function CompanyProfile() {
       "company_size",
       "year_founded",
       "headquarters",
-      "founder",
+      // "founder",
       "niche",
       "services",
     ];
@@ -483,9 +483,9 @@ export default function CompanyProfile() {
     }
 
     // Founders validation
-    if (!formData.founder.length) {
-      errors.founder = "At least one founder is required";
-    } else {
+    if (formData.founder.length > 0) {
+      //   errors.founder = "At least one founder is required";
+      // } else {
       formData.founder.forEach((founder, index) => {
         if (!founder.name.trim()) {
           errors[`founder_${index}_name`] = "Founder name is required";
