@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Shield, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
 import { Company, UserData } from "@/types";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, logout, storeRedirectUrl } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-context";
 import { validatePassword } from "@/lib/validation";
+import { useRouter } from "next/navigation";
 
 interface SecuritySettingsProps {
   user?: UserData;
@@ -23,6 +24,7 @@ export default function SecuritySettings({
   user,
   company,
 }: SecuritySettingsProps) {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { showToast } = useToast();
   const [error, setError] = useState("");
@@ -72,8 +74,8 @@ export default function SecuritySettings({
     try {
       // Use different endpoints based on account type
       const endpoint = user
-        ? `${BASE_URL}/api/v1/users/change-password`
-        : `${BASE_URL}/api/v1/companies/change-password`;
+        ? `${BASE_URL}/api/v1/user/change-password`
+        : `${BASE_URL}/api/v1/company/change-password`;
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -85,6 +87,17 @@ export default function SecuritySettings({
       });
 
       if (!response.ok) {
+        const result = await response.json();
+        if (
+          result.detail &&
+          result.detail === "Could not validate credentials!"
+        ) {
+          showToast("Token has expired! Please sign in!", "info");
+          logout();
+          storeRedirectUrl();
+          router.push("/auth/signin");
+          return;
+        }
         const errorData = await response.json();
         throw new Error(errorData.detail || "Password change failed");
       }
