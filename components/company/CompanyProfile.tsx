@@ -206,6 +206,7 @@ export default function CompanyProfile() {
             return;
           } else if (!isUserSignedIn()) {
             showToast("Token has expired! Please sign in!", "info");
+            logout();
             storeRedirectUrl();
             router.push("/auth/signin");
             return;
@@ -667,6 +668,17 @@ export default function CompanyProfile() {
       const result = await response.json();
 
       if (!response.ok) {
+        const errorData = result;
+        if (
+          errorData.detail &&
+          errorData.detail === "Could not validate credentials!"
+        ) {
+          showToast("Token has expired! Please sign in!", "info");
+          logout();
+          storeRedirectUrl();
+          router.push("/auth/signin");
+          return;
+        }
         throw new Error(
           result.error || result.message || "Profile update failed"
         );
