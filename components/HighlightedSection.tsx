@@ -137,7 +137,11 @@ const HighlightedSection = () => {
       }
     };
 
+    const startTime = new Date();
     fetchCompanies();
+    const endTime = new Date();
+    const timeUsedMs = endTime.getTime() - startTime.getTime();
+    console.log(`Time used: ${timeUsedMs / 1000} s`);
   }, []);
 
   const handleScroll = (direction: "left" | "right") => {
