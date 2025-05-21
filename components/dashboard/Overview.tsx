@@ -779,7 +779,7 @@ function CompanyListItem({ company }: { company: CompanyItem }) {
       <div className="space-y-1">
         <span className="flex gap-3">
           {company.logo ? (
-            <div className="rounded-sm h-full w-full flex items-center justify-center dark:!bg-[#fcf8f8]">
+            <div className="rounded-sm flex items-center justify-center dark:!bg-[#fff]">
               <Image
                 src={company.logo}
                 alt="logo"
