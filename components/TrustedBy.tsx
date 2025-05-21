@@ -2,110 +2,44 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  Building2,
-  Landmark,
-  Shield,
-  Building,
-  BadgeCheck,
-  Award,
-  Briefcase,
-  Globe,
-  BarChart3,
-  Book,
-  Camera,
-  Car,
-  Cpu,
-  Database,
-  FileText,
-  GitBranch,
-  Key,
-  Laptop,
-  Mail,
-  Map,
-  Monitor,
-  Music,
-  Paperclip,
-  PenTool,
-  Phone,
-  Printer,
-  Radio,
-  Server,
-  Smartphone,
-  LucideIcon,
-} from "lucide-react";
+import Image from "next/image";
 
-// Define logo and color pair
-interface LogoItem {
-  icon: LucideIcon;
-  color: string;
-}
+const logos: string[] = [
+  "/images/logos/Codera.png",
+  "https://www.fynhaus.com/wp-content/uploads/2021/11/fynhaus_website_header_logo_170.png",
+  "/images/logos/sunoida.png",
+  "https://static.wixstatic.com/media/2984b2_88180e1bf1854edbbc645925e66bd483~mv2.png/v1/fill/w_368,h_207,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Logo_PNG_Black.png",
+  "https://www.crt.hr/assets/images/logo_v2.svg",
+  "https://www.synaptique.com/wp-content/uploads/2024/07/synaptique_blk.svg",
+  "/images/logos/ap.png",
+  "/images/logos/complyadv.png",
+  "/images/logos/oomero.png",
+];
 
-// Build icon list with color mapping
-const logoItems: LogoItem[] = [
-  Building2,
-  Shield,
-  Landmark,
-  Building,
-  BadgeCheck,
-  Award,
-  Briefcase,
-  Globe,
-  BarChart3,
-  Book,
-  Camera,
-  Car,
-  Cpu,
-  Database,
-  FileText,
-  GitBranch,
-  Key,
-  Laptop,
-  Mail,
-  Map,
-  Monitor,
-  Music,
-  Paperclip,
-  PenTool,
-  Phone,
-  Printer,
-  Radio,
-  Server,
-  Smartphone,
-].map((icon, i) => ({
-  icon,
-  color: [
-    "#006E51",
-    "#1A365D",
-    "#7C3AED",
-    "#2563EB",
-    "#AD0000",
-    "#0891B2",
-    "#7E22CE",
-    "#047857",
-    "#B91C1C",
-    "#4338CA",
-    "#EA580C",
-    "#0369A1",
-    "#CA8A04",
-    "#9333EA",
-    "#15803D",
-    "#DC2626",
-    "#4F46E5",
-    "#0D9488",
-    "#BE123C",
-    "#6D28D9",
-    "#65A30D",
-    "#0284C7",
-    "#D97706",
-    "#7C2D12",
-    "#475569",
-    "#0F766E",
-    "#86198F",
-    "#166534",
-    "#2563EB",
-  ][i % 29], // Safe fallback with mod
-}));
+const logos2: string[] = [
+  "/images/logos/docfox.png",
+  "https://www.globalvoicegroup.com/wp-content/uploads/2024/03/GVG_Logo.png",
+  "https://accurascan.com/wp-content/uploads/2023/04/purple_logo_accura.webp",
+  "https://aml-analytics.com/wp-content/uploads/2024/08/Group-171810.svg",
+  "https://cdn.cookielaw.org/logos/fefee38f-fbda-471c-b52e-14950b7224fb/a465bd03-c0a1-48f3-879c-65e33529ae1a/6c00783e-034b-4f48-8374-8e22a7ff4eab/logo-fenergo-fond-clair-couleur@3x.png",
+  "https://cdn.cookielaw.org/logos/047cfe2c-0e7b-4a56-81fc-d8b6832dbcfc/7a6490b3-2d4f-479d-9d5f-e94073ccf155/483faafa-99a0-4498-90fa-752354262e26/dnv_logo@2x.png",
+  "/images/logos/elucidate.png",
+  "/images/logos/amlp.png",
+  "/images/logos/regcompass.png",
+  "/images/logos/Fineksus-Logo.png",
+];
+
+const logos3: string[] = [
+  "/images/logos/hotfoot.png",
+  "https://vanrise.com/wp-content/uploads/2021/06/logo-vanrise.svg",
+  "/images/logos/fintellix.png",
+  "/images/logos/regos.png",
+  "/images/logos/loopai.png",
+  "https://ft-solutions.com/wp-content/uploads/2017/02/logo.png",
+  "/images/logos/gh.png",
+  "/images/logos/sumsub.png",
+  "/images/logos/youverify.png",
+];
 
 // Render one scrolling row of icons
 const InfiniteScrollRow: React.FC<{
@@ -133,12 +67,28 @@ const InfiniteScrollRow: React.FC<{
 );
 
 const TrustedBy: React.FC = () => {
-  const renderedIcons = logoItems.map(({ icon: Icon, color }, i) => (
+  const renderedLogos = logos.map((logo: string, i) => (
     <div
-      key={`icon-${i}`}
-      className="w-20 h-20 flex items-center justify-center bg-white rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer"
+      key={`logo-${i}`}
+      className="w-20 h-20 flex items-center justify-center bg-white dark:!bg-[#fff] rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer"
     >
-      <Icon size={38} style={{ color }} />
+      <Image alt="logo" src={logo} width={55} height={55} />
+    </div>
+  ));
+  const renderedLogos2 = logos2.map((logo: string, i) => (
+    <div
+      key={`logo-${i}`}
+      className="w-20 h-20 flex items-center justify-center bg-white dark:!bg-[#fff] rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer"
+    >
+      <Image alt="logo" src={logo} width={55} height={55} />
+    </div>
+  ));
+  const renderedLogos3 = logos3.map((logo: string, i) => (
+    <div
+      key={`logo-${i}`}
+      className="w-20 h-20 flex items-center justify-center bg-white dark:!bg-[#fff] rounded-xl shadow hover:shadow-lg transition duration-300 cursor-pointer"
+    >
+      <Image alt="logo" src={logo} width={55} height={55} />
     </div>
   ));
 
@@ -152,25 +102,25 @@ const TrustedBy: React.FC = () => {
         <div className="space-y-6">
           <div className="overflow-hidden">
             <InfiniteScrollRow
-              items={renderedIcons}
+              items={renderedLogos}
               reverse={false}
-              duration={60}
+              duration={120}
               keyPrefix="row1"
             />
           </div>
           <div className="overflow-hidden">
             <InfiniteScrollRow
-              items={renderedIcons}
+              items={renderedLogos2}
               reverse={true}
-              duration={50}
+              duration={100}
               keyPrefix="row2"
             />
           </div>
           <div className="overflow-hidden">
             <InfiniteScrollRow
-              items={renderedIcons}
+              items={renderedLogos3}
               reverse={false}
-              duration={70}
+              duration={140}
               keyPrefix="row3"
             />
           </div>

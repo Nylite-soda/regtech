@@ -349,7 +349,7 @@ const HighlightedSection = () => {
                           "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
                           "rounded-2xl overflow-hidden",
                           "border border-gray-200 dark:border-gray-700",
-                          "bg-gray-100 dark:!bg-[#fcf8f8]",
+                          "bg-white dark:!bg-[#fcf8f8]",
                           "transition-transform duration-500",
                           "hover:rotate-4 hover:scale-102",
                           "group-hover:rotate-3 group-hover:scale-105"
@@ -360,7 +360,7 @@ const HighlightedSection = () => {
                             company.logo || "/images/logos/placeholder-logo.svg"
                           }
                           alt={`${company.name} logo`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           loading="lazy"
                           onError={(e) => {
                             // Fallback if image fails to load
