@@ -293,3 +293,17 @@ export default function CompanyCard({
     </Link>
   );
 }
+
+export function CompanyCardSkeleton() {
+  return (
+    <div className="p-4 border border-gray-700/15 drop-shadow-xl rounded-md animate-pulse bg-gray-100">
+      <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>{" "}
+      {/* Company name */}
+      <div className="h-4 bg-gray-300 rounded w-1/2 mb-1"></div> {/* Niche */}
+      <div className="h-4 bg-gray-300 rounded w-1/3 mb-1"></div>{" "}
+      {/* Services */}
+      <div className="h-4 bg-gray-300 rounded w-1/4 mb-1"></div> {/* Size */}
+      <div className="h-4 bg-gray-300 rounded w-1/5"></div> {/* Website */}
+    </div>
+  );
+}

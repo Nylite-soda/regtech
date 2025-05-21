@@ -11,7 +11,7 @@ import {
   UsersIcon,
   CalendarIcon,
 } from "lucide-react";
-import CompanyCard from "@/components/CompanyCard";
+import CompanyCard, { CompanyCardSkeleton } from "@/components/CompanyCard";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
 import { BASE_URL, isUserSignedIn, storeRedirectUrl } from "@/lib/utils";
@@ -727,69 +727,70 @@ export default function AdvancedSearchPage() {
             </div>
 
             {/* Results */}
-            {isLoading ? (
-              <div className="bg-white rounded-lg shadow-sm p-8 flex justify-center">
-                <LoadingScreen />
+            <div className="bg-white rounded-lg shadow-sm">
+              {/* Table Headers - Desktop Only */}
+              <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_1fr_1fr_80px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
+                <div className="text-left font-medium text-sm text-gray-700">
+                  Company
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Niche
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Services
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Size
+                </div>
+                <div className="text-center font-medium text-sm text-gray-700">
+                  Website
+                </div>
+                <div></div>
               </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-sm">
-                {/* Table Headers - Desktop Only */}
-                <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_1fr_1fr_80px] items-center px-5 py-3 bg-gray-50 border-b border-gray-200">
-                  <div className="text-left font-medium text-sm text-gray-700">
-                    Company
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Niche
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Services
-                  </div>
-                  <div className="text-center font-medium text-sm text-gray-700">
-                    Size
-                  </div>
-                  <div className="font-medium text-sm text-gray-700">
-                    Website
-                  </div>
-                  <div></div>
-                </div>
 
-                {/* Company Cards */}
-                <div className="md:divide-y md:divide-gray-200">
-                  {companies.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">
-                      {searchQuery ||
-                      filters.location.length ||
-                      filters.companySize.length ||
-                      filters.niche.length
-                        ? "No companies found matching your criteria"
-                        : "No companies available"}
-                    </div>
-                  ) : (
-                    companies.map((company) => (
-                      <CompanyCard
-                        key={company.id}
-                        company={{
-                          ...company,
-                          services: company.services,
-                          employees: company.employees || "N/A",
-                        }}
-                      />
-                    ))
-                  )}
-                </div>
-
-                {/* Pagination */}
-                {companies.length > 0 && (
-                  <div className="p-4 border-t border-gray-200">
-                    <Pagination
-                      currentPage={pagination.page}
-                      totalPages={pagination.total_pages}
-                      onPageChange={handlePageChange}
+              {/* Company Cards or Skeletons */}
+              <div className="md:divide-y md:divide-gray-200">
+                {isLoading ? (
+                  // Display multiple skeleton cards while loading
+                  <div className="grid gap-4 p-4">
+                    {[...Array(5)].map((_, index) => (
+                      <CompanyCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : companies.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    {searchQuery ||
+                    filters.location.length ||
+                    filters.companySize.length ||
+                    filters.niche.length
+                      ? "No companies found matching your criteria"
+                      : "No companies available"}
+                  </div>
+                ) : (
+                  companies.map((company) => (
+                    <CompanyCard
+                      key={company.id}
+                      company={{
+                        ...company,
+                        services: company.services,
+                        employees: company.employees || "N/A",
+                      }}
                     />
-                  </div>
+                  ))
                 )}
               </div>
-            )}
+
+              {/* Pagination */}
+              {!isLoading && companies.length > 0 && (
+                <div className="p-4 border-t border-gray-200">
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.total_pages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

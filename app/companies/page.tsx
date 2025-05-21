@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
-import CompanyCard from "@/components/CompanyCard";
+import CompanyCard, { CompanyCardSkeleton } from "@/components/CompanyCard";
 
 import { useSearchParams } from "next/navigation";
 
@@ -306,7 +306,13 @@ export default function CompaniesPage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && <Spinner size="lg" label="Loading companies..." />}
+        {isLoading && (
+          <div className="grid gap-4 md:gap-6">
+            {Array.from({ length: pagination.per_page }).map((_, idx) => (
+              <CompanyCardSkeleton key={idx} />
+            ))}
+          </div>
+        )}
 
         {/* Error State */}
         {error && !isLoading && (

@@ -108,6 +108,7 @@ const CompanyOverview: React.FC = () => {
             errorData.detail === "Could not validate credentials!"
           ) {
             showToast("Token has expired! Please sign in!", "info");
+            logout();
             setCompany(null);
             storeRedirectUrl();
             router.push("/auth/signin");
