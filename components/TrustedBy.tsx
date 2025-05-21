@@ -47,7 +47,7 @@ const InfiniteScrollRow: React.FC<{
   reverse?: boolean;
   duration?: number;
   keyPrefix: string;
-}> = ({ items, reverse = false, duration = 60, keyPrefix }) => (
+}> = ({ items, reverse = false, duration = 600, keyPrefix }) => (
   <motion.div
     className="flex"
     initial={{ x: reverse ? "-100%" : "0%" }}
@@ -104,7 +104,7 @@ const TrustedBy: React.FC = () => {
             <InfiniteScrollRow
               items={renderedLogos}
               reverse={false}
-              duration={120}
+              duration={1200}
               keyPrefix="row1"
             />
           </div>
@@ -112,7 +112,7 @@ const TrustedBy: React.FC = () => {
             <InfiniteScrollRow
               items={renderedLogos2}
               reverse={true}
-              duration={100}
+              duration={1000}
               keyPrefix="row2"
             />
           </div>
@@ -120,7 +120,7 @@ const TrustedBy: React.FC = () => {
             <InfiniteScrollRow
               items={renderedLogos3}
               reverse={false}
-              duration={140}
+              duration={1400}
               keyPrefix="row3"
             />
           </div>
