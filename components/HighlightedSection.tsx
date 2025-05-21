@@ -136,12 +136,7 @@ const HighlightedSection = () => {
         setLoading(false);
       }
     };
-
-    const startTime = new Date();
     fetchCompanies();
-    const endTime = new Date();
-    const timeUsedMs = endTime.getTime() - startTime.getTime();
-    console.log(`Time used: ${timeUsedMs / 1000} s`);
   }, []);
 
   const handleScroll = (direction: "left" | "right") => {
@@ -295,7 +290,15 @@ const HighlightedSection = () => {
         </div>
 
         {/* Loading state */}
-        {loading && <Spinner label="Loading companies..." size="lg" />}
+        {loading && (
+          <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 py-2 md:pb-14">
+            {Array(3)
+              .fill(0)
+              .map((_, i) => (
+                <CompanyCardSkeleton key={i} />
+              ))}
+          </div>
+        )}
 
         {/* Companies List */}
         <div
@@ -500,3 +503,20 @@ const HighlightedSection = () => {
 };
 
 export default HighlightedSection;
+const CompanyCardSkeleton = () => {
+  return (
+    <div className="min-w-[320px] w-[320px] sm:w-[360px] md:w-[380px] lg:w-[400px] shrink-0 border border-gray-200 dark:border-gray-800 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse p-6">
+      <div className="flex items-start gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-gray-300 dark:bg-gray-700"></div>
+        <div className="flex-1 space-y-2 py-1">
+          <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="mt-4 space-y-3">
+        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded"></div>
+        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6"></div>
+      </div>
+    </div>
+  );
+};
