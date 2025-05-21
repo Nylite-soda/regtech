@@ -325,13 +325,15 @@ export default function CompanyProfilePage({
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-white/10 flex items-center justify-center">
                 {company.logo ? (
-                  <Image
-                    src={company.logo}
-                    alt={`${company.name} logo`}
-                    width={80}
-                    height={80}
-                    className="rounded-lg object-contain"
-                  />
+                  <div className="rounded-lg h-full w-full flex items-center justify-center py-1 px-2 dark:!bg-[#fcf8f8] bg-white">
+                    <Image
+                      src={company.logo}
+                      alt={`${company.name} logo`}
+                      width={80}
+                      height={80}
+                      className="rounded-lg object-contain"
+                    />
+                  </div>
                 ) : (
                   <Building2 className="w-8 h-8 md:w-10 md:h-10 text-white/80" />
                 )}

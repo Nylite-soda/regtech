@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "@/styles/md-editor.css";
 import { PageWrapper } from "@/components/layout/page-wrapper";
 import { NavigationProvider } from "@/components/navigation/navigation-context";
 import { ToastProvider } from "@/components/ui/toast-context";

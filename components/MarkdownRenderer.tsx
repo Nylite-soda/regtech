@@ -7,7 +7,7 @@ import "highlight.js/styles/github.css"; // import syntax highlighting style
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <div className="prose prose-lg mx-auto max-w-3xl p-6 font-sans text-base">
+    <div className="prose rounded-r-lg prose-lg mx-auto max-w-3xl p-6 font-sans text-base">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeHighlight]}

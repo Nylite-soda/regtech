@@ -222,7 +222,7 @@ export default function CompanyCard({
   const TableView = () => (
     <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_1fr_1fr_80px] items-center px-5 py-3 bg-white">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="h-10 w-10 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center">
+        <div className="h-10 w-10 flex-shrink-0 rounded-xl overflow-hidden dark:!bg-[#fcf8f8] bg-gray-50 flex items-center justify-center">
           {company.logo ? (
             <Image
               src={company.logo}

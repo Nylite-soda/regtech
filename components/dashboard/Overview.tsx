@@ -779,13 +779,15 @@ function CompanyListItem({ company }: { company: CompanyItem }) {
       <div className="space-y-1">
         <span className="flex gap-3">
           {company.logo ? (
-            <Image
-              src={company.logo}
-              alt="logo"
-              width={30}
-              height={30}
-              className="rounded-sm"
-            />
+            <div className="rounded-sm h-full w-full flex items-center justify-center dark:!bg-[#fcf8f8]">
+              <Image
+                src={company.logo}
+                alt="logo"
+                width={30}
+                height={30}
+                className="rounded-sm"
+              />
+            </div>
           ) : (
             <Building2 className="w-6 h-6" />
           )}
