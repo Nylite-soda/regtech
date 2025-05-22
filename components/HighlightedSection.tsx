@@ -343,7 +343,7 @@ const HighlightedSection = () => {
                 >
                   <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col min-h-[330px]">
                     {/* Header - Logo, Title, Niche */}
-                    <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <div
                         className={cn(
                           "w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
@@ -373,7 +373,7 @@ const HighlightedSection = () => {
                         <h3
                           className={cn(
                             "text-lg sm:text-xl md:text-2xl font-semibold",
-                            "text-gray-900 dark:text-white"
+                            "text-gray-900 dark:text-white line-clamp-2"
                           )}
                         >
                           {company.name || "Unnamed Company"}
